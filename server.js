@@ -11,7 +11,7 @@ const PORT = 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Imposta la directory per i file statici (dove si trovano i file Vue.js o HTML)
+// Imposta la directory per i file statici
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Inizializza il database SQLite
@@ -23,7 +23,7 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
     }
 });
 
-// Crea la tabella "users" nel database
+// Crea le tabelle "users" e "products" nel database
 db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
@@ -34,49 +34,141 @@ db.serialize(() => {
             dob TEXT
         )
     `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT,
+            size TEXT,
+            color TEXT,
+            brand TEXT,
+            condition TEXT
+        )
+    `);
 });
 
-// Route principale per il caricamento della pagina di Vue.js o HTML
+// Route principale
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
-    console.log('Richiesta ricevuta al server:', req.body); // Log dei dati ricevuti dal frontend
-
     const { name, email, password, dob } = req.body;
     if (!name || !email || !password || !dob) {
-        console.log('Campi mancanti'); // Log in caso di campi mancanti
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
     try {
-        // Hash della password
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log('Password criptata:', hashedPassword);
-
-        // Inserisce i dati dell'utente nel database
         db.run(
             `INSERT INTO users (name, email, password, dob) VALUES (?, ?, ?, ?)`,
             [name, email, hashedPassword, dob],
             function (err) {
                 if (err) {
-                    console.error('Errore durante l\'inserimento nel database:', err.message);
                     if (err.message.includes('UNIQUE constraint failed')) {
                         return res.status(400).json({ message: 'Email già in uso' });
                     } else {
-                        return res.status(500).json({ message: 'Errore durante la registrazione', error: err });
+                        return res.status(500).json({ message: 'Errore durante la registrazione' });
                     }
                 }
-                console.log('Utente registrato con ID:', this.lastID); // Log per confermare l'inserimento
                 res.status(200).json({ message: 'Registrazione avvenuta con successo!' });
             }
         );
     } catch (error) {
-        console.error('Errore nel server:', error.message);
         res.status(500).json({ message: 'Errore nel server', error });
     }
+});
+
+// Route per gestire il login
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: 'Email e password sono obbligatorie.' });
+    }
+
+    db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, row) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Errore nel server.' });
+        }
+        if (!row) {
+            return res.status(401).json({ success: false, message: 'Email o password errati.' });
+        }
+
+        const match = await bcrypt.compare(password, row.password);
+        if (!match) {
+            return res.status(401).json({ success: false, message: 'Email o password errati.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Login avvenuto con successo!' });
+    });
+});
+
+// Route per aggiungere un nuovo prodotto
+app.post('/products', (req, res) => {
+    const { category, size, color, brand, condition } = req.body;
+
+    if (!category || !size || !color || !brand || !condition) {
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+    }
+
+    db.run(`INSERT INTO products (category, size, color, brand, condition) VALUES (?, ?, ?, ?, ?)`,
+        [category, size, color, brand, condition],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Errore durante l\'aggiunta del prodotto.' });
+            }
+            res.status(201).json({ message: 'Prodotto aggiunto con successo!', id: this.lastID });
+        }
+    );
+});
+
+// Route per ottenere tutti i prodotti
+app.get('/products', (req, res) => {
+    db.all(`SELECT * FROM products`, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel recupero dei prodotti.' });
+        }
+        res.status(200).json({ products: rows });
+    });
+});
+
+// Route per rimuovere un prodotto
+app.delete('/products/:id', (req, res) => {
+    const productId = req.params.id;
+    db.run(`DELETE FROM products WHERE id = ?`, productId, function(err) {
+        if (err) {
+            return res.status(500).json({ message: 'Errore durante la rimozione del prodotto.' });
+        }
+        res.status(200).json({ message: 'Prodotto rimosso con successo!' });
+    });
+});
+
+// Route per ottenere un prodotto specifico
+app.get('/products/:id', (req, res) => {
+    const productId = req.params.id;
+    db.get(`SELECT * FROM products WHERE id = ?`, [productId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel recupero del prodotto.' });
+        }
+        res.status(200).json({ product: row });
+    });
+});
+
+// Route per aggiornare un prodotto
+app.put('/products/:id', (req, res) => {
+    const { category, size, color, brand, condition } = req.body;
+    const productId = req.params.id;
+
+    db.run(`UPDATE products SET category = ?, size = ?, color = ?, brand = ?, condition = ? WHERE id = ?`,
+        [category, size, color, brand, condition, productId],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Errore durante l\'aggiornamento del prodotto.' });
+            }
+            res.status(200).json({ message: 'Prodotto aggiornato con successo!' });
+        }
+    );
 });
 
 // Avvia il server

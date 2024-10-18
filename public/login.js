@@ -20,9 +20,10 @@ new Vue({
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                if (data.message === 'Login avvenuto con successo!') {
+                if (data.success) {
                     window.location.href = 'products.html'; // Reindirizza alla pagina dei prodotti
+                } else {
+                    alert(data.message); // Mostra il messaggio di errore
                 }
             })
             .catch(err => alert('Errore: ' + err.message));

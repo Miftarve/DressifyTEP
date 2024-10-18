@@ -8,19 +8,54 @@ new Vue({
             brand: '',
             condition: ''
         },
-        products: []
+        products: [] // Inizializza un array vuoto per i prodotti
     },
     methods: {
+        loadProducts() {
+            fetch('/products')
+                .then(response => {
+                    console.log(response); // Log della risposta
+                    if (!response.ok) {
+                        throw new Error('Errore nel caricamento dei prodotti');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.products = data.products; // Aggiorna l'array dei prodotti con i dati ricevuti
+                })
+                .catch(err => alert('Errore nel caricamento dei prodotti: ' + err.message));
+        },
         addProduct() {
-            if (this.newProduct.category && this.newProduct.size && this.newProduct.color && this.newProduct.brand && this.newProduct.condition) {
-                this.products.push({ ...this.newProduct });
+            fetch('/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.newProduct)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                this.loadProducts(); // Ricarica i prodotti dopo aver aggiunto uno nuovo
                 this.resetForm();
-            } else {
-                alert('Per favore compila tutti i campi.');
-            }
+            })
+            .catch(err => alert('Errore nell\'aggiunta del prodotto: ' + err.message));
         },
         removeProduct(index) {
-            this.products.splice(index, 1);
+            const productId = this.products[index].id; // Assicurati che ci sia un ID per il prodotto
+            fetch(`/products/${productId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                this.loadProducts(); // Ricarica i prodotti dopo aver rimosso uno
+            })
+            .catch(err => alert('Errore nella rimozione del prodotto: ' + err.message));
+        },
+        editProduct(index) {
+            const productId = this.products[index].id; // Ottieni l'ID del prodotto
+            window.location.href = `edit-product.html?id=${productId}`; // Reindirizza alla pagina di modifica
         },
         resetForm() {
             this.newProduct = {
@@ -29,7 +64,10 @@ new Vue({
                 color: '',
                 brand: '',
                 condition: ''
-            };
+            }; // Resetta i campi del form
         }
+    },
+    created() {
+        this.loadProducts(); // Chiama loadProducts quando il componente è creato
     }
 });
