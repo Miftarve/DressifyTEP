@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Prodotti</title>
+    <link rel="stylesheet" href="prodotti.css">
+</head>
+<body>
+
+    <div id="app">
+        <div class="container">
+            <h1>Gestione Prodotti</h1>
+            <form @submit.prevent="addProduct">
+                <label for="category">Categoria</label>
+                <input type="text" v-model="newProduct.category" required>
+
+                <label for="size">Taglia</label>
+                <input type="text" v-model="newProduct.size" required>
+
+                <label for="color">Colore</label>
+                <input type="text" v-model="newProduct.color" required>
+
+                <label for="brand">Marca</label>
+                <input type="text" v-model="newProduct.brand" required>
+
+                <label for="condition">Condizione</label>
+                <select v-model="newProduct.condition" required>
+                    <option value="nuovo">Nuovo</option>
+                    <option value="usato">Usato</option>
+                </select>
+
+                <button type="submit">Aggiungi Prodotto</button>
+            </form>
+
+            <h2>Lista Prodotti</h2>
+            <ul>
+                <li v-for="(product, index) in products" :key="index">
+                    {{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - {{ product.condition }}
+                    <button @click="removeProduct(index)">Rimuovi</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="products.js"></script>
+
+</body>
+</html>

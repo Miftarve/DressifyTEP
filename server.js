@@ -43,8 +43,13 @@ app.get('/', (req, res) => {
 
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
+    console.log('Richiesta ricevuta al server:', req.body); // Log dei dati ricevuti dal frontend
+
     const { name, email, password, dob } = req.body;
-    console.log('Dati ricevuti dal client:', req.body); // Log dei dati ricevuti
+    if (!name || !email || !password || !dob) {
+        console.log('Campi mancanti'); // Log in caso di campi mancanti
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
+    }
 
     try {
         // Hash della password
@@ -57,15 +62,14 @@ app.post('/register', async (req, res) => {
             [name, email, hashedPassword, dob],
             function (err) {
                 if (err) {
+                    console.error('Errore durante l\'inserimento nel database:', err.message);
                     if (err.message.includes('UNIQUE constraint failed')) {
-                        console.error('Email già esistente:', email);
                         return res.status(400).json({ message: 'Email già in uso' });
                     } else {
-                        console.error('Errore durante l\'inserimento nel database:', err.message);
                         return res.status(500).json({ message: 'Errore durante la registrazione', error: err });
                     }
                 }
-                console.log('Utente registrato con ID:', this.lastID); // Log per vedere se l'inserimento è andato a buon fine
+                console.log('Utente registrato con ID:', this.lastID); // Log per confermare l'inserimento
                 res.status(200).json({ message: 'Registrazione avvenuta con successo!' });
             }
         );
@@ -73,29 +77,6 @@ app.post('/register', async (req, res) => {
         console.error('Errore nel server:', error.message);
         res.status(500).json({ message: 'Errore nel server', error });
     }
-});
-
-// Route per gestire il login
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-
-    // Verifica se l'utente esiste nel database
-    db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
-        if (err) {
-            return res.status(500).json({ message: 'Errore durante il login', error: err });
-        }
-        if (!user) {
-            return res.status(400).json({ message: 'Email non trovata' });
-        }
-
-        // Confronta la password fornita con quella salvata
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) {
-            return res.status(400).json({ message: 'Password errata' });
-        }
-
-        res.status(200).json({ message: 'Login avvenuto con successo!', user });
-    });
 });
 
 // Avvia il server

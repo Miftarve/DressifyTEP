@@ -2,20 +2,16 @@ new Vue({
     el: '#app',
     data: {
         email: '',
-        password: '',
-        name: '',
-        dob: ''
+        password: ''
     },
     methods: {
-        handleSubmit() {
+        handleLogin() {
             const data = {
                 email: this.email,
-                password: this.password,
-                name: this.name,
-                dob: this.dob
+                password: this.password
             };
 
-            fetch('/register', {
+            fetch('/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -25,8 +21,8 @@ new Vue({
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                if (data.message === 'Registrazione avvenuta con successo!') {
-                    this.email = this.password = this.name = this.dob = '';
+                if (data.message === 'Login avvenuto con successo!') {
+                    window.location.href = 'products.html'; // Reindirizza alla pagina dei prodotti
                 }
             })
             .catch(err => alert('Errore: ' + err.message));
