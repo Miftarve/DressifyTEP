@@ -171,6 +171,37 @@ app.put('/products/:id', (req, res) => {
     );
 });
 
+// Route per ottenere un prodotto specifico
+app.get('/get-product/:id', (req, res) => {
+    const productId = req.params.id;
+    db.get(`SELECT * FROM products WHERE id = ?`, [productId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel recupero del prodotto.' });
+        }
+        if (!row) {
+            return res.status(404).json({ message: 'Prodotto non trovato.' });
+        }
+        res.status(200).json({ product: row });
+    });
+});
+
+// Route per aggiornare un prodotto
+app.put('/products/:id', (req, res) => {
+    const { category, size, color, brand, condition } = req.body;
+    const productId = req.params.id;
+
+    db.run(`UPDATE products SET category = ?, size = ?, color = ?, brand = ?, condition = ? WHERE id = ?`,
+        [category, size, color, brand, condition, productId],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Errore durante l\'aggiornamento del prodotto.' });
+            }
+            res.status(200).json({ message: 'Prodotto aggiornato con successo!' });
+        }
+    );
+});
+
+
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);

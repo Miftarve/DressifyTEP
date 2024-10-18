@@ -1,4 +1,4 @@
-new Vue({
+Vue({
     el: '#app',
     data: {
         // Dati per la registrazione

@@ -93,3 +93,22 @@ button:hover {
 .remove-button:hover {
     background-color: #c9302c;
 }
+
+
+.button-group button {
+    margin-right: 10px; /* Spazio tra i pulsanti */
+}
+
+.small-button {
+    width: auto; /* Rimuove la larghezza al 100% */
+    padding: 5px 10px; /* Riduce il padding */
+    font-size: 0.9em; /* Riduce la dimensione del testo */
+}
+
+.button-group {
+    display: flex;
+    margin: 10px;
+    justify-content: space-between; /* Separa i pulsanti */
+    margin-top: 20px;
+}
+
