@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <div class="container">
+            <h1>Login</h1>
+            <form @submit.prevent="handleLogin">
+                <label for="email">Email</label>
+                <input type="email" v-model="email" required>
+
+                <label for="password">Password</label>
+                <input type="password" v-model="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Non hai un account? <a href="index.html">Registrati qui</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="login.js"></script>
+
+</body>
+</html>
