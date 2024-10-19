@@ -1,0 +1,114 @@
+/* Stile base per il corpo */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Contenitore principale */
+#app {
+    max-width: 1200px;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Intestazione principale */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Sezione di ricerca e filtri */
+.search-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-filters input,
+.search-filters select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-right: 10px;
+    flex: 1;
+}
+
+.search-filters select {
+    flex: 0.2; /* Dimensione fissa per i filtri */
+}
+
+/* Lista dei prodotti */
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.product {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    transition: box-shadow 0.3s ease;
+}
+
+.product:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product h3 {
+    margin: 0;
+    color: #007BFF; /* Colore del marchio */
+}
+
+.product p {
+    margin: 5px 0;
+    color: #666;
+}
+
+/* Pulsanti */
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Sezione Carrello */
+.cart {
+    margin-top: 40px;
+    background: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.cart h2 {
+    margin: 0 0 15px;
+}
+
+/* Responsività */
+@media (max-width: 768px) {
+    .search-filters {
+        flex-direction: column;
+    }
+
+    .search-filters input,
+    .search-filters select {
+        margin-bottom: 10px;
+    }
+}

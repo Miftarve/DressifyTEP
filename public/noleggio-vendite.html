@@ -1,1 +1,79 @@
-<h1>hello</h1>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noleggio e Vendita</title>
+    <link rel="stylesheet" href="noleggio-vendite.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Noleggio e Vendita</h1>
+
+        <!-- Ricerca e Filtri -->
+        <div class="search-filters">
+            <input type="text" v-model="searchQuery" placeholder="Cerca per nome o descrizione">
+            <select v-model="filterCondition">
+                <option value="">Tutte le condizioni</option>
+                <option value="new">Nuovo</option>
+                <option value="used">Usato</option>
+            </select>
+            <select v-model="filterSize">
+                <option value="">Tutte le taglie</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <!-- Aggiungere altre taglie se necessario -->
+            </select>
+            <select v-model="sortBy">
+                <option value="price">Ordina per prezzo</option>
+                <option value="brand">Ordina per marca</option>
+            </select>
+        </div>
+
+        <!-- Lista prodotti -->
+        <div class="products">
+            <div v-for="product in filteredProducts" :key="product.id" class="product">
+                <h3>{{ product.brand }} - {{ product.category }}</h3>
+                <p>{{ product.size }} - {{ product.condition }}</p>
+                <p>{{ product.price }}€</p>
+
+                <!-- Noleggio -->
+                <div>
+                    <label>Durata del noleggio (giorni):</label>
+                    <input type="number" v-model.number="rentalDuration" min="1">
+                    <p>Prezzo noleggio: {{ calculateRentalPrice(product.price) }}€</p>
+                    <button @click="rentProduct(product)">Noleggia</button>
+                </div>
+
+                <!-- Acquisto -->
+                <button @click="buyProduct(product)">Compra</button>
+
+                <!-- Contrattazione -->
+                <div>
+                    <input type="number" v-model.number="proposedPrice" placeholder="Proponi un prezzo">
+                    <button @click="proposePrice(product)">Invia proposta</button>
+                </div>
+
+                <button @click="addToCart(product)">Aggiungi al carrello</button>
+            </div>
+        </div>
+
+        <!-- Carrello -->
+        <div class="cart">
+            <h2>Carrello</h2>
+            <div v-for="item in cart" :key="item.id">
+                <p>{{ item.brand }} - {{ item.category }} ({{ item.size }})</p>
+                <button @click="removeFromCart(item)">Rimuovi</button>
+            </div>
+        </div>
+
+        <!-- Salvataggio ricerche preferite -->
+        <button @click="saveSearch">Salva ricerca</button>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="noleggio-vendita.js"></script>
+</body>
+</html>

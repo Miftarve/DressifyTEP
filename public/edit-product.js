@@ -7,7 +7,8 @@ new Vue({
             size: '',
             color: '',
             brand: '',
-            condition: ''
+            condition: '',
+            price: '' // Aggiunto campo prezzo
         }
     },
     methods: {
@@ -31,6 +32,9 @@ new Vue({
         },
 
         updateProduct() {
+            // Aggiungi " euro" al prezzo prima di inviare al server
+            this.product.price = `${this.product.price} euro`; 
+        
             fetch(`/products/${this.product.id}`, { // Modificato l'endpoint
                 method: 'PUT',
                 headers: {
@@ -49,7 +53,7 @@ new Vue({
                 window.location.href = 'products.html'; // Reindirizza alla lista dei prodotti
             })
             .catch(err => alert('Errore: ' + err.message));
-        },
+        },        
 
         goBack() {
             window.location.href = 'products.html'; // Torna alla lista dei prodotti

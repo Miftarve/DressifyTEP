@@ -6,10 +6,11 @@ new Vue({
             size: '',
             color: '',
             brand: '',
-            condition: ''
+            condition: '',
+            price: '' // Aggiungi il campo price qui
         },
-        products: [] // Inizializza un array vuoto per i prodotti
-    },
+        products: []
+    },    
     methods: {
         loadProducts() {
             fetch('/products')

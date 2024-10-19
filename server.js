@@ -42,9 +42,19 @@ db.serialize(() => {
             size TEXT,
             color TEXT,
             brand TEXT,
-            condition TEXT
+            condition TEXT,
+            price REAL
         )
     `);
+});
+
+// Modifica la struttura della tabella "products" per includere il campo "price"
+db.run(`ALTER TABLE products ADD COLUMN price REAL`, (err) => {
+    if (err && !err.message.includes("duplicate column name")) {
+        console.error('Errore nell\'aggiunta della colonna price:', err.message);
+    } else {
+        console.log('Colonna "price" aggiunta con successo (o già esistente)');
+    }
 });
 
 // Route principale
@@ -106,14 +116,14 @@ app.post('/login', (req, res) => {
 
 // Route per aggiungere un nuovo prodotto
 app.post('/products', (req, res) => {
-    const { category, size, color, brand, condition } = req.body;
+    const { category, size, color, brand, condition, price } = req.body;
 
-    if (!category || !size || !color || !brand || !condition) {
+    if (!category || !size || !color || !brand || !condition || price == null) {
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
     }
 
-    db.run(`INSERT INTO products (category, size, color, brand, condition) VALUES (?, ?, ?, ?, ?)`,
-        [category, size, color, brand, condition],
+    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`,
+        [category, size, color, brand, condition, price],
         function(err) {
             if (err) {
                 return res.status(500).json({ message: 'Errore durante l\'aggiunta del prodotto.' });
@@ -133,46 +143,10 @@ app.get('/products', (req, res) => {
     });
 });
 
-// Route per rimuovere un prodotto
-app.delete('/products/:id', (req, res) => {
-    const productId = req.params.id;
-    db.run(`DELETE FROM products WHERE id = ?`, productId, function(err) {
-        if (err) {
-            return res.status(500).json({ message: 'Errore durante la rimozione del prodotto.' });
-        }
-        res.status(200).json({ message: 'Prodotto rimosso con successo!' });
-    });
-});
+
 
 // Route per ottenere un prodotto specifico
 app.get('/products/:id', (req, res) => {
-    const productId = req.params.id;
-    db.get(`SELECT * FROM products WHERE id = ?`, [productId], (err, row) => {
-        if (err) {
-            return res.status(500).json({ message: 'Errore nel recupero del prodotto.' });
-        }
-        res.status(200).json({ product: row });
-    });
-});
-
-// Route per aggiornare un prodotto
-app.put('/products/:id', (req, res) => {
-    const { category, size, color, brand, condition } = req.body;
-    const productId = req.params.id;
-
-    db.run(`UPDATE products SET category = ?, size = ?, color = ?, brand = ?, condition = ? WHERE id = ?`,
-        [category, size, color, brand, condition, productId],
-        function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Errore durante l\'aggiornamento del prodotto.' });
-            }
-            res.status(200).json({ message: 'Prodotto aggiornato con successo!' });
-        }
-    );
-});
-
-// Route per ottenere un prodotto specifico
-app.get('/get-product/:id', (req, res) => {
     const productId = req.params.id;
     db.get(`SELECT * FROM products WHERE id = ?`, [productId], (err, row) => {
         if (err) {
@@ -187,11 +161,11 @@ app.get('/get-product/:id', (req, res) => {
 
 // Route per aggiornare un prodotto
 app.put('/products/:id', (req, res) => {
-    const { category, size, color, brand, condition } = req.body;
+    const { category, size, color, brand, condition, price } = req.body;
     const productId = req.params.id;
 
-    db.run(`UPDATE products SET category = ?, size = ?, color = ?, brand = ?, condition = ? WHERE id = ?`,
-        [category, size, color, brand, condition, productId],
+    db.run(`UPDATE products SET category = ?, size = ?, color = ?, brand = ?, condition = ?, price = ? WHERE id = ?`,
+        [category, size, color, brand, condition, price, productId],
         function(err) {
             if (err) {
                 return res.status(500).json({ message: 'Errore durante l\'aggiornamento del prodotto.' });
@@ -199,6 +173,17 @@ app.put('/products/:id', (req, res) => {
             res.status(200).json({ message: 'Prodotto aggiornato con successo!' });
         }
     );
+});
+
+// Route per rimuovere un prodotto
+app.delete('/products/:id', (req, res) => {
+    const productId = req.params.id;
+    db.run(`DELETE FROM products WHERE id = ?`, productId, function(err) {
+        if (err) {
+            return res.status(500).json({ message: 'Errore durante la rimozione del prodotto.' });
+        }
+        res.status(200).json({ message: 'Prodotto rimosso con successo!' });
+    });
 });
 
 

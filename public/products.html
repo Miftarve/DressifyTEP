@@ -43,6 +43,11 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label for="price">Prezzo</label>
+                        <input type="number" v-model="newProduct.price" required placeholder="Prezzo in euro">
+                    </div>
+
                     <button type="submit">Aggiungi Prodotto</button>
                 </form>
 
@@ -50,7 +55,7 @@
                     <h2>Lista Prodotti</h2>
                     <ul>
                         <li v-for="(product, index) in products" :key="index" class="product-item">
-                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - {{ product.condition }}</span>
+                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - {{ product.condition }} - €{{ product.price }}</span>
                             <div class="button-group">
                                 <button @click="editProduct(index)">Modifica</button>
                                 <button @click="removeProduct(index)" class="remove-button">Rimuovi</button>
