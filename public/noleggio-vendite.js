@@ -1,48 +1,32 @@
 new Vue({
-    el: '#app',
+    el: '.container',
     data: {
-        products: [],
+        products: [
+            { id: 1, brand: 'Temperley London', category: 'Abito Lungo', size: '36', condition: 'Nuovo', price: 2295, image: 'path/to/image1.jpg' },
+            { id: 2, brand: 'Ilkyaz Ozel', category: 'Abito Piume', size: '38', condition: 'Nuovo', price: 1000, image: 'path/to/image2.jpg' },
+            { id: 3, brand: 'Badgley Mischka', category: 'Completo Velluto', size: '40', condition: 'Usato', price: 1177, image: 'path/to/image3.jpg' }
+        ],
         cart: [],
         searchQuery: '',
-        filterCondition: '',
+        filterPrice: 2000,
         filterSize: '',
         sortBy: '',
         rentalDuration: 1,
-        proposedPrice: 0,
-        savedSearches: []
+        proposedPrice: 0
     },
     computed: {
         filteredProducts() {
             return this.products
-                .filter(product => {
-                    return (
-                        (!this.filterCondition || product.condition === this.filterCondition) &&
-                        (!this.filterSize || product.size === this.filterSize) &&
-                        (product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                        product.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
-                    );
-                })
-                .sort((a, b) => {
-                    if (this.sortBy === 'price') {
-                        return a.price - b.price;
-                    } else if (this.sortBy === 'brand') {
-                        return a.brand.localeCompare(b.brand);
-                    }
-                    return 0;
-                });
+                .filter(product => product.price <= this.filterPrice &&
+                    (!this.filterSize || product.size === this.filterSize) &&
+                    (product.brand.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                     product.category.toLowerCase().includes(this.searchQuery.toLowerCase())))
+                .sort((a, b) => this.sortBy === 'price' ? a.price - b.price : a.brand.localeCompare(b.brand));
         }
     },
     methods: {
-        fetchProducts() {
-            fetch('/products')
-                .then(response => response.json())
-                .then(data => {
-                    this.products = data.products;
-                })
-                .catch(err => console.error('Errore:', err));
-        },
-        calculateRentalPrice(basePrice) {
-            return (basePrice * this.rentalDuration * 0.1).toFixed(2); // 10% del prezzo base per giorno
+        calculateRentalPrice(price) {
+            return (price * this.rentalDuration * 0.1).toFixed(2);
         },
         rentProduct(product) {
             alert(`Hai noleggiato ${product.brand} per ${this.rentalDuration} giorni.`);
@@ -51,23 +35,16 @@ new Vue({
             alert(`Hai acquistato ${product.brand} per ${product.price}€.`);
         },
         proposePrice(product) {
-            alert(`Hai proposto ${this.proposedPrice}€ per ${product.brand}.`);
+            alert(`Proposta inviata: ${this.proposedPrice}€ per ${product.brand}.`);
         },
         addToCart(product) {
             this.cart.push(product);
         },
         removeFromCart(item) {
-            this.cart = this.cart.filter(product => product.id !== item.id);
+            this.cart = this.cart.filter(p => p.id !== item.id);
         },
         saveSearch() {
-            const search = {
-                query: this.searchQuery,
-                condition: this.filterCondition,
-                size: this.filterSize,
-                sortBy: this.sortBy
-            };
-            this.savedSearches.push(search);
-            alert('Ricerca salvata.');
+            alert('Ricerca salvata con successo!');
         }
     },
     mounted() {

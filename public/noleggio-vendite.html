@@ -3,74 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noleggio e Vendita</title>
+    <title>Noleggio e Vendita - Fashion Store</title>
     <link rel="stylesheet" href="noleggio-vendite.css">
 </head>
 <body>
-    <div id="app">
-        <h1>Noleggio e Vendita</h1>
+    <header class="navbar">
+        <h1>Drexcode - Dress Your Code</h1>
+    </header>
 
-        <!-- Ricerca e Filtri -->
-        <div class="search-filters">
+    <div class="container">
+        <!-- Sidebar Filters -->
+        <aside class="filters">
+            <h2>Filtra per</h2>
             <input type="text" v-model="searchQuery" placeholder="Cerca per nome o descrizione">
-            <select v-model="filterCondition">
-                <option value="">Tutte le condizioni</option>
-                <option value="new">Nuovo</option>
-                <option value="used">Usato</option>
-            </select>
+
+            <label>Prezzo Noleggio (Max):</label>
+            <input type="range" min="10" max="2000" step="10" v-model="filterPrice">
+            <p>{{ filterPrice }} €</p>
+
+            <label>Taglia:</label>
             <select v-model="filterSize">
                 <option value="">Tutte le taglie</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <!-- Aggiungere altre taglie se necessario -->
+                <option value="36">36</option>
+                <option value="38">38</option>
+                <option value="40">40</option>
+                <option value="42">42</option>
             </select>
+
+            <label>Ordina per:</label>
             <select v-model="sortBy">
-                <option value="price">Ordina per prezzo</option>
-                <option value="brand">Ordina per marca</option>
+                <option value="price">Prezzo</option>
+                <option value="brand">Marca</option>
+                <option value="condition">Condizione</option>
             </select>
-        </div>
 
-        <!-- Lista prodotti -->
-        <div class="products">
-            <div v-for="product in filteredProducts" :key="product.id" class="product">
-                <h3>{{ product.brand }} - {{ product.category }}</h3>
-                <p>{{ product.size }} - {{ product.condition }}</p>
-                <p>{{ product.price }}€</p>
+            <button @click="saveSearch">Salva Ricerca</button>
+        </aside>
 
-                <!-- Noleggio -->
-                <div>
-                    <label>Durata del noleggio (giorni):</label>
-                    <input type="number" v-model.number="rentalDuration" min="1">
-                    <p>Prezzo noleggio: {{ calculateRentalPrice(product.price) }}€</p>
+        <!-- Product List -->
+        <main class="products">
+            <div v-for="product in filteredProducts" :key="product.id" class="product-card">
+                <img :src="product.image" :alt="product.name">
+                <h3>{{ product.brand }}</h3>
+                <p>{{ product.category }} - Taglia: {{ product.size }}</p>
+                <p>Condizione: {{ product.condition }}</p>
+                <p>Noleggio: {{ calculateRentalPrice(product.price) }}€ (per {{ rentalDuration }} giorni)</p>
+                <p>Prezzo Boutique: {{ product.price }}€</p>
+
+                <div class="actions">
+                    <!-- Rental -->
+                    <label>Durata Noleggio (giorni):</label>
+                    <input type="number" v-model.number="rentalDuration" min="1" max="30">
                     <button @click="rentProduct(product)">Noleggia</button>
-                </div>
 
-                <!-- Acquisto -->
-                <button @click="buyProduct(product)">Compra</button>
+                    <!-- Purchase -->
+                    <button @click="buyProduct(product)">Compra</button>
 
-                <!-- Contrattazione -->
-                <div>
+                    <!-- Bargain -->
                     <input type="number" v-model.number="proposedPrice" placeholder="Proponi un prezzo">
-                    <button @click="proposePrice(product)">Invia proposta</button>
+                    <button @click="proposePrice(product)">Invia Proposta</button>
+
+                    <button @click="addToCart(product)">Aggiungi al Carrello</button>
                 </div>
-
-                <button @click="addToCart(product)">Aggiungi al carrello</button>
             </div>
-        </div>
+        </main>
 
-        <!-- Carrello -->
-        <div class="cart">
+        <!-- Cart -->
+        <aside class="cart">
             <h2>Carrello</h2>
-            <div v-for="item in cart" :key="item.id">
+            <div v-for="item in cart" :key="item.id" class="cart-item">
                 <p>{{ item.brand }} - {{ item.category }} ({{ item.size }})</p>
                 <button @click="removeFromCart(item)">Rimuovi</button>
             </div>
-        </div>
-
-        <!-- Salvataggio ricerche preferite -->
-        <button @click="saveSearch">Salva ricerca</button>
-
+        </aside>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
