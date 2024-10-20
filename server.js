@@ -143,6 +143,21 @@ app.get('/api/products', (req, res) => {
     });
 });
 
+// Route per ottenere un prodotto specifico per ID
+app.get('/api/products/:id', (req, res) => {
+    const productId = req.params.id;
+    db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Prodotto non trovato' });
+        }
+        res.status(200).json(row);
+    });
+});
+
+
 
 
 // Route per ottenere un prodotto specifico

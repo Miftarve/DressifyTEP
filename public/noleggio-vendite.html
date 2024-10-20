@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noleggio e Vendita Abbigliamento</title>
     <link rel="stylesheet" href="noleggio-vendite.css">
 </head>
+
 <body>
     <header>
         <h1>Noleggio e Vendita Abbigliamento</h1>
@@ -18,26 +20,23 @@
                     <h2>Ricerca e Filtri</h2>
                     <div id="ricerca">
                         <h3>Ricerca</h3>
-                        <input type="text" id="ricerca-capo" name="ricerca-capo" placeholder="Cerca per nome o descrizione">
+                        <input type="text" id="ricerca-capo" name="ricerca-capo"
+                            placeholder="Cerca per nome o descrizione">
                         <button>Cerca</button>
                     </div>
-                    <div id="filtri">
-                        <h3>Filtri</h3>
-                        <label for="prezzo">Prezzo:</label>
-                        <input type="range" id="prezzo" name="prezzo" min="0" max="1000">
-                        <label for="taglia">Taglia:</label>
-                        <select id="taglia" name="taglia">
-                            <option value="s">S</option>
-                            <option value="m">M</option>
-                            <option value="l">L</option>
-                        </select>
-                        <label for="marca">Marca:</label>
-                        <input type="text" id="marca" name="marca">
-                        <label for="condizioni">Condizioni:</label>
-                        <select id="condizioni" name="condizioni">
-                            <option value="nuovo">Nuovo</option>
-                            <option value="usato">Usato</option>
-                        </select>
+                    <h3>Filtri</h3>
+                    <div>
+                        <!-- Filtro per nome -->
+                        <input type="text" id="nameFilter" placeholder="Nome del prodotto">
+                        <button onclick="filterByName(document.getElementById('nameFilter').value)">Cerca per
+                            Nome</button>
+
+                        <!-- Filtro per prezzo -->
+                        <input type="number" id="minPriceFilter" placeholder="Prezzo Minimo">
+                        <input type="number" id="maxPriceFilter" placeholder="Prezzo Massimo">
+                        <button
+                            onclick="filterByPrice(document.getElementById('minPriceFilter').value, document.getElementById('maxPriceFilter').value)">Cerca
+                            per Prezzo</button>
                     </div>
                     <div id="salvataggio">
                         <h3>Salvataggio</h3>
@@ -63,5 +62,90 @@
         </section>
     </main>
     <script src="noleggio-vendite.js"></script>
+    <script>
+        // Carrello che memorizza i prodotti aggiunti
+        let cart = [];
+
+        // Funzione per aggiungere un prodotto al carrello
+        function addToCart(productId) {
+            fetch(`/api/products/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    cart.push(product);
+                    updateCart();
+                });
+        }
+
+        // Funzione per aggiornare la visualizzazione del carrello
+        function updateCart() {
+            const cartContainer = document.getElementById('cartItems');
+            cartContainer.innerHTML = '';  // Pulizia degli elementi precedenti
+
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.innerHTML = `${item.category} - Prezzo: ${item.price} € <button onclick="removeFromCart(${item.id})">Rimuovi</button>`;
+                cartContainer.appendChild(cartItem);
+            });
+        }
+
+        // Funzione per rimuovere un prodotto dal carrello
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        // Funzione per visualizzare tutti i prodotti
+        function fetchAllProducts() {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    displayProducts(data.products);
+                });
+        }
+
+        // Funzione per filtrare i prodotti per nome
+        function filterByName() {
+            const nameFilter = document.getElementById('nameFilter').value;
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    const filteredProducts = data.products.filter(product => product.category.toLowerCase().includes(nameFilter.toLowerCase()));
+                    displayProducts(filteredProducts);
+                });
+        }
+
+        // Funzione per filtrare i prodotti per prezzo
+        function filterByPrice() {
+            const minPrice = document.getElementById('minPriceFilter').value || 0;
+            const maxPrice = document.getElementById('maxPriceFilter').value || Number.MAX_VALUE;
+
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    const filteredProducts = data.products.filter(product => product.price >= minPrice && product.price <= maxPrice);
+                    displayProducts(filteredProducts);
+                });
+        }
+
+        // Funzione per visualizzare i prodotti filtrati
+        function displayProducts(products) {
+            const productContainer = document.getElementById('productList');
+            productContainer.innerHTML = '';  // Pulizia della lista
+
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.innerHTML = `
+                    <h4>${product.category}</h4>
+                    <p>Prezzo: ${product.price} €</p>
+                    <button onclick="addToCart(${product.id})">Aggiungi al Carrello</button>
+                `;
+                productContainer.appendChild(productCard);
+            });
+        }
+
+        // Carica tutti i prodotti all'avvio
+        fetchAllProducts();
+    </script>
 </body>
+
 </html>
