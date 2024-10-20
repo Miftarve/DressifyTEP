@@ -48,30 +48,18 @@
             <div class="card" id="noleggio-vendita-card">
                 <section id="noleggio-vendita">
                     <h2>Noleggio e Vendita</h2>
-                    <div id="noleggio">
-                        <h3>Noleggio</h3>
-                        <label for="durata-noleggio">Durata del noleggio:</label>
-                        <input type="number" id="durata-noleggio" name="durata-noleggio" min="1" max="30">
-                        <button onclick="calcolaPrezzo()">Calcola Prezzo</button>
-                        <p id="prezzo-noleggio"></p>
-                    </div>
-                    <div id="acquisto">
-                        <h3>Acquisto</h3>
-                        <button>Compra Ora</button>
-                    </div>
-                    <div id="contrattazione">
-                        <h3>Contrattazione</h3>
-                        <label for="proposta-prezzo">Proposta di prezzo:</label>
-                        <input type="number" id="proposta-prezzo" name="proposta-prezzo">
-                        <button>Invia Proposta</button>
+                    <div id="prodotti-container">
+                        <!-- Qui verranno mostrate le card dei prodotti -->
                     </div>
                 </section>
             </div>
         </div>
         <section id="carrello">
             <h2>Carrello</h2>
-            <button>Aggiungi al Carrello</button>
-            <button>Rimuovi dal Carrello</button>
+            <div id="carrello-items">
+                <!-- Qui verranno mostrati gli oggetti nel carrello -->
+            </div>
+            <button id="rimuovi-carrello">Rimuovi dal Carrello</button>
         </section>
     </main>
     <script src="noleggio-vendite.js"></script>

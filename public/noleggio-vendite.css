@@ -27,7 +27,6 @@ main {
     border-radius: 5px;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: width 0.3s;
 }
 
 #ricerca-filtri-card {
@@ -39,20 +38,11 @@ main {
     width: 65%;
 }
 
-#ricerca-filtri {
-    display: none;
-}
-
-#ricerca-filtri-card.active #ricerca-filtri {
-    display: block;
-}
-
-#ricerca-filtri-card.active {
-    width: 30%;
-}
-
-#noleggio-vendita-card.expanded {
-    width: 95%;
+.prodotto-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
 
 h2 {
@@ -82,26 +72,5 @@ button {
 }
 
 button:hover {
-    background-color: #555;
-}
-
-#toggle-ricerca-filtri {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    padding: 0.1rem 0.2rem; /* Riduci la dimensione del pulsante */
-    font-size: 0.5rem; /* Riduci la dimensione del testo */
-    width: 150px; /* Larghezza del pulsante */
-    height: 50px; /* Altezza del pulsante */
-    border-radius: 5px; /* Angoli arrotondati */
-    font-size: 16px; /* Dimensione del testo */
-    cursor: pointer;
-}
-
-#toggle-ricerca-filtri:hover {
     background-color: #555;
 }
