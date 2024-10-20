@@ -1,50 +1,79 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noleggio & Vendita Moda</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <title>Noleggio e Vendita Abbigliamento</title>
     <link rel="stylesheet" href="noleggio-vendite.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-
 <body>
-    <div class="container">
-        <!-- Sidebar Filters -->
-        <aside class="filters">
-            <h2>Filtri di Ricerca</h2>
-            <input type="text" v-model="searchQuery" placeholder="🔍 Cerca per nome o descrizione">
-
-            <label>Prezzo Noleggio (max):</label>
-            <input type="range" min="10" max="2000" step="10" v-model="filterPrice" @input="updatePrice">
-            <p><strong>{{ displayedPrice }} €</strong></p>
-            
-
-            <label>Taglia:</label>
-            <select v-model="filterSize">
-                <option value="">Tutte</option>
-                <option value="XS">XS</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-            </select>
-
-            <label>Ordina per:</label>
-            <select v-model="sortBy">
-                <option value="price">Prezzo</option>
-                <option value="brand">Marca</option>
-                <option value="condition">Condizione</option>
-            </select>
-
-            <button class="btn-primary" @click="saveSearch">Salva Ricerca</button>
-        </aside>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-    <script src="noleggio-vendita.js"></script>
-
+    <header>
+        <h1>Noleggio e Vendita Abbigliamento</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="card" id="ricerca-filtri-card">
+                <button id="toggle-ricerca-filtri">☰</button>
+                <section id="ricerca-filtri">
+                    <h2>Ricerca e Filtri</h2>
+                    <div id="ricerca">
+                        <h3>Ricerca</h3>
+                        <input type="text" id="ricerca-capo" name="ricerca-capo" placeholder="Cerca per nome o descrizione">
+                        <button>Cerca</button>
+                    </div>
+                    <div id="filtri">
+                        <h3>Filtri</h3>
+                        <label for="prezzo">Prezzo:</label>
+                        <input type="range" id="prezzo" name="prezzo" min="0" max="1000">
+                        <label for="taglia">Taglia:</label>
+                        <select id="taglia" name="taglia">
+                            <option value="s">S</option>
+                            <option value="m">M</option>
+                            <option value="l">L</option>
+                        </select>
+                        <label for="marca">Marca:</label>
+                        <input type="text" id="marca" name="marca">
+                        <label for="condizioni">Condizioni:</label>
+                        <select id="condizioni" name="condizioni">
+                            <option value="nuovo">Nuovo</option>
+                            <option value="usato">Usato</option>
+                        </select>
+                    </div>
+                    <div id="salvataggio">
+                        <h3>Salvataggio</h3>
+                        <button>Salva Ricerca</button>
+                    </div>
+                </section>
+            </div>
+            <div class="card" id="noleggio-vendita-card">
+                <section id="noleggio-vendita">
+                    <h2>Noleggio e Vendita</h2>
+                    <div id="noleggio">
+                        <h3>Noleggio</h3>
+                        <label for="durata-noleggio">Durata del noleggio:</label>
+                        <input type="number" id="durata-noleggio" name="durata-noleggio" min="1" max="30">
+                        <button onclick="calcolaPrezzo()">Calcola Prezzo</button>
+                        <p id="prezzo-noleggio"></p>
+                    </div>
+                    <div id="acquisto">
+                        <h3>Acquisto</h3>
+                        <button>Compra Ora</button>
+                    </div>
+                    <div id="contrattazione">
+                        <h3>Contrattazione</h3>
+                        <label for="proposta-prezzo">Proposta di prezzo:</label>
+                        <input type="number" id="proposta-prezzo" name="proposta-prezzo">
+                        <button>Invia Proposta</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <section id="carrello">
+            <h2>Carrello</h2>
+            <button>Aggiungi al Carrello</button>
+            <button>Rimuovi dal Carrello</button>
+        </section>
+    </main>
+    <script src="noleggio-vendite.js"></script>
 </body>
-
 </html>

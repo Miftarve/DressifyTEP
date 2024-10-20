@@ -1,106 +1,107 @@
-/* Global Styles */
-* {
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    background-color: #f4f4f4;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f7f9fc;
-    color: #333;
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
 }
 
-/* Navbar */
-.navbar {
-    background-color: #343a40;
-    color: white;
+main {
+    padding: 1rem;
+}
+
+.container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    font-size: 1.5rem;
 }
 
-.navbar i {
-    margin-right: 10px;
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s;
 }
 
-/* Cart Icon */
-.cart-icon {
+#ricerca-filtri-card {
+    width: 30%;
     position: relative;
+}
+
+#noleggio-vendita-card {
+    width: 65%;
+}
+
+#ricerca-filtri {
+    display: none;
+}
+
+#ricerca-filtri-card.active #ricerca-filtri {
+    display: block;
+}
+
+#ricerca-filtri-card.active {
+    width: 30%;
+}
+
+#noleggio-vendita-card.expanded {
+    width: 95%;
+}
+
+h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 0.5rem;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+}
+
+input, select, button {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+#toggle-ricerca-filtri {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.1rem 0.2rem; /* Riduci la dimensione del pulsante */
+    font-size: 0.5rem; /* Riduci la dimensione del testo */
+    width: 150px; /* Larghezza del pulsante */
+    height: 50px; /* Altezza del pulsante */
+    border-radius: 5px; /* Angoli arrotondati */
+    font-size: 16px; /* Dimensione del testo */
     cursor: pointer;
 }
 
-.cart-count {
-    position: absolute;
-    top: -5px;
-    right: -10px;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 5px;
-    font-size: 0.8rem;
-}
-
-/* Layout */
-.container {
-    display: flex;
-    gap: 20px;
-    padding: 30px;
-    max-width: 1300px;
-    margin: 0 auto;
-}
-
-/* Sidebar Filters */
-.filters {
-    width: 260px;
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 20px;
-}
-
-.filters h2 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-}
-
-.filters input,
-.filters select {
-    width: 100%;
-    margin: 12px 0;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-/* Products Grid */
-.products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
-    flex-grow: 1;
-}
-
-.product-card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    transition: transform 0.3s;
-}
-
-.product-card:hover {
-    transform: scale(1.05);
-}
-
-.product-brand {
-    font-size: 1.6rem;
-    color: #2980B9;
-    margin-bottom: 10px;
-    font-weight: bold;
+#toggle-ricerca-filtri:hover {
+    background-color: #555;
 }
