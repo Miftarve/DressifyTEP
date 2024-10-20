@@ -122,7 +122,7 @@ app.post('/products', (req, res) => {
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
     }
 
-    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`,
+    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)` ,
         [category, size, color, brand, condition, price],
         function(err) {
             if (err) {
@@ -134,10 +134,10 @@ app.post('/products', (req, res) => {
 });
 
 // Route per ottenere tutti i prodotti
-app.get('/products', (req, res) => {
-    db.all(`SELECT * FROM products`, [], (err, rows) => {
+app.get('/api/products', (req, res) => {
+    db.all('SELECT * FROM products', [], (err, rows) => {
         if (err) {
-            return res.status(500).json({ message: 'Errore nel recupero dei prodotti.' });
+            return res.status(500).json({ error: err.message });
         }
         res.status(200).json({ products: rows });
     });
