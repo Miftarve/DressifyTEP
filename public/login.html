@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Create New Account</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="app">
         <div class="container">
-            <h1>Login</h1>
-            <form @submit.prevent="handleLogin">
+            <h1>Create New Account</h1>
+            <form @submit.prevent="handleSubmit">
                 <label for="email">Email</label>
                 <input type="email" v-model="email" required>
+
+                <label for="name">Name</label>
+                <input type="text" v-model="name" required>
 
                 <label for="password">Password</label>
                 <input type="password" v-model="password" required>
 
-                <button type="submit">Login</button>
+                <label for="dob">Date of Birth</label>
+                <input type="date" v-model="dob" required>
+
+                <button type="submit">Register</button>
+                <p>Hai già un account? <a href="login.html">Login qui</a></p>
             </form>
-            <p>Non hai un account? <a href="index.html">Registrati qui</a></p>
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-    <script src="login.js"></script>
+    <script src="app.js"></script>
 
 </body>
 </html>

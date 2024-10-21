@@ -160,6 +160,7 @@ app.get('/api/products/:id', (req, res) => {
 
 
 
+
 // Route per ottenere un prodotto specifico
 app.get('/products/:id', (req, res) => {
     const productId = req.params.id;

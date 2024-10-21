@@ -7,11 +7,12 @@ new Vue({
             color: '',
             brand: '',
             condition: '',
-            price: '' // Aggiungi il campo price qui
+            price: '' // Aggiunto il campo price
         },
         products: []
     },    
     methods: {
+        // Carica i prodotti esistenti dal server
         loadProducts() {
             fetch('/products')
                 .then(response => {
@@ -26,7 +27,14 @@ new Vue({
                 })
                 .catch(err => alert('Errore nel caricamento dei prodotti: ' + err.message));
         },
+
+        // Aggiunge un nuovo prodotto
         addProduct() {
+            if (!this.newProduct.price || isNaN(this.newProduct.price)) {
+                alert('Per favore inserisci un prezzo valido.');
+                return;
+            }
+
             fetch('/products', {
                 method: 'POST',
                 headers: {
@@ -42,6 +50,8 @@ new Vue({
             })
             .catch(err => alert('Errore nell\'aggiunta del prodotto: ' + err.message));
         },
+
+        // Rimuove un prodotto
         removeProduct(index) {
             const productId = this.products[index].id; // Assicurati che ci sia un ID per il prodotto
             fetch(`/products/${productId}`, {
@@ -54,21 +64,28 @@ new Vue({
             })
             .catch(err => alert('Errore nella rimozione del prodotto: ' + err.message));
         },
+
+        // Modifica un prodotto e reindirizza alla pagina di modifica
         editProduct(index) {
             const productId = this.products[index].id; // Ottieni l'ID del prodotto
             window.location.href = `edit-product.html?id=${productId}`; // Reindirizza alla pagina di modifica
         },
+
+        // Resetta il modulo di input per l'aggiunta di nuovi prodotti
         resetForm() {
             this.newProduct = {
                 category: '',
                 size: '',
                 color: '',
                 brand: '',
-                condition: ''
-            }; // Resetta i campi del form
+                condition: '',
+                price: '' // Resetta anche il campo price
+            };
         }
     },
+
+    // Chiama loadProducts quando il componente è creato per caricare i dati iniziali
     created() {
-        this.loadProducts(); // Chiama loadProducts quando il componente è creato
+        this.loadProducts();
     }
 });
