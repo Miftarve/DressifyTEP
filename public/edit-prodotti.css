@@ -1,0 +1,113 @@
+/* General styles */
+body {
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #1a1a1a; /* Dark background for the form container */
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Soft shadow */
+    transition: transform 0.3s;
+}
+
+.container:hover {
+    transform: scale(1.01); /* Slight scaling on hover */
+}
+
+/* Form styling */
+h1 {
+    text-align: center;
+    color: #f39c12; /* Golden text for heading */
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ccc;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    box-sizing: border-box;
+    border-radius: 5px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    background-color: #444;
+    border-color: #777;
+}
+
+/* Button styling */
+.small-button {
+    background-color: #f39c12; /* Golden button */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+    font-weight: bold;
+}
+
+.small-button:hover {
+    background-color: #e67e22; /* Darker golden on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Add a subtle shadow on hover */
+    transform: scale(1.05); /* Slightly bigger button */
+}
+
+.small-button:active {
+    transform: scale(1); /* Restore to normal size on click */
+}
+
+/* Spacing for button group */
+.button-group {
+    display: flex;
+    justify-content: flex-end; /* Right-align the button */
+    margin-top: 20px;
+}
+
+/* Back button styling */
+button[type="button"] {
+    margin-top: 15px;
+    background-color: #555; /* Grey button */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s, transform 0.3s;
+    font-weight: bold;
+}
+
+button[type="button"]:hover {
+    background-color: #777;
+    transform: scale(1.05);
+}
+
+button[type="button"]:active {
+    transform: scale(1);
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .container {
+        width: 90%; /* Form will take more space on smaller screens */
+    }
+}
