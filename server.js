@@ -52,9 +52,8 @@ db.serialize(() => {
 db.run(`ALTER TABLE products ADD COLUMN price REAL`, (err) => {
     if (err && !err.message.includes("duplicate column name")) {
         console.error('Errore nell\'aggiunta della colonna price:', err.message);
-    } else {
-        console.log('Colonna "price" aggiunta con successo (o già esistente)');
-    }
+    } 
+    
 });
 
 // Route principale
