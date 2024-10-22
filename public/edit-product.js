@@ -18,7 +18,7 @@ new Vue({
 
             console.log(`Fetching product with ID: ${productId}`);
 
-            fetch(`/get-product/${productId}`)
+            fetch(`/products/${productId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Prodotto non trovato');

@@ -1,23 +1,55 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #000; /* Sfondo nero */
+    color: #fff; /* Colore testo bianco */
     margin: 0;
     padding: 0;
 }
 
+/* Container più scuro con bordi arrotondati */
 .container {
     width: 90%;
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background: white;
+    background: #000000; /* Grigio scuro per il contenitore */
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Colore chiaro per il titolo */
 h1 {
     text-align: center;
-    color: #333;
+    color: #000000;
+}
+
+/* Stile flex per layout */
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-form {
+    margin-right: 20px;
+    background: #000000; /* Grigio scuro */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff; /* Testo bianco */
+}
+
+h1 {
+    text-align: center;
+    color: #000000;
 }
 
 .flex-container {
@@ -39,13 +71,25 @@ label {
     font-weight: bold;
 }
 
+/* Label posizionate sopra le textbox */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff; /* Colore bianco per le label */
+}
+
+/* Textbox e select con larghezza ridotta */
 input, select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+    width: 100%; /* Larghezza piena */
+    padding: 8px;
+    border: 1px solid #555;
+    background: #333; /* Sfondo scuro per le textbox */
+    color: #fff;
     border-radius: 4px;
 }
 
+/* Pulsante Aggiungi Prodotto */
 button {
     background-color: #5cb85c;
     color: white;
@@ -54,7 +98,24 @@ button {
     border-radius: 4px;
     cursor: pointer;
     width: 100%;
+    margin-top: 10px;
 }
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+/* Elementi della lista prodotti */
+.product-item {
+    background: #2a2a2a;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 
 button:hover {
     background-color: #4cae4c;
@@ -110,5 +171,97 @@ button:hover {
     margin: 10px;
     justify-content: space-between; /* Separa i pulsanti */
     margin-top: 20px;
+}
+
+/* Imposta lo sfondo nero */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000; /* Sfondo nero */
+    color: #fff; /* Colore testo bianco */
+    margin: 0;
+    padding: 0;
+}
+
+/* Container più scuro con bordi arrotondati */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #1a1a1a; /* Grigio scuro per il contenitore */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Colore chiaro per il titolo */
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+/* Stile flex per layout */
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-form {
+    margin-right: 20px;
+    background: #000000; /* Grigio scuro */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff; /* Testo bianco */
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #000000;
+    background: #222; /* Sfondo scuro per input */
+    color: #fff; /* Testo bianco */
+    border-radius: 4px;
+}
+
+/* Stile per il bottone */
+button {
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+/* Lista prodotti con colori scuri */
+.product-list {
+    margin-top: 20px;
+    flex: 1;
+}
+
+.product-item {
+    background: #000000; /* Sfondo grigio scuro per ogni prodotto */
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
