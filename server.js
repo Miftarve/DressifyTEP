@@ -25,35 +25,35 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
 
 // Crea le tabelle "users" e "products" nel database
 db.serialize(() => {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            email TEXT UNIQUE,
-            password TEXT,
-            dob TEXT
-        )
-    `);
+    // Crea la tabella users solo se non esiste
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        email TEXT UNIQUE,
+        password TEXT,
+        dob TEXT,
+        phone TEXT,
+        nationality TEXT
+    )`, (err) => {
+        if (err) {
+            console.error('Errore nella creazione della tabella users:', err.message);
+        }
+    });
 
-    db.run(`
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            size TEXT,
-            color TEXT,
-            brand TEXT,
-            condition TEXT,
-            price REAL
-        )
-    `);
-});
-
-// Modifica la struttura della tabella "products" per includere il campo "price"
-db.run(`ALTER TABLE products ADD COLUMN price REAL`, (err) => {
-    if (err && !err.message.includes("duplicate column name")) {
-        console.error('Errore nell\'aggiunta della colonna price:', err.message);
-    } 
-    
+    // Crea la tabella "products" se non esiste
+    db.run(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT,
+        size TEXT,
+        color TEXT,
+        brand TEXT,
+        condition TEXT,
+        price REAL
+    )`, (err) => {
+        if (err) {
+            console.error('Errore nella creazione della tabella products:', err.message);
+        }
+    });
 });
 
 // Route principale
@@ -63,16 +63,16 @@ app.get('/', (req, res) => {
 
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
-    const { name, email, password, dob } = req.body;
-    if (!name || !email || !password || !dob) {
+    const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
+    if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
-            `INSERT INTO users (name, email, password, dob) VALUES (?, ?, ?, ?)`,
-            [name, email, hashedPassword, dob],
+            `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
+            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
             function (err) {
                 if (err) {
                     if (err.message.includes('UNIQUE constraint failed')) {
@@ -156,10 +156,6 @@ app.get('/api/products/:id', (req, res) => {
     });
 });
 
-
-
-
-
 // Route per ottenere un prodotto specifico
 app.get('/products/:id', (req, res) => {
     const productId = req.params.id;
@@ -200,7 +196,6 @@ app.delete('/products/:id', (req, res) => {
         res.status(200).json({ message: 'Prodotto rimosso con successo!' });
     });
 });
-
 
 // Avvia il server
 app.listen(PORT, () => {

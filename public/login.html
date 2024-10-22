@@ -15,19 +15,26 @@
             <form @submit.prevent="handleSubmit">
                 <label for="email">Email</label>
                 <input type="email" v-model="email" required>
-
+            
                 <label for="name">Name</label>
                 <input type="text" v-model="name" required>
-
+            
+                <label for="phone">Phone Number</label>
+                <input type="tel" v-model="phone" required>
+            
+                <label for="nationality">Nationality</label>
+                <input type="text" v-model="nationality" required>
+            
                 <label for="password">Password</label>
                 <input type="password" v-model="password" required>
-
+            
                 <label for="dob">Date of Birth</label>
                 <input type="date" v-model="dob" required>
-
+            
                 <button type="submit">Register</button>
                 <p>Hai già un account? <a href="index.html">Login qui</a></p>
             </form>
+            
 
         </div>
     </div>
