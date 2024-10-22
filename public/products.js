@@ -14,7 +14,7 @@ new Vue({
     methods: {
         // Carica i prodotti esistenti dal server
         loadProducts() {
-            fetch('/products')
+            fetch('/api/products')
                 .then(response => {
                     console.log(response); // Log della risposta
                     if (!response.ok) {
@@ -27,7 +27,7 @@ new Vue({
                 })
                 .catch(err => alert('Errore nel caricamento dei prodotti: ' + err.message));
         },
-
+        
         // Aggiunge un nuovo prodotto
         addProduct() {
             if (!this.newProduct.price || isNaN(this.newProduct.price)) {
