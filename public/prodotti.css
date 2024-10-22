@@ -1,55 +1,27 @@
 body {
-    font-family: Arial, sans-serif;
     background-color: #000; /* Sfondo nero */
-    color: #fff; /* Colore testo bianco */
+    color: #fff; /* Testo bianco */
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
+    display: flex;
 }
 
-/* Container più scuro con bordi arrotondati */
 .container {
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #000000; /* Grigio scuro per il contenitore */
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Colore chiaro per il titolo */
-h1 {
-    text-align: center;
-    color: #000000;
-}
-
-/* Stile flex per layout */
-.flex-container {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
 }
 
-.product-form {
-    margin-right: 20px;
-    background: #000000; /* Grigio scuro */
+.sidebar {
+    width: 25%;
+    background-color: #1a1a1a;
     padding: 20px;
-    border-radius: 8px;
+    color: #fff;
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #fff; /* Testo bianco */
-}
-
-h1 {
-    text-align: center;
-    color: #000000;
+#app {
+    width: 75%;
+    padding: 20px;
 }
 
 .flex-container {
@@ -57,211 +29,146 @@ h1 {
     justify-content: space-between;
 }
 
-.product-form {
-    margin-right: 20px;
+.product-form, .product-list {
+    width: 48%;
 }
 
 .form-group {
     margin-bottom: 15px;
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 5px;
-    font-weight: bold;
 }
 
-/* Label posizionate sopra le textbox */
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #fff; /* Colore bianco per le label */
-}
-
-/* Textbox e select con larghezza ridotta */
-input, select {
-    width: 100%; /* Larghezza piena */
+.form-group input, .form-group select {
+    width: 100%;
     padding: 8px;
+    box-sizing: border-box;
+    background-color: #333;
     border: 1px solid #555;
-    background: #333; /* Sfondo scuro per le textbox */
     color: #fff;
-    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* Pulsante Aggiungi Prodotto */
+.form-group input:focus, .form-group select:focus {
+    background-color: #444;
+    border-color: #777;
+}
+
 button {
-    background-color: #5cb85c;
-    color: white;
-    padding: 10px;
+    background-color: #444; /* Colore pulsante */
+    color: #fff; /* Testo bianco */
+    padding: 10px 20px;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
+    transition: transform 0.3s, background-color 0.3s;
 }
 
 button:hover {
-    background-color: #4cae4c;
-}
-
-/* Elementi della lista prodotti */
-.product-item {
-    background: #2a2a2a;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-button:hover {
-    background-color: #4cae4c;
-}
-
-.product-list {
-    margin-top: 20px;
-    flex: 1;
+    transform: scale(1.05);
+    background-color: #555;
 }
 
 .product-item {
-    background: #f9f9f9;
+    background-color: #222;
     padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.button-group {
-    display: flex;
-    gap: 10px; /* Spazio tra i bottoni */
-}
-
-.remove-button {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.remove-button:hover {
-    background-color: #c9302c;
-}
-
-
-.button-group button {
-    margin-right: 10px; /* Spazio tra i pulsanti */
-}
-
-.small-button {
-    width: auto; /* Rimuove la larghezza al 100% */
-    padding: 5px 10px; /* Riduce il padding */
-    font-size: 0.9em; /* Riduce la dimensione del testo */
-}
-
-.button-group {
-    display: flex;
-    margin: 10px;
-    justify-content: space-between; /* Separa i pulsanti */
-    margin-top: 20px;
-}
-
-/* Imposta lo sfondo nero */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #000; /* Sfondo nero */
-    color: #fff; /* Colore testo bianco */
-    margin: 0;
-    padding: 0;
-}
-
-/* Container più scuro con bordi arrotondati */
-.container {
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #1a1a1a; /* Grigio scuro per il contenitore */
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Colore chiaro per il titolo */
-h1 {
-    text-align: center;
-    color: #fff;
-}
-
-/* Stile flex per layout */
-.flex-container {
-    display: flex;
-    justify-content: space-between;
-}
-
-.product-form {
-    margin-right: 20px;
-    background: #000000; /* Grigio scuro */
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #fff; /* Testo bianco */
-}
-
-input, select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #000000;
-    background: #222; /* Sfondo scuro per input */
-    color: #fff; /* Testo bianco */
-    border-radius: 4px;
-}
-
-/* Stile per il bottone */
-button {
-    background-color: #5cb85c;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 5px;
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #4cae4c;
+.product-item:hover {
+    background-color: #333;
 }
 
-/* Lista prodotti con colori scuri */
-.product-list {
-    margin-top: 20px;
-    flex: 1;
+.button-group button {
+    margin-right: 10px;
 }
 
-.product-item {
-    background: #000000; /* Sfondo grigio scuro per ogni prodotto */
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #000000;
-    border-radius: 4px;
+.remove-button {
+    background-color: red;
+    color: white;
+}
+
+.sidebar-info {
+    text-align: center;
+}
+
+.avatar-box img {
+    border-radius: 50%;
+}
+
+.info-content .name {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.info-content .title {
+    color: gray;
+}
+
+.contacts-list, .social-list {
+    list-style: none;
+    padding: 0;
+}
+
+.contact-item, .social-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
+.icon-box {
+    margin-right: 10px;
+}
+
+.contact-link, .contact-title, address, time {
+    margin: 0;
+}
+
+.separator {
+    border-bottom: 1px solid #ccc;
+    margin: 20px 0;
+}
+.sidebar-info {
+    text-align: center;
+}
+
+.avatar-box img {
+    border-radius: 50%;
+}
+
+.info-content .name {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.info-content .title {
+    color: gray;
+}
+
+.contacts-list, .social-list {
+    list-style: none;
+    padding: 0;
+}
+
+.contact-item, .social-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.icon-box {
+    margin-right: 10px;
+}
+
+.contact-link, .contact-title, address, time {
+    margin: 0;
+}
+
+.separator {
+    border-bottom: 1px solid #ccc;
+    margin: 20px 0;
+}
