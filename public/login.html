@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Account</title>
+    <title>Crea un nuovo account</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,24 +11,24 @@
     <div id="app">
         <center><h1><em>DRESSIFY</em></h1></center><br><br>
         <div class="container">
-            <h1>Create New Account</h1>
+            <h1>Crea un nuovo account</h1>
             <form @submit.prevent="handleSubmit">
                 <label for="email">Email</label>
                 <input type="email" v-model="email" required>
             
-                <label for="name">Name</label>
+                <label for="name">Nome</label>
                 <input type="text" v-model="name" required>
             
-                <label for="phone">Phone Number</label>
+                <label for="phone">Numbero di telefono</label>
                 <input type="tel" v-model="phone" required>
             
-                <label for="nationality">Nationality</label>
+                <label for="nationality">Nazionalità</label>
                 <input type="text" v-model="nationality" required>
             
                 <label for="password">Password</label>
                 <input type="password" v-model="password" required>
             
-                <label for="dob">Date of Birth</label>
+                <label for="dob">Data di nascita</label>
                 <input type="date" v-model="dob" required>
             
                 <button type="submit">Register</button>
