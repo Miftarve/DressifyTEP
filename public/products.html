@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,30 @@
     <link rel="stylesheet" href="prodotti.css">
     <link rel="stylesheet" href="sidebar.css">
 </head>
+
 <body>
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <figure class="avatar-box">
+                <img src="./assets/dressify.png" alt="userInfo.name" width="60">
+            </figure> <!-- Modifica il link con il tuo logo -->
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sicurezza.html">Sicurezza</a></li>
+            <li><a href="feedback.html">Feedback</a></li>
+        </ul>
+    </nav>
+
+
     <div class="container">
         <aside class="sidebar" data-sidebar>
             <center><h1>DRESSIFY</h1></center>
             <div class="sidebar-info">
                 <figure class="avatar-box">
-                    <img src="./assets/images.jpeg" :alt="userInfo.name" width="80">
+                    <img src="./assets/images.jpeg" alt="userInfo.name" width="80">
                 </figure>
                 <div class="info-content">
                     <h1 class="name" title="userInfo.name">{{ userInfo.name }}</h1>
@@ -28,7 +46,7 @@
                         </div>
                         <div class="contact-info">
                             <p class="contact-title">Email</p>
-                            <a :href="'mailto:' + userInfo.email" class="contact-link">{{ userInfo.email }}</a>
+                            <a href="mailto:userInfo.email" class="contact-link">{{ userInfo.email }}</a>
                         </div>
                     </li>
                     <li class="contact-item">
@@ -37,7 +55,7 @@
                         </div>
                         <div class="contact-info">
                             <p class="contact-title">Telefono</p>
-                            <a :href="'tel:' + userInfo.phone" class="contact-link">{{ userInfo.phone }}</a>
+                            <a href="tel:userInfo.phone" class="contact-link">{{ userInfo.phone }}</a>
                         </div>
                     </li>
                     <li class="contact-item">
@@ -46,7 +64,7 @@
                         </div>
                         <div class="contact-info">
                             <p class="contact-title">Data di nascita</p>
-                            <time :datetime="userInfo.dob">{{ new Date(userInfo.dob).toLocaleDateString() }}</time>
+                            <time datetime="userInfo.dob">{{ new Date(userInfo.dob).toLocaleDateString() }}</time>
                         </div>
                     </li>
                     <li class="contact-item">
@@ -61,8 +79,8 @@
                 </ul>
                 <!-- ... Altri contenuti ... -->
             </div>
-                    
         </aside>
+        
 
         <div id="app">
             <h1>Gestione Prodotti</h1>
@@ -104,7 +122,8 @@
                     <h2>Lista Prodotti</h2>
                     <ul>
                         <li v-for="(product, index) in products" :key="index" class="product-item">
-                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - {{ product.condition }} - €{{ product.price }}</span>
+                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand
+                                }} - {{ product.condition }} - €{{ product.price }}</span>
                             <div class="button-group">
                                 <button @click="editProduct(index)">Modifica</button>
                                 <button @click="removeProduct(index)" class="remove-button">Rimuovi</button>
@@ -119,4 +138,5 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="products.js"></script>
 </body>
+
 </html>

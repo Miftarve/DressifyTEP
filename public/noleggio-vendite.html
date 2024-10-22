@@ -9,9 +9,20 @@
 </head>
 
 <body>
-    <header>
-        <h1>Noleggio e Vendita Abbigliamento</h1>
-    </header>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h2>Abbigliamento</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="sicurezza.html">Sicurezza</a></li>
+            <li><a href="feedback.html">Feedback</a></li>
+        </ul>
+    </nav>
+    <br><br>
+    <br>
+
     <main>
         <div class="container">
             <div class="card" id="ricerca-filtri-card">
@@ -26,17 +37,12 @@
                     </div>
                     <h3>Filtri</h3>
                     <div>
-                        <!-- Filtro per nome -->
                         <input type="text" id="nameFilter" placeholder="Nome del prodotto">
-                        <button onclick="filterByName(document.getElementById('nameFilter').value)">Cerca per
-                            Nome</button>
+                        <button onclick="filterByName(document.getElementById('nameFilter').value)">Cerca per Nome</button>
 
-                        <!-- Filtro per prezzo -->
                         <input type="number" id="minPriceFilter" placeholder="Prezzo Minimo">
                         <input type="number" id="maxPriceFilter" placeholder="Prezzo Massimo">
-                        <button
-                            onclick="filterByPrice(document.getElementById('minPriceFilter').value, document.getElementById('maxPriceFilter').value)">Cerca
-                            per Prezzo</button>
+                        <button onclick="filterByPrice(document.getElementById('minPriceFilter').value, document.getElementById('maxPriceFilter').value)">Cerca per Prezzo</button>
                     </div>
                     <div id="salvataggio">
                         <h3>Salvataggio</h3>

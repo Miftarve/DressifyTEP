@@ -1,0 +1,164 @@
+/* Stile generale */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #000; /* Sfondo nero */
+    color: #fff; /* Testo bianco */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenitore principale */
+.container {
+    width: 90%;
+    max-width: 800px;
+    background-color: #1c1c1c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+/* Stile header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #4CAF50;
+    font-size: 2.5rem;
+}
+
+/* Sezione Sicurezza */
+.security article {
+    margin-bottom: 20px;
+}
+
+.security h2 {
+    font-size: 1.8rem;
+    color: #ff9800;
+}
+
+.security p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+/* Sezione Feedback */
+.feedback h2 {
+    color: #4CAF50;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Form feedback */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+input, select, textarea {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #aaa;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #888;
+}
+/* Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #111; /* Colore scuro per la navbar */
+    display: flex;
+    justify-content: center; /* Allinea gli elementi al centro */
+    align-items: center;
+    padding: 1rem 0; /* Rimuovi il padding laterale */
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    z-index: 999;
+    transition: background-color 0.3s; /* Transizione per il colore di sfondo */
+}
+
+.logo {
+    position: absolute; /* Posiziona il logo a sinistra */
+    left: 20px; /* Distanza dal bordo sinistro */
+}
+
+.nav-links {
+    list-style-type: none;
+    display: flex;
+    margin: 0;
+    padding: 0; /* Rimuovi padding */
+}
+
+.nav-links li {
+    margin: 0 20px; /* Margine laterale uniforme */
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    position: relative; /* Per il posizionamento degli effetti */
+    overflow: hidden; /* Nascondi il contenuto che esce */
+    transition: color 0.3s; /* Transizione per il colore */
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 3px;
+    background-color: #fff; /* Colore dell'effetto */
+    transition: width 0.3s, left 0.3s; /* Transizione per l'effetto */
+}
+
+.nav-links a:hover {
+    color: #ffd700; /* Colore del testo al passaggio del mouse */
+}
+
+.nav-links a:hover::after {
+    width: 100%; /* Estendi l'effetto al passaggio del mouse */
+    left: 0; /* Posiziona l'effetto */
+}
+
