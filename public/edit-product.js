@@ -33,8 +33,8 @@ new Vue({
 
         updateProduct() {
             // Aggiungi " euro" al prezzo prima di inviare al server
-            this.product.price = `${this.product.price} euro`; 
-        
+            this.product.price = this.product.price;  // Rimuovi 'euro' dalla stringa qui
+
             fetch(`/products/${this.product.id}`, { // Modificato l'endpoint
                 method: 'PUT',
                 headers: {
