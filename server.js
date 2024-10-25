@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 });
 
 // Route per gestire la registrazione
-app.post('http://37.27.40.78/register', async (req, res) => {
+app.post('/register', async (req, res) => {
     const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
     if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
@@ -90,7 +90,7 @@ app.post('http://37.27.40.78/register', async (req, res) => {
 });
 
 // Route per gestire il login
-app.post('http://37.27.40.78/login', (req, res) => {
+app.post('/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ success: false, message: 'Email e password sono obbligatorie.' });
@@ -114,7 +114,7 @@ app.post('http://37.27.40.78/login', (req, res) => {
 });
 
 // Route per aggiungere un nuovo prodotto
-app.post('http://37.27.40.78/products', (req, res) => {
+app.post('/products', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
 
     if (!category || !size || !color || !brand || !condition || price == null) {
@@ -133,7 +133,7 @@ app.post('http://37.27.40.78/products', (req, res) => {
 });
 
 // Route per ottenere tutti i prodotti
-app.get('http://37.27.40.78/api/products', (req, res) => {
+app.get('/api/products', (req, res) => {
     db.all('SELECT * FROM products', [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -143,7 +143,7 @@ app.get('http://37.27.40.78/api/products', (req, res) => {
 });
 
 // Route per ottenere un prodotto specifico per ID
-app.get('http://37.27.40.78/api/products/:id', (req, res) => {
+app.get('/api/products/:id', (req, res) => {
     const productId = req.params.id;
     db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
         if (err) {
@@ -157,7 +157,7 @@ app.get('http://37.27.40.78/api/products/:id', (req, res) => {
 });
 
 // Route per ottenere un prodotto specifico
-app.get('http://37.27.40.78/products/:id', (req, res) => {
+app.get('/products/:id', (req, res) => {
     const productId = req.params.id;
     db.get(`SELECT * FROM products WHERE id = ?`, [productId], (err, row) => {
         if (err) {
@@ -171,7 +171,7 @@ app.get('http://37.27.40.78/products/:id', (req, res) => {
 });
 
 // Route per aggiornare un prodotto
-app.put('http://37.27.40.78/products/:id', (req, res) => {
+app.put('/products/:id', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
     const productId = req.params.id;
 
@@ -187,7 +187,7 @@ app.put('http://37.27.40.78/products/:id', (req, res) => {
 });
 
 // Route per rimuovere un prodotto
-app.delete('http://37.27.40.78/products/:id', (req, res) => {
+app.delete('/products/:id', (req, res) => {
     const productId = req.params.id;
     db.run(`DELETE FROM products WHERE id = ?`, productId, function(err) {
         if (err) {
@@ -198,7 +198,6 @@ app.delete('http://37.27.40.78/products/:id', (req, res) => {
 });
 
 // Avvia il server
-
-app.listen(PORT, '37.27.40.78', () => {
-    console.log(`Server in esecuzione su http://37.27.40.78:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Server in esecuzione su http://localhost:${PORT}`);
 });
