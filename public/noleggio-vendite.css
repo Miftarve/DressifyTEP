@@ -7,176 +7,70 @@ body {
     color: #fff; /* Testo bianco */
 }
 
-
 /* Navbar */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #111; /* Colore scuro per la navbar */
+    background-color: #111;
     display: flex;
-    justify-content: center; /* Allinea gli elementi al centro */
+    justify-content: space-between; /* Distribuisce gli elementi */
     align-items: center;
-    padding: 1rem 0; /* Rimuovi il padding laterale */
+    padding: 1rem;
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     z-index: 999;
-    transition: background-color 0.3s; /* Transizione per il colore di sfondo */
+    transition: background-color 0.3s;
 }
 
 .logo {
-    position: absolute; /* Posiziona il logo a sinistra */
-    left: 20px; /* Distanza dal bordo sinistro */
+    margin-left: 20px;
 }
 
 .nav-links {
     list-style-type: none;
     display: flex;
     margin: 0;
-    padding: 0; /* Rimuovi padding */
+    padding: 0;
 }
 
 .nav-links li {
-    margin: 0 20px; /* Margine laterale uniforme */
+    margin: 0 15px;
 }
 
 .nav-links a {
     color: #fff;
     text-decoration: none;
-    font-size: 1.1rem;
-    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    padding: 0.5rem;
     border-radius: 5px;
-    position: relative; /* Per il posizionamento degli effetti */
-    overflow: hidden; /* Nascondi il contenuto che esce */
-    transition: color 0.3s; /* Transizione per il colore */
-}
-
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 0;
-    height: 3px;
-    background-color: #fff; /* Colore dell'effetto */
-    transition: width 0.3s, left 0.3s; /* Transizione per l'effetto */
+    transition: color 0.3s;
 }
 
 .nav-links a:hover {
-    color: #ffd700; /* Colore del testo al passaggio del mouse */
-}
-
-.nav-links a:hover::after {
-    width: 100%; /* Estendi l'effetto al passaggio del mouse */
-    left: 0; /* Posiziona l'effetto */
-}
-
-
-/* Header */
-header {
-    background-color: #222; /* Sfondo più chiaro per l'intestazione */
-    color: #fff;
-    padding: 1rem;
-    text-align: center;
-    margin-top: 80px; /* Spazio per la navbar */
-}
-
-h1 {
-    font-size: 2.5rem;
+    color: #ffd700;
 }
 
 /* Main */
 main {
-    padding: 2rem;
+    padding: 3rem 1rem;
+    margin-top: 80px; /* Spazio per la navbar */
 }
 
 .container {
     display: flex;
+    gap: 1.5rem;
     justify-content: space-between;
-    margin-top: 20px;
+    flex-wrap: wrap; /* Dispone le card a capo */
 }
 
-/* Card per la ricerca e filtri */
+/* Card Styles */
 .card {
-    background-color: #333; /* Sfondo delle card */
+    background-color: #333;
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
-    transition: transform 0.3s, box-shadow 0.3s; /* Effetto di hover */
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
-}
-
-#ricerca-filtri-card {
-    width: 30%;
-    position: relative;
-}
-
-#noleggio-vendita-card {
-    width: 65%;
-}
-
-#prodotti-container {
-    display: flex;
-    flex-wrap: wrap; /* Permette alle card di andare a capo quando non c'è spazio */
-    gap: 20px; /* Spazio tra le card */
-}
-
-.prodotto-card {
-    background-color: #444; /* Sfondo delle card prodotto */
-    border-radius: 8px;
-    flex: 0 0 calc(50% - 20px); /* Due card per riga, sottraendo il gap */
-    box-sizing: border-box; /* Assicura che il padding non influisca sulla larghezza */
-    padding: 1rem;
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s; /* Effetto di hover */
-}
-
-.prodotto-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
-}
-
-h2 {
-    border-bottom: 2px solid #fff; /* Sottolineatura bianca per i titoli */
-    padding-bottom: 0.5rem;
-}
-
-h3 {
-    margin-top: 0;
-}
-
-label {
-    display: block;
-    margin-top: 1rem;
-    color: #ccc; /* Colore chiaro per le etichette */
-}
-
-input, select, button {
-    margin-top: 0.5rem;
-    padding: 0.5rem;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid #555; /* Bordo scuro per input */
-    border-radius: 5px;
-    background-color: #222; /* Sfondo input scuro */
-    color: #fff; /* Testo input bianco */
-}
-
-button {
-    background-color: #767676; /* Colore blu per i pulsanti */
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #555; /* Colore blu più scuro al passaggio del mouse */
+    flex: 1;
+    min-width: 280px; /* Larghezza minima per le card */
 }
 
 /* Carrello */
@@ -184,14 +78,59 @@ button:hover {
     margin-top: 2rem;
 }
 
-#carrello-items {
-    margin-bottom: 1rem;
+/* Product Cards */
+#prodotti-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-/* Footer */
-footer {
+.prodotto-card {
+    background-color: #444;
+    border-radius: 8px;
+    padding: 1rem;
     text-align: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: #ccc; /* Colore chiaro per il footer */
+    flex: 1 1 calc(50% - 10px); /* Due card per riga */
+}
+
+button {
+    background-color: #767676;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Impila verticalmente le card */
+    }
+    
+    .navbar {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+    }
+
+    #prodotti-container {
+        flex-direction: column;
+    }
+
+    .prodotto-card {
+        flex: 1 1 100%;
+    }
 }

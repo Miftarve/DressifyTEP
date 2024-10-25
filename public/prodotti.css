@@ -281,3 +281,62 @@ button:active {
     left: 0; /* Posiziona l'effetto */
 }
 
+/* Media query per tablet (768px e inferiori) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Layout a colonna */
+    }
+
+    .sidebar {
+        width: 100%; /* Sidebar occupa l'intera larghezza */
+        margin-top: 0; /* Rimuovi il margine per risparmiare spazio */
+    }
+
+    #app {
+        width: 100%;
+        margin-top: 20px; /* Riduci lo spazio dalla navbar */
+    }
+
+    .flex-container {
+        flex-direction: column; /* Layout a colonna per form e lista prodotti */
+    }
+
+    .product-form, .product-list {
+        width: 100%; /* Massima larghezza su schermi piccoli */
+    }
+}
+
+/* Media query per smartphone (480px e inferiori) */
+@media (max-width: 480px) {
+    .navbar {
+        flex-direction: column; /* Navbar a colonna */
+        padding: 0.5rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+    }
+
+    .nav-links li {
+        margin: 5px 0; /* Riduci il margine */
+    }
+
+    .product-item {
+        font-size: 0.9rem; /* Riduci il font */
+    }
+
+    .avatar-box img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .product-item {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .button-group {
+        flex-direction: column; /* Pulsanti in colonna */
+        gap: 10px;
+    }
+}
