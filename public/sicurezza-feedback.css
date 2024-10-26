@@ -9,6 +9,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    transition: background-color 0.5s ease-in-out;
 }
 
 /* Contenitore principale */
@@ -19,6 +20,11 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    transition: transform 0.3s ease-in-out;
+}
+
+.container:hover {
+    transform: scale(1.05);
 }
 
 /* Stile header */
@@ -30,6 +36,7 @@ header {
 header h1 {
     color: #4CAF50;
     font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Sezione Sicurezza */
@@ -40,11 +47,17 @@ header h1 {
 .security h2 {
     font-size: 1.8rem;
     color: #ff9800;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .security p {
     font-size: 1.2rem;
     line-height: 1.6;
+    transition: color 0.3s ease-in-out;
+}
+
+.security p:hover {
+    color: #ffcc00;
 }
 
 /* Sezione Feedback */
@@ -52,6 +65,7 @@ header h1 {
     color: #4CAF50;
     font-size: 2rem;
     margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Form feedback */
@@ -73,6 +87,12 @@ input, select, textarea {
     background-color: #333;
     color: #fff;
     font-size: 1rem;
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+    background-color: #444;
+    border-color: #4CAF50;
 }
 
 input::placeholder, textarea::placeholder {
@@ -87,10 +107,12 @@ button {
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 button:hover {
     background-color: #45a049;
+    transform: scale(1.1);
 }
 
 /* Footer */
@@ -99,7 +121,13 @@ footer {
     margin-top: 20px;
     font-size: 0.9rem;
     color: #888;
+    transition: color 0.3s ease-in-out;
 }
+
+footer:hover {
+    color: #fff;
+}
+
 /* Navbar */
 .navbar {
     position: fixed;
@@ -113,6 +141,10 @@ footer {
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     z-index: 999;
     transition: background-color 0.3s; /* Transizione per il colore di sfondo */
+}
+
+.navbar:hover {
+    background-color: #222;
 }
 
 .logo {
@@ -161,4 +193,3 @@ footer {
     width: 100%; /* Estendi l'effetto al passaggio del mouse */
     left: 0; /* Posiziona l'effetto */
 }
-
