@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3000;
 
 // Configurazione per accettare i dati in formato JSON
 app.use(bodyParser.json());
