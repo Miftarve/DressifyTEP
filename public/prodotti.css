@@ -1,7 +1,7 @@
 /* General Styles */
 body {
-    background-color: #000; /* Black background */
-    color: #fff; /* White text */
+    background-color: #121212; /* Darker background */
+    color: #e0e0e0; /* Light grey text */
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
@@ -17,13 +17,14 @@ body {
 /* Sidebar styling */
 .sidebar {
     width: 25%;
-    background-color: #1a1a1a;
+    background-color: #1f1f1f;
     padding: 20px;
     color: #fff;
-    margin-top: 80px; /* Aggiungi questo margine per staccare la sidebar dalla navbar */
+    margin-top: 80px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow */
 }
 
-
+/* Main content area */
 #app {
     width: 75%;
     padding: 20px;
@@ -107,7 +108,7 @@ button:active {
 /* Separazione tra i pulsanti Modifica e Rimuovi */
 .button-group {
     display: flex;
-    gap: 20px; /* Spazio tra i pulsanti */
+    gap: 20px;
 }
 
 .remove-button {
@@ -212,42 +213,42 @@ button:active {
     color: #f39c12;
     transform: scale(1.2);
 }
+
 /* Navbar */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #111; /* Colore scuro per la navbar */
+    background-color: #111;
     display: flex;
-    justify-content: center; /* Allinea gli elementi al centro */
+    justify-content: center;
     align-items: center;
-    padding: 1rem 0; /* Rimuovi il padding laterale */
+    padding: 1rem 0;
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     z-index: 999;
-    transition: background-color 0.3s; /* Transizione per il colore di sfondo */
+    transition: background-color 0.3s;
 }
 
 #app {
     width: 75%;
     padding: 20px;
-    margin-top: 80px; /* Margine per separare la navbar dai contenuti sottostanti */
+    margin-top: 80px;
 }
 
-
 .logo {
-    position: absolute; /* Posiziona il logo a sinistra */
-    left: 20px; /* Distanza dal bordo sinistro */
+    position: absolute;
+    left: 20px;
 }
 
 .nav-links {
     list-style-type: none;
     display: flex;
     margin: 0;
-    padding: 0; /* Rimuovi padding */
+    padding: 0;
 }
 
 .nav-links li {
-    margin: 0 20px; /* Margine laterale uniforme */
+    margin: 0 20px;
 }
 
 .nav-links a {
@@ -256,9 +257,9 @@ button:active {
     font-size: 1.1rem;
     padding: 0.5rem 1rem;
     border-radius: 5px;
-    position: relative; /* Per il posizionamento degli effetti */
-    overflow: hidden; /* Nascondi il contenuto che esce */
-    transition: color 0.3s; /* Transizione per il colore */
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
 }
 
 .nav-links a::after {
@@ -268,75 +269,65 @@ button:active {
     bottom: 0;
     width: 0;
     height: 3px;
-    background-color: #fff; /* Colore dell'effetto */
-    transition: width 0.3s, left 0.3s; /* Transizione per l'effetto */
+    background-color: #fff;
+    transition: width 0.3s, left 0.3s;
 }
 
 .nav-links a:hover {
-    color: #ffd700; /* Colore del testo al passaggio del mouse */
+    color: #ffd700;
 }
 
 .nav-links a:hover::after {
-    width: 100%; /* Estendi l'effetto al passaggio del mouse */
-    left: 0; /* Posiziona l'effetto */
+    width: 100%;
+    left: 0;
 }
 
 /* Media query per tablet (768px e inferiori) */
 @media (max-width: 768px) {
     .container {
-        flex-direction: column; /* Layout a colonna */
+        flex-direction: column;
     }
-
     .sidebar {
-        width: 100%; /* Sidebar occupa l'intera larghezza */
-        margin-top: 0; /* Rimuovi il margine per risparmiare spazio */
+        width: 100%;
+        margin-top: 0;
     }
-
     #app {
         width: 100%;
-        margin-top: 20px; /* Riduci lo spazio dalla navbar */
+        margin-top: 20px;
     }
-
     .flex-container {
-        flex-direction: column; /* Layout a colonna per form e lista prodotti */
+        flex-direction: column;
     }
-
     .product-form, .product-list {
-        width: 100%; /* Massima larghezza su schermi piccoli */
+        width: 100%;
     }
 }
 
 /* Media query per smartphone (480px e inferiori) */
 @media (max-width: 480px) {
     .navbar {
-        flex-direction: column; /* Navbar a colonna */
+        flex-direction: column;
         padding: 0.5rem;
     }
-
     .nav-links {
         flex-direction: column;
     }
-
     .nav-links li {
-        margin: 5px 0; /* Riduci il margine */
+        margin: 5px 0;
     }
-
     .product-item {
-        font-size: 0.9rem; /* Riduci il font */
+        font-size: 0.9rem;
     }
-
     .avatar-box img {
         width: 60px;
         height: 60px;
     }
-
     .product-item {
         padding: 8px;
         margin-bottom: 8px;
     }
-
     .button-group {
-        flex-direction: column; /* Pulsanti in colonna */
+        flex-direction: column;
         gap: 10px;
     }
 }

@@ -42,6 +42,10 @@ header h1 {
 /* Sezione Sicurezza */
 .security article {
     margin-bottom: 20px;
+    background-color: #2b2b2b;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .security h2 {
@@ -192,4 +196,67 @@ footer:hover {
 .nav-links a:hover::after {
     width: 100%; /* Estendi l'effetto al passaggio del mouse */
     left: 0; /* Posiziona l'effetto */
+}
+
+/* Media query per tablet (768px e inferiori) */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .security h2, .feedback h2 {
+        font-size: 1.5rem;
+    }
+
+    .navbar {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+    }
+
+    .nav-links li {
+        margin: 5px 0;
+    }
+}
+
+/* Media query per smartphone (480px e inferiori) */
+@media (max-width: 480px) {
+    .container {
+        width: 100%;
+        padding: 5px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .security h2, .feedback h2 {
+        font-size: 1.2rem;
+    }
+
+    .navbar {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+    }
+
+    .nav-links li {
+        margin: 5px 0;
+    }
+
+    button {
+        font-size: 1rem;
+        padding: 10px;
+    }
 }
