@@ -331,3 +331,11 @@ button:active {
         gap: 10px;
     }
 }
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ddd; /* Cambia il colore al passaggio del mouse */
+}
+

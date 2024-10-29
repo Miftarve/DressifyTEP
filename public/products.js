@@ -7,7 +7,8 @@ new Vue({
             color: '',
             brand: '',
             condition: '',
-            price: '' // Aggiunto il campo price
+            price: '',
+            image: '' // Campo per l'immagine del prodotto
         },
         products: []
     },    
@@ -16,14 +17,13 @@ new Vue({
         loadProducts() {
             fetch('/api/products')
                 .then(response => {
-                    console.log(response); // Log della risposta
                     if (!response.ok) {
                         throw new Error('Errore nel caricamento dei prodotti');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    this.products = data.products; // Aggiorna l'array dei prodotti con i dati ricevuti
+                    this.products = data.products; // Aggiorna l'array dei prodotti
                 })
                 .catch(err => alert('Errore nel caricamento dei prodotti: ' + err.message));
         },
@@ -34,18 +34,32 @@ new Vue({
                 alert('Per favore inserisci un prezzo valido.');
                 return;
             }
+            if (!this.newProduct.category || !this.newProduct.size || !this.newProduct.color || 
+                !this.newProduct.brand || !this.newProduct.condition || !this.newProduct.price) {
+                alert("Tutti i campi sono obbligatori.");
+                return; // Esci se ci sono campi vuoti
+            }
+
+            this.products.push({...this.newProduct});
+            this.newProduct = {};
+            
+            const formData = new FormData(); // Usato per caricare file
+            formData.append('category', this.newProduct.category);
+            formData.append('size', this.newProduct.size);
+            formData.append('color', this.newProduct.color);
+            formData.append('brand', this.newProduct.brand);
+            formData.append('condition', this.newProduct.condition);
+            formData.append('price', this.newProduct.price);
+            formData.append('image', this.newProduct.image); // Aggiungi immagine
 
             fetch('/products', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.newProduct)
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                this.loadProducts(); // Ricarica i prodotti dopo aver aggiunto uno nuovo
+                this.loadProducts(); // Ricarica i prodotti dopo l'aggiunta
                 this.resetForm();
             })
             .catch(err => alert('Errore nell\'aggiunta del prodotto: ' + err.message));
@@ -60,7 +74,7 @@ new Vue({
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                this.loadProducts(); // Ricarica i prodotti dopo aver rimosso uno
+                this.loadProducts(); // Ricarica i prodotti dopo la rimozione
             })
             .catch(err => alert('Errore nella rimozione del prodotto: ' + err.message));
         },
@@ -79,8 +93,14 @@ new Vue({
                 color: '',
                 brand: '',
                 condition: '',
-                price: '' // Resetta anche il campo price
+                price: '',
+                image: '' // Resetta anche il campo immagine
             };
+        },
+
+        // Funzione per caricare l'immagine
+        handleImageUpload(event) {
+            this.newProduct.image = event.target.files[0]; // Salva il file dell'immagine
         }
     },
 
