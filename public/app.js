@@ -8,7 +8,6 @@ new Vue({
         phone: '', // Aggiunta del campo numero di telefono
         nationality: '', // Aggiunta del campo nazionalità
         dob: '',
-
         // Dati per la gestione prodotti
         newProduct: {
             category: '',
@@ -31,10 +30,8 @@ new Vue({
                 nationality: this.nationality, // Includi la nazionalità
                 dob: this.dob
             };
-
             // Log dei dati inviati
             console.log('Dati inviati:', data);
-
             fetch('/register', {
                 method: 'POST',
                 headers: {
@@ -46,10 +43,15 @@ new Vue({
             .then(data => {
                 // Log della risposta
                 console.log('Risposta ricevuta:', data);
-
                 alert(data.message);
                 if (data.message === 'Registrazione avvenuta con successo!') {
                     this.email = this.password = this.name = this.phone = this.nationality = this.dob = ''; // Reset dei campi
+                    // Controlla il dominio dell'email
+                    if (this.email.endsWith('@dressify.com')) {
+                        window.location.href = 'products.html'; // Reindirizza alla pagina products.html
+                    } else {
+                        window.location.href = 'noleggio-vendite.html'; // Reindirizza alla pagina noleggio-vendita.html
+                    }
                 }
             })
             .catch(err => {
@@ -58,7 +60,6 @@ new Vue({
                 alert('Errore: ' + err.message);
             });
         },
-
         // Funzione per aggiungere un nuovo prodotto
         addProduct() {
             // Logica per aggiungere un nuovo prodotto
