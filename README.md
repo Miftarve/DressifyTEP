@@ -90,3 +90,6 @@ Tipo:Funzionale
 **Descrizione**: Il sistema deve essere in grado di supportare un numero crescente di utenti e prodotti.  
 Tipo: Non Funzionale
 
+# Diagramma dei casi d'uso per Dressify
+- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](http://yuml.me/mifty/diagram/scruffy/usecase/)
+
