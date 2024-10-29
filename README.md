@@ -36,7 +36,7 @@ Dressify risolve il problema della disponibilità di abbigliamento di marca a pr
 # 1.2. Struttura del Profilo
 - **Profilo Utente**: Nome, cognome, numero di telefono, età, email, e password.
 
-# 1.3. Prodotti**
+# 1.3. Prodotti
 - **Categorie di Prodotti**: Giacche, accessori, ecc.
 - **Dettagli del Prodotto**: Taglia, colore, marca, e condizione (nuovo/usato).
 
@@ -91,5 +91,5 @@ Tipo:Funzionale
 Tipo: Non Funzionale
 
 # Diagramma dei casi d'uso per Dressify
-- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](http://yuml.me/mifty/diagram/scruffy/usecase/.svg)
+- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](https://yuml.me/mifty/mifty.svg)
 
