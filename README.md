@@ -164,6 +164,7 @@ Poshmark
 # REGISTRAZIONE
 **Metodo register**
 
+
 app.post('/register', async (req, res) => {
 
     const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
@@ -224,10 +225,15 @@ app.post('/register', async (req, res) => {
 
 **Metodo Login**
 
+
 app.post('/login', (req, res) => {
+
     const { email, password } = req.body;
+    
     if (!email || !password) {
+    
         return res.status(400).json({ success: false, message: 'Email e password sono obbligatorie.' });
+        
     }
 
     db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, row) => {
