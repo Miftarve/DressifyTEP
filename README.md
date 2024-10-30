@@ -165,9 +165,13 @@ Poshmark
 **Metodo register**
 
 app.post('/register', async (req, res) => {
+
     const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
+    
     if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
+    
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
+        
     }
 
     try {
