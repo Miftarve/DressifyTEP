@@ -80,7 +80,7 @@ Poshmark
 
 
 # Funzionalità - Raccolta dei Requisiti per Dressify
-**1. Requisiti di Dominio**
+# 1. Requisiti di Dominio
 
 **1.1. Tipi di Utenti**
 **Acquirenti**: Utenti che comprano vestiti usati o noleggiano abbigliamento.
