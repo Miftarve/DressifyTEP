@@ -190,21 +190,34 @@ app.post('/register', async (req, res) => {
     }
 });
 **PROVA DATI**
+
 {
+
   "name": "Mario Rossi",
+  
   "email": "mario.rossi@example.com",
+  
   "password": "Password123",
+  
   "dob": "1990-01-01",
+  
   "phone": "+391234567890",
+  
   "nationality": "Italian"
+  
 }
 
 **RISPOSTA**
+
 {
+
   "message": "Registrazione avvenuta con successo!"
+  
 }
 # LOGIN
+
 **Metodo Login**
+
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -229,13 +242,20 @@ app.post('/login', (req, res) => {
 });
 **PROVA DATI**
 {
+
   "email": "mario.rossi@example.com",
+  
   "password": "Password123"
+  
 }
 
 **RISPOSTA**
+
 {
+
   "success": true,
+  
   "message": "Login avvenuto con successo!"
+  
 }
 
