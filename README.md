@@ -161,3 +161,81 @@ Poshmark
 # Diagramma dei casi d'uso per Dressify
 - Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](http://yuml.me/mify/ildiagrammadelmifty.svg)
 
+# REGISTRAZIONE
+**Metodo register**
+app.post('/register', async (req, res) => {
+    const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
+    if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        db.run(
+            `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
+            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
+            function (err) {
+                if (err) {
+                    if (err.message.includes('UNIQUE constraint failed')) {
+                        return res.status(400).json({ message: 'Email già in uso' });
+                    } else {
+                        return res.status(500).json({ message: 'Errore durante la registrazione' });
+                    }
+                }
+                res.status(200).json({ message: 'Registrazione avvenuta con successo!' });
+            }
+        );
+    } catch (error) {
+        res.status(500).json({ message: 'Errore nel server', error });
+    }
+});
+**PROVA DATI**
+{
+  "name": "Mario Rossi",
+  "email": "mario.rossi@example.com",
+  "password": "Password123",
+  "dob": "1990-01-01",
+  "phone": "+391234567890",
+  "nationality": "Italian"
+}
+
+**RISPOSTA**
+{
+  "message": "Registrazione avvenuta con successo!"
+}
+# LOGIN
+**Metodo Login**
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: 'Email e password sono obbligatorie.' });
+    }
+
+    db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, row) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Errore nel server.' });
+        }
+        if (!row) {
+            return res.status(401).json({ success: false, message: 'Email o password errati.' });
+        }
+
+        const match = await bcrypt.compare(password, row.password);
+        if (!match) {
+            return res.status(401).json({ success: false, message: 'Email o password errati.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Login avvenuto con successo!' });
+    });
+});
+**PROVA DATI**
+{
+  "email": "mario.rossi@example.com",
+  "password": "Password123"
+}
+
+**RISPOSTA**
+{
+  "success": true,
+  "message": "Login avvenuto con successo!"
+}
+
