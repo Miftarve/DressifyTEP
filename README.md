@@ -159,5 +159,5 @@ Poshmark
 **Tipo**: Non Funzionale
 
 # Diagramma dei casi d'uso per Dressify
-- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](http://yuml.me/mifty/mifty.svg)
+- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](http://yuml.me/mify/ildiagrammadelmifty.svg)
 
