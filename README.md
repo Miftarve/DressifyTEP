@@ -35,25 +35,41 @@ Poshmark
 **API**: RESTful API per gestire utenti, prodotti e transazioni.
 
 # Requisiti iniziali
+
 **Funzionalità Utente**:
+**Registrazione**:Creare un account con nome, cognome, numero di telefono, età, email e password.
 
-**Registrazione**: Creare un account con nome, cognome, numero di telefono, età, email e password.
-
-**Login**: Usare email e password.
+**Login**: email e password.
 
 **Gestione Prodotti**:
-
-**Categori**e: Suddividere i vestiti in gruppi (es. giacche, accessori).
+**Categorie**: Suddividere i vestiti in gruppi (es. giacche, accessori).
 
 **Dettagli**: Mostrare taglia, colore, marca e condizione (nuovo/usato).
 
-# Noleggio e Vendita:
-
-**Noleggio**: Scegliere la durata e calcolare il prezzo automaticamente.
+**Noleggio e Vendita**:
+**Noleggio**: Selezionare la durata del noleggio e calcolare il prezzo automaticamente.
 
 **Acquisto**: Opzione per comprare i vestiti direttamente.
 
-**Contrattazione**: Proporre un prezzo ai venditori.
+**Contrattazione**: Invio di proposte di prezzo ai venditori.
+
+**Ricerca e Filtri**:
+**Ricerca**: Trovare capi per nome o descrizione.
+
+**Filtri**: Ordinare per prezzo, taglia, marca e condizioni.
+
+**Salvataggio**: Possibilità di salvare le ricerche preferite.
+
+**Carrello**:
+**Carrello**: Aggiungere o rimuovere capi facilmente.
+
+**Sicurezza**:
+**Protezione Dati**: Usare HTTPS per la sicurezza online.
+
+**Privacy**: Chiarezza sulle politiche di gestione dei dati.
+
+**Feedback**:
+**Recensioni**: Gli utenti possono lasciare valutazioni sui prodotti.
 
 # Ricerca e Filtri:
 **Ricerca**: Trovare vestiti per nome o descrizione.
