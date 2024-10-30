@@ -169,6 +169,7 @@ app.post('/register', async (req, res) => {
     if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
@@ -224,6 +225,7 @@ app.post('/login', (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ success: false, message: 'Email e password sono obbligatorie.' });
     }
+
     db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, row) => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Errore nel server.' });
