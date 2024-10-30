@@ -23,8 +23,11 @@ Poshmark
 
 # Tecnologie
 **Frontend**: HTML, CSS, Vue.js
+
 **Backend**: Node.js, Express.js
+
 **Database**: SQLite
+
 **API**: RESTful API per gestire utenti, prodotti e transazioni.
 
 # Requisiti iniziali
