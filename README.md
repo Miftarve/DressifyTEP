@@ -78,17 +78,6 @@ Poshmark
 
 **Salvataggio**: Salvare le ricerche preferite.
 
-# Carrello:
-Aggiungere o rimuovere vestiti facilmente.
-
-# Sicurezza:
-**Protezione Dati**: Usare HTTPS per la sicurezza online.
-
-**Privacy**: Chiarezza sulle politiche di gestione dei dati.
-
-# Feedback:
-Gli utenti possono lasciare valutazioni sui prodotti.
-
 # Funzionalità - Raccolta dei Requisiti per Dressify
 **1. Requisiti di Dominio**
 
