@@ -4,6 +4,9 @@
 # Descrizione  
 Dressify è una piattaforma digitale dedicata al noleggio e alla vendita di abbigliamento di marca di seconda mano. Permette agli utenti di scoprire e acquistare capi di alta qualità a prezzi accessibili, oppure di noleggiare vestiti per occasioni speciali. Dressify semplifica la gestione dei prodotti, la selezione di categorie, e il processo di acquisto e noleggio, offrendo un’esperienza completa per chi cerca abbigliamento di qualità a prezzi vantaggiosi.
 
+# Tag line
+Una piattaforma digitale dedicata al noleggio e alla vendita di abbigliamento di marca di seconda mano. 
+
 # Target
 - Appassionati di moda in cerca di capi di marca a prezzi accessibili
 - Utenti interessati al noleggio di vestiti per eventi
@@ -25,6 +28,28 @@ Dressify risolve il problema della disponibilità di abbigliamento di marca a pr
 - **Database**: SQLite
 - **API**: RESTful API per la gestione degli utenti, prodotti e transazioni
 
+# Requisiti iniziali 
+**Funzionalità Utente**:
+Registrazione:Creare un account con nome, cognome, numero di telefono, età, email e password.
+Login: email e password.
+**Gestione Prodotti**:
+Categorie: Suddividere i vestiti in gruppi (es. giacche, accessori).
+Dettagli: Mostrare taglia, colore, marca e condizione (nuovo/usato).
+**Noleggio e Vendita**:
+Noleggio: Selezionare la durata del noleggio e calcolare il prezzo automaticamente.
+Acquisto: Opzione per comprare i vestiti direttamente.
+Contrattazione: Invio di proposte di prezzo ai venditori.
+**Ricerca e Filtri**:
+Ricerca: Trovare capi per nome o descrizione.
+Filtri: Ordinare per prezzo, taglia, marca e condizioni.
+Salvataggio: Possibilità di salvare le ricerche preferite.
+**Carrello**:
+Carrello: Aggiungere o rimuovere capi facilmente.
+**Sicurezza**:
+Protezione Dati: Usare HTTPS per la sicurezza online.
+Privacy: Chiarezza sulle politiche di gestione dei dati.
+**Feedback**:
+Recensioni: Gli utenti possono lasciare valutazioni sui prodotti.
 
 ### Funzionalità - Raccolta dei Requisiti per Dressify
 
