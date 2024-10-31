@@ -37,21 +37,25 @@
                 <input type="text" v-model="newProduct.brand" placeholder="Marca" required>
                 <input type="text" v-model="newProduct.condition" placeholder="Condizione" required>
                 <input type="number" v-model="newProduct.price" placeholder="Prezzo" required>
-                <input type="file" @change="handleImageUpload" required>
+                <input type="file" @change="handleImageUpload" multiple accept="image/*" required>
                 <button type="submit">Aggiungi Prodotto</button>
             </form>
-            
+
             <div v-for="(product, index) in products" :key="product.id">
                 <h2>{{ product.brand }} - {{ product.category }}</h2>
                 <p>Taglia: {{ product.size }}</p>
                 <p>Colore: {{ product.color }}</p>
                 <p>Condizione: {{ product.condition }}</p>
                 <p>Prezzo: €{{ product.price }}</p>
+                <div v-if="product.images && product.images.length">
+                    <img v-for="image in product.images" :src="`/public/${image}`" :alt="product.brand" width="100"
+                        height="100">
+                </div>
                 <button @click="editProduct(index)">Modifica</button>
                 <button @click="removeProduct(index)">Rimuovi</button>
             </div>
         </div>
-        
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
