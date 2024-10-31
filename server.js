@@ -13,14 +13,15 @@ const PORT = 3000;
 app.use(fileUpload());
 app.use(express.static('public'));
 
+app.use('/public', express.static('public'));
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
+    destination: (req, file, cb) => cb(null, 'public/'),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
 const upload = multer({ storage });
 // Rendi la cartella assets accessibile come file statici
-app.use('/public/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/public/assets', express.static(path.join(__dirname, 'public/assets')));
 
 // Configurazione per accettare i dati in formato JSON
 app.use(bodyParser.json());
