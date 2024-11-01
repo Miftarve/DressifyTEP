@@ -47,8 +47,7 @@
                 <p>Colore: {{ product.color }}</p>
                 <p>Condizione: {{ product.condition }}</p>
                 <p>Prezzo: €{{ product.price }}</p>
-                <div v-if="product.images && product.images.length">
-                    <img v-for="image in product.images" :src="`assets/${image}`" :alt="product.brand" width="100" height="100">
+                <div v-if="product.images && product.images.length"><img v-for="image in product.images" :src="`/public/assets/${image}`" :alt="product.brand" width="100" height="100">
                 </div>
                 <button @click="editProduct(index)">Modifica</button>
                 <button @click="removeProduct(index)">Rimuovi</button>
