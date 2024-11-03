@@ -8,7 +8,7 @@ new Vue({
             brand: '',
             condition: '',
             price: '',
-            images: [] // Campo per le immagini multiple
+            images: []
         },
         products: []
     },
@@ -18,9 +18,10 @@ new Vue({
                 .then(response => response.json())
                 .then(data => {
                     this.products = data.products;
+                    localStorage.setItem('products', JSON.stringify(data.products)); // Salva i dati nel Local Storage
                 });
         },
-        
+
         addProduct() {
             if (!this.newProduct.price || isNaN(this.newProduct.price)) {
                 alert('Per favore inserisci un prezzo valido.');
@@ -36,7 +37,7 @@ new Vue({
             formData.append('price', this.newProduct.price);
 
             this.newProduct.images.forEach((image, index) => {
-                formData.append(`images`, image);
+                formData.append('images', image);
             });
 
             fetch('/products', {
@@ -46,15 +47,20 @@ new Vue({
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                this.loadProducts();
+                this.loadProducts(); // Ricarica i prodotti e aggiorna il Local Storage
                 this.resetForm();
             })
             .catch(err => alert('Errore nell\'aggiunta del prodotto: ' + err.message));
         },
 
         handleImageUpload(event) {
-            this.newProduct.images = Array.from(event.target.files); // Gestisce immagini multiple
-        },
+            const files = Array.from(event.target.files);
+            this.newProduct.images = files.map((file, index) => {
+                const fileName = `${this.newProduct.category.replace(/\s+/g, '_')}_${Date.now()}_${index}.jpg`;
+                Object.defineProperty(file, 'name', { value: fileName, writable: false });
+                return file;
+            });
+        },        
 
         resetForm() {
             this.newProduct = {
@@ -66,9 +72,21 @@ new Vue({
                 price: '',
                 images: []
             };
+        },
+
+        // Carica dati dal Local Storage se offline
+        loadProductsFromLocalStorage() {
+            const storedProducts = localStorage.getItem('products');
+            if (storedProducts) {
+                this.products = JSON.parse(storedProducts);
+            }
         }
     },
     created() {
-        this.loadProducts();
+        if (navigator.onLine) {
+            this.loadProducts();
+        } else {
+            this.loadProductsFromLocalStorage(); // Usa i dati locali se offline
+        }
     }
 });

@@ -3,32 +3,26 @@ const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const multer = require('multer'); 
-const fileUpload = require('express-fileupload'); 
-
-
+const multer = require('multer');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const PORT = 3000;
 app.use(fileUpload());
-app.use(express.static('public'));
 
-app.use('/public', express.static('public'));
+// Imposta una sola directory statica
+app.use(express.static(path.join(__dirname, 'public')));
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/'),
+    destination: (req, file, cb) => cb(null, 'public/assets'),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
-const upload = multer({ storage });
-// Rendi la cartella assets accessibile come file statici
-app.use('/public/assets', express.static(path.join(__dirname, 'public/assets')));
 
-// Configurazione per accettare i dati in formato JSON
+const upload = multer({ storage });
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Imposta la directory per i file statici
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Inizializza il database SQLite
 const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
@@ -137,40 +131,19 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Route per aggiungere un nuovo prodotto con immagini
-app.post('/products', (req, res) => {
+
+app.post('/products', upload.array('images', 3), (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
+    const imagePaths = req.files.map(file => `public/assets/${file.filename}`);
     
-    // Controllo dati mancanti
-    if (!category || !size || !color || !brand || !condition || price == null) {
-        return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
-    }
-    
-    // Gestione delle immagini
-    const files = req.files ? Object.values(req.files) : [];
-    if (files.length > 3) {
-        return res.status(400).json({ message: 'Carica massimo 3 immagini.' });
-    }
-    
-    const imagePaths = files.map((file, index) => {
-        const imagePath = `public/assets/image_${Date.now()}_${index}.jpg`;
-        file.mv(path.join(__dirname, imagePath), err => {
-            if (err) console.error("Errore nel salvataggio dell'immagine:", err.message);
-        });
-        return imagePath;
-    });
-    
-    // Salva il prodotto
     db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`,
         [category, size, color, brand, condition, price],
         function(err) {
             if (err) {
-                console.error('Errore durante l\'aggiunta del prodotto:', err.message); // Log errore
                 return res.status(500).json({ message: 'Errore durante l\'aggiunta del prodotto.' });
             }
             const productId = this.lastID;
 
-            // Salva percorsi delle immagini
             const insertImageQuery = db.prepare(`INSERT INTO product_images (product_id, image_path) VALUES (?, ?)`);
             imagePaths.forEach(imagePath => {
                 insertImageQuery.run([productId, imagePath]);
