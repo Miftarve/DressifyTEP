@@ -27,32 +27,112 @@
 
 
     <div class="container">
+        <aside class="sidebar" data-sidebar>
+            <center><h1>DRESSIFY</h1></center>
+            <div class="sidebar-info">
+                <figure class="avatar-box">
+                    <img src="./assets/images.jpeg" alt="userInfo.name" width="80">
+                </figure>
+                <div class="info-content">
+                    <h1 class="name" title="userInfo.name">{{ userInfo.name }}</h1>
+                </div>
+            </div>
+            <div class="sidebar-info_more">
+                <div class="separator"></div>
+                <ul class="contacts-list">
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="mail-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Email</p>
+                            <a href="mailto:userInfo.email" class="contact-link">{{ userInfo.email }}</a>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="phone-portrait-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Telefono</p>
+                            <a href="tel:userInfo.phone" class="contact-link">{{ userInfo.phone }}</a>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Data di nascita</p>
+                            <time datetime="userInfo.dob">{{ new Date(userInfo.dob).toLocaleDateString() }}</time>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="location-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Nazionalità</p>
+                            <address>{{ userInfo.nationality }}</address>
+                        </div>
+                    </li>
+                </ul>
+                <!-- ... Altri contenuti ... -->
+            </div>
+        </aside>
+        
+
         <div id="app">
             <h1>Gestione Prodotti</h1>
-            <form @submit.prevent="addProduct">
-                <input type="text" v-model="newProduct.category" placeholder="Categoria" required>
-                <input type="text" v-model="newProduct.size" placeholder="Taglia" required>
-                <input type="text" v-model="newProduct.color" placeholder="Colore" required>
-                <input type="text" v-model="newProduct.brand" placeholder="Marca" required>
-                <input type="text" v-model="newProduct.condition" placeholder="Condizione" required>
-                <input type="number" v-model="newProduct.price" placeholder="Prezzo" required>
-                <input type="file" @change="handleImageUpload" multiple accept="image/*" required>
-                <button type="submit">Aggiungi Prodotto</button>
-            </form>
+            <div class="flex-container">
+                <form @submit.prevent="addProduct" class="product-form">
+                    <h2>Aggiungi un Nuovo Prodotto</h2>
+                    <div class="form-group">
+                        <label for="category">Categoria</label>
+                        <input type="text" v-model="newProduct.category" required placeholder="es. Giacche, Accessori">
+                    </div>
+                    <div class="form-group">
+                        <label for="size">Taglia</label>
+                        <input type="text" v-model="newProduct.size" required placeholder="es. S, M, L">
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Colore</label>
+                        <input type="text" v-model="newProduct.color" required placeholder="es. Rosso, Blu">
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Marca</label>
+                        <input type="text" v-model="newProduct.brand" required placeholder="es. Nike, Adidas">
+                    </div>
+                    <div class="form-group">
+                        <label for="condition">Condizione</label>
+                        <select v-model="newProduct.condition" required>
+                            <option value="">Seleziona condizione</option>
+                            <option value="nuovo">Nuovo</option>
+                            <option value="usato">Usato</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Prezzo</label>
+                        <input type="number" v-model="newProduct.price" required placeholder="Prezzo in euro">
+                    </div>
+                    <button type="submit">Aggiungi Prodotto</button>
+                </form>
 
-            <div v-for="(product, index) in products" :key="product.id">
-                <h2>{{ product.brand }} - {{ product.category }}</h2>
-                <p>Taglia: {{ product.size }}</p>
-                <p>Colore: {{ product.color }}</p>
-                <p>Condizione: {{ product.condition }}</p>
-                <p>Prezzo: €{{ product.price }}</p>
-                <div v-if="product.images && product.images.length"><img v-for="image in product.images" :src="`/public/assets/${image}`" :alt="product.brand" width="100" height="100">
+                <div class="product-list">
+                    <h2>Lista Prodotti</h2>
+                    <ul>
+                        <li v-for="(product, index) in products" :key="index" class="product-item">
+                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand
+                                }} - {{ product.condition }} - €{{ product.price }}</span>
+                            <div class="button-group">
+                                <button @click="editProduct(index)">Modifica</button>
+                                <button @click="removeProduct(index)" class="remove-button">Rimuovi</button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <button @click="editProduct(index)">Modifica</button>
-                <button @click="removeProduct(index)">Rimuovi</button>
             </div>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>

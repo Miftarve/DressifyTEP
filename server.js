@@ -3,26 +3,20 @@ const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const multer = require('multer');
-const fileUpload = require('express-fileupload');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
-app.use(fileUpload());
 
-// Imposta una sola directory statica
-app.use(express.static(path.join(__dirname, 'public')));
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/assets'),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-});
-
-const upload = multer({ storage });
-
+// Configurazione per accettare i dati in formato JSON
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Imposta la directory per i file statici
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configurazione per accettare richieste da qualsiasi origine
+app.use(cors());
 
 // Inizializza il database SQLite
 const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
@@ -64,14 +58,6 @@ db.serialize(() => {
             console.error('Errore nella creazione della tabella products:', err.message);
         }
     });
-    db.run(`
-        CREATE TABLE IF NOT EXISTS product_images (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            product_id INTEGER,
-            image_path TEXT,
-            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-        )
-    `);
 });
 
 // Route principale
@@ -131,50 +117,46 @@ app.post('/login', (req, res) => {
     });
 });
 
-
-app.post('/products', upload.array('images', 3), (req, res) => {
+// Route per aggiungere un nuovo prodotto
+app.post('/products', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
-    const imagePaths = req.files.map(file => `public/assets/${file.filename}`);
-    
-    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`,
+
+    if (!category || !size || !color || !brand || !condition || price == null) {
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+    }
+
+    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)` ,
         [category, size, color, brand, condition, price],
         function(err) {
             if (err) {
                 return res.status(500).json({ message: 'Errore durante l\'aggiunta del prodotto.' });
             }
-            const productId = this.lastID;
-
-            const insertImageQuery = db.prepare(`INSERT INTO product_images (product_id, image_path) VALUES (?, ?)`);
-            imagePaths.forEach(imagePath => {
-                insertImageQuery.run([productId, imagePath]);
-            });
-            insertImageQuery.finalize();
-
-            res.status(201).json({ message: 'Prodotto aggiunto con successo!' });
+            res.status(201).json({ message: 'Prodotto aggiunto con successo!', id: this.lastID });
         }
     );
 });
 
-// Route per ottenere i prodotti con le relative immagini
+// Route per ottenere tutti i prodotti
 app.get('/api/products', (req, res) => {
-    db.all('SELECT * FROM products', [], (err, products) => {
+    db.all('SELECT * FROM products', [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
+        res.status(200).json({ products: rows });
+    });
+});
 
-        const productsWithImages = products.map(product => new Promise((resolve, reject) => {
-            db.all('SELECT image_path FROM product_images WHERE product_id = ?', [product.id], (err, images) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ ...product, images: images.map(img => img.image_path) });
-                }
-            });
-        }));
-
-        Promise.all(productsWithImages)
-            .then(results => res.status(200).json({ products: results }))
-            .catch(err => res.status(500).json({ error: err.message }));
+// Route per ottenere un prodotto specifico per ID
+app.get('/api/products/:id', (req, res) => {
+    const productId = req.params.id;
+    db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Prodotto non trovato' });
+        }
+        res.status(200).json(row);
     });
 });
 
@@ -223,3 +205,4 @@ app.delete('/products/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
 });
+ 
