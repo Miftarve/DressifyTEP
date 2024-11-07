@@ -27,59 +27,7 @@
 
 
     <div class="container">
-        <aside class="sidebar" data-sidebar>
-            <center><h1>DRESSIFY</h1></center>
-            <div class="sidebar-info">
-                <figure class="avatar-box">
-                    <img src="./assets/images.jpeg" alt="userInfo.name" width="80">
-                </figure>
-                <div class="info-content">
-                    <h1 class="name" title="userInfo.name">{{ userInfo.name }}</h1>
-                </div>
-            </div>
-            <div class="sidebar-info_more">
-                <div class="separator"></div>
-                <ul class="contacts-list">
-                    <li class="contact-item">
-                        <div class="icon-box">
-                            <ion-icon name="mail-outline"></ion-icon>
-                        </div>
-                        <div class="contact-info">
-                            <p class="contact-title">Email</p>
-                            <a href="mailto:userInfo.email" class="contact-link">{{ userInfo.email }}</a>
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="icon-box">
-                            <ion-icon name="phone-portrait-outline"></ion-icon>
-                        </div>
-                        <div class="contact-info">
-                            <p class="contact-title">Telefono</p>
-                            <a href="tel:userInfo.phone" class="contact-link">{{ userInfo.phone }}</a>
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="icon-box">
-                            <ion-icon name="calendar-outline"></ion-icon>
-                        </div>
-                        <div class="contact-info">
-                            <p class="contact-title">Data di nascita</p>
-                            <time datetime="userInfo.dob">{{ new Date(userInfo.dob).toLocaleDateString() }}</time>
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="icon-box">
-                            <ion-icon name="location-outline"></ion-icon>
-                        </div>
-                        <div class="contact-info">
-                            <p class="contact-title">Nazionalità</p>
-                            <address>{{ userInfo.nationality }}</address>
-                        </div>
-                    </li>
-                </ul>
-                <!-- ... Altri contenuti ... -->
-            </div>
-        </aside>
+      
         
 
         <div id="app">
@@ -131,6 +79,7 @@
                         </li>
                     </ul>
                 </div>
+                
             </div>
         </div>
     </div>
