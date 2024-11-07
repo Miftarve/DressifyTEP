@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Utenti - Dressify</title>
+    <link rel="stylesheet" href="prodotti.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <figure class="avatar-box">
+                <img src="./assets/dressify.png" alt="Dressify Logo" width="60">
+            </figure>
+        </div>
+        <ul class="nav-links">
+            <li><a href="user.html">Home</a></li>
+            <li><a href="products.html">Prodotti</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div id="userApp">
+            <h1>Gestione Utenti</h1>
+            <ul class="user-list">
+                <li v-for="(user, index) in users" :key="index" class="user-item">
+                    <span>{{ user.name }} - {{ user.email }} - {{ user.phone }} - {{ user.nationality }}</span>
+                    <button v-if="isOwner" @click="removeUser(user.id)" class="remove-button">Rimuovi</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="users.js"></script>
+</body>
+</html>
