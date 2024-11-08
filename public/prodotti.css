@@ -339,17 +339,3 @@ button:hover {
     background-color: #ddd; /* Cambia il colore al passaggio del mouse */
 }
 
-.user-list {
-    list-style: none;
-    padding: 0;
-}
-
-.user-item {
-    background-color: #222;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}

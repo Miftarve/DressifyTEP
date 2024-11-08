@@ -67,16 +67,16 @@ app.get('/', (req, res) => {
 
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
-    const { name, email, password, dob } = req.body;
-    if (!name || !email || !password || !dob) {
+    const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
+    if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
-            `INSERT INTO users (name, email, password, dob) VALUES (?, ?, ?, ?)`,
-            [name, email, hashedPassword, dob],
+            `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
+            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
             function (err) {
                 if (err) {
                     if (err.message.includes('UNIQUE constraint failed')) {
@@ -190,7 +190,6 @@ app.put('/products/:id', (req, res) => {
     );
 });
 
-
 // Route per rimuovere un prodotto
 app.delete('/products/:id', (req, res) => {
     const productId = req.params.id;
@@ -202,37 +201,8 @@ app.delete('/products/:id', (req, res) => {
     });
 });
 
-// Route per ottenere tutti gli utenti
-app.get('/api/users', (req, res) => {
-    db.all('SELECT * FROM users', [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(200).json({ users: rows });
-    });
-});
-
-// Route per eliminare un utente (accessibile solo ai proprietari)
-app.delete('/api/users/:id', (req, res) => {
-    const userId = req.params.id;
-    const requesterEmail = req.headers['x-user-email']; // Passare l'email dell'utente tramite header
-
-    if (!requesterEmail || !requesterEmail.endsWith('@dressify.com')) {
-        return res.status(403).json({ message: 'Accesso negato. Solo il proprietario può eliminare utenti.' });
-    }
-
-    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
-        if (err) {
-            return res.status(500).json({ message: 'Errore durante la rimozione dell\'utente.' });
-        }
-        res.status(200).json({ message: 'Utente rimosso con successo.' });
-    });
-});
-
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
 });
  
-
-
