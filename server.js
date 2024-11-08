@@ -201,6 +201,28 @@ app.delete('/products/:id', (req, res) => {
     });
 });
 
+// Rotta per ottenere tutti gli utenti
+app.get('/api/users', (req, res) => {
+    db.all('SELECT id, name, email FROM users', [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel recupero degli utenti.' });
+        }
+        res.status(200).json({ users: rows });
+    });
+});
+
+// Rotta per eliminare un utente
+app.delete('/users/:id', (req, res) => {
+    const userId = req.params.id;
+    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nella rimozione dell\'utente.' });
+        }
+        res.status(200).json({ message: 'Utente rimosso con successo.' });
+    });
+});
+
+
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);

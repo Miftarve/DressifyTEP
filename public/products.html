@@ -70,14 +70,26 @@
                     <h2>Lista Prodotti</h2>
                     <ul>
                         <li v-for="(product, index) in products" :key="index" class="product-item">
-                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand
-                                }} - {{ product.condition }} - €{{ product.price }}</span>
+                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - €{{ product.price }}</span>
                             <div class="button-group">
                                 <button @click="editProduct(index)">Modifica</button>
                                 <button @click="removeProduct(index)" class="remove-button">Rimuovi</button>
                             </div>
                         </li>
                     </ul>
+                </div>
+
+                <!-- Gestione Utenti -->
+                <div class="user-list">
+                    <h2>Gestione Utenti</h2>
+                    <div class="user-cards">
+                        <div v-for="(user, index) in users" :key="user.id" class="user-card">
+                            <p><strong>{{ user.name }}</strong></p>
+                            <p>Email: {{ user.email }}</p>
+                            <button @click="viewUser(user.id)">Visualizza</button>
+                            <button @click="removeUser(user.id)" class="remove-button">Rimuovi</button>
+                        </div>
+                    </div>
                 </div>
                 
             </div>
