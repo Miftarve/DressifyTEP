@@ -67,16 +67,16 @@ app.get('/', (req, res) => {
 
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
-    const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
-    if (!name || !email || !password || !dob || !phone || !nationality) { // Verifica che tutti i campi siano presenti
+    const { name, email, password, dob } = req.body;
+    if (!name || !email || !password || !dob) {
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
-            `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
-            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
+            `INSERT INTO users (name, email, password, dob) VALUES (?, ?, ?, ?)`,
+            [name, email, hashedPassword, dob],
             function (err) {
                 if (err) {
                     if (err.message.includes('UNIQUE constraint failed')) {
@@ -234,3 +234,5 @@ app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
 });
  
+
+
