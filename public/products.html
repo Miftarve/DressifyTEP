@@ -20,6 +20,7 @@
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="products.html">Prodotti</a></li>
+            <li><a href="user.html">Utenti</a></li>
             <li><a href="sicurezza.html">Sicurezza</a></li>
             <li><a href="feedback.html">Feedback</a></li>
         </ul>
@@ -78,20 +79,6 @@
                         </li>
                     </ul>
                 </div>
-
-                <!-- Gestione Utenti -->
-                <div class="user-list">
-                    <h2>Gestione Utenti</h2>
-                    <div class="user-cards">
-                        <div v-for="(user, index) in users" :key="user.id" class="user-card">
-                            <p><strong>{{ user.name }}</strong></p>
-                            <p>Email: {{ user.email }}</p>
-                            <button @click="viewUser(user.id)">Visualizza</button>
-                            <button @click="removeUser(user.id)" class="remove-button">Rimuovi</button>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
         </div>
     </div>

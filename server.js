@@ -203,17 +203,41 @@ app.delete('/products/:id', (req, res) => {
 
 // Rotta per ottenere tutti gli utenti
 app.get('/api/users', (req, res) => {
-    db.all('SELECT id, name, email FROM users', [], (err, rows) => {
+    console.log('Chiamata alla route /api/users');
+    db.all('SELECT id, name, email, phone, nationality FROM users', [], (err, rows) => {
         if (err) {
+            console.error('Errore nel recupero degli utenti:', err.message);
             return res.status(500).json({ message: 'Errore nel recupero degli utenti.' });
         }
         res.status(200).json({ users: rows });
     });
 });
 
+
+
+
 // Rotta per eliminare un utente
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
+    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nella rimozione dell\'utente.' });
+        }
+        res.status(200).json({ message: 'Utente rimosso con successo.' });
+    });
+});
+
+
+// Rotta per eliminare un utente con autenticazione
+app.delete('/api/users/:id', (req, res) => {
+    const userId = req.params.id;
+    const requesterEmail = req.headers['x-user-email'];
+
+    // Verifica se l'email del richiedente termina con "@dressify.com"
+    if (!requesterEmail || !requesterEmail.endsWith('@dressify.com')) {
+        return res.status(403).json({ message: 'Non autorizzato.' });
+    }
+
     db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
         if (err) {
             return res.status(500).json({ message: 'Errore nella rimozione dell\'utente.' });

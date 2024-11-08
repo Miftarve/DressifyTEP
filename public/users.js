@@ -6,15 +6,25 @@ new Vue({
     },
     methods: {
         loadUsers() {
-            fetch('http://37.27.40.78:3000/api/users')
+            fetch('http://localhost:3000/api/users')
                 .then(response => {
-                    if (!response.ok) throw new Error('Errore nel caricamento degli utenti');
+                    if (!response.ok) {
+                        // Lancia un errore con lo status del server per facilitare la diagnosi
+                        throw new Error(`Errore ${response.status}: ${response.statusText}`);
+                    }
                     return response.json();
                 })
                 .then(data => {
-                    this.users = data.users;
+                    if (data && data.users) {
+                        this.users = data.users;
+                    } else {
+                        throw new Error('Formato della risposta non valido');
+                    }
                 })
-                .catch(err => alert('Errore nel caricamento degli utenti: ' + err.message));
+                .catch(err => {
+                    // Mostra un errore specifico con i dettagli del messaggio di errore
+                    alert('Errore nel caricamento degli utenti: ' + err.message);
+                });
         },
         
         removeUser(userId) {
@@ -32,7 +42,7 @@ new Vue({
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Errore nella rimozione dell\'utente');
+                    throw new Error(`Errore ${response.status}: ${response.statusText}`);
                 }
                 return response.json();
             })

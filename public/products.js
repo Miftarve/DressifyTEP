@@ -1,4 +1,4 @@
-new Vue({ 
+new Vue({
     el: '#app',
     data: {
         newProduct: {
@@ -9,13 +9,18 @@ new Vue({
             condition: '',
             price: ''
         },
-        products: [],
-        users: []  // Aggiunto array per gli utenti
+        products: []
     },
     methods: {
         loadProducts() {
             fetch('http://37.27.40.78:3000/api/products')
-                .then(response => response.json())
+                .then(response => {
+                    console.log(response);
+                    if (!response.ok) {
+                        throw new Error('Errore nel caricamento dei prodotti');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     this.products = data.products;
                 })
@@ -30,7 +35,9 @@ new Vue({
 
             fetch('http://37.27.40.78:3000/products', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(this.newProduct)
             })
             .then(response => response.json())
@@ -60,31 +67,6 @@ new Vue({
             window.location.href = `edit-product.html?id=${productId}`;
         },
 
-        loadUsers() {
-            fetch('http://37.27.40.78:3000/api/users')
-                .then(response => response.json())
-                .then(data => {
-                    this.users = data.users;
-                })
-                .catch(err => alert('Errore nel caricamento degli utenti: ' + err.message));
-        },
-
-        viewUser(userId) {
-            window.location.href = `user-details.html?id=${userId}`;  // Nuova pagina per visualizzare i dettagli utente
-        },
-
-        removeUser(userId) {
-            fetch(`http://37.27.40.78:3000/users/${userId}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                this.loadUsers(); // Ricarica la lista utenti
-            })
-            .catch(err => alert('Errore nella rimozione dell\'utente: ' + err.message));
-        },
-
         resetForm() {
             this.newProduct = {
                 category: '',
@@ -96,8 +78,8 @@ new Vue({
             };
         }
     },
+
     created() {
         this.loadProducts();
-        this.loadUsers();  // Carica gli utenti all'inizio
     }
 });
