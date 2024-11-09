@@ -203,7 +203,6 @@ app.delete('/products/:id', (req, res) => {
 
 // Rotta per ottenere tutti gli utenti
 app.get('/api/users', (req, res) => {
-    console.log('Chiamata alla route /api/users');
     db.all('SELECT id, name, email, phone, nationality FROM users', [], (err, rows) => {
         if (err) {
             console.error('Errore nel recupero degli utenti:', err.message);
