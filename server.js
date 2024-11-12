@@ -27,22 +27,25 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
     }
 });
 
+
 // Crea le tabelle "users" e "products" nel database
 db.serialize(() => {
-    // Crea la tabella users solo se non esiste
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT UNIQUE,
-        password TEXT,
-        dob TEXT,
-        phone TEXT,
-        nationality TEXT
-    )`, (err) => {
-        if (err) {
-            console.error('Errore nella creazione della tabella users:', err.message);
-        }
-    });
+
+        db.run(`CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT,
+            size TEXT,
+            color TEXT,
+            brand TEXT,
+            condition TEXT,
+            price REAL
+        )`, (err) => {
+            if (err) {
+                console.error('Errore nella creazione della tabella products:', err.message);
+            }
+        });
+
+
 
     // Crea la tabella "products" se non esiste
     db.run(`CREATE TABLE IF NOT EXISTS products (
@@ -117,7 +120,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Route per aggiungere un nuovo prodotto
 app.post('/products', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
 
@@ -135,6 +137,8 @@ app.post('/products', (req, res) => {
         }
     );
 });
+
+
 
 // Route per ottenere tutti i prodotti
 app.get('/api/products', (req, res) => {
@@ -227,22 +231,17 @@ app.delete('/users/:id', (req, res) => {
 });
 
 
-// Rotta per eliminare un utente con autenticazione
 app.delete('/api/users/:id', (req, res) => {
     const userId = req.params.id;
-    const requesterEmail = req.headers['x-user-email'];
 
-    // Verifica se l'email del richiedente termina con "@dressify.com"
-    if (!requesterEmail || !requesterEmail.endsWith('@dressify.com')) {
-        return res.status(403).json({ message: 'Non autorizzato.' });
+    // Trova l'indice dell'utente nel database
+    const index = users.findIndex(user => user.id === parseInt(userId));
+    if (index !== -1) {
+        users.splice(index, 1); // Rimuovi l'utente
+        res.status(200).send({ message: "Utente eliminato con successo!" });
+    } else {
+        res.status(404).send({ message: "Utente non trovato." });
     }
-
-    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
-        if (err) {
-            return res.status(500).json({ message: 'Errore nella rimozione dell\'utente.' });
-        }
-        res.status(200).json({ message: 'Utente rimosso con successo.' });
-    });
 });
 
 

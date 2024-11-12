@@ -48,25 +48,23 @@ new Vue({
             .catch(err => alert('Errore nella sospensione dell\'utente: ' + err.message));
         },
 
-        removeUser(userId) {
-            const requesterEmail = localStorage.getItem('email');
-            if (!requesterEmail) {
-                alert('Email del richiedente non trovata.');
-                return;
+        deleteUser(userId, index) {
+            if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+                // Elimina utente dal backend
+                fetch(`/api/users/${userId}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Elimina utente dalla lista locale
+                            this.users.splice(index, 1);
+                            alert("Utente eliminato con successo!");
+                        } else {
+                            alert("Errore durante l'eliminazione dell'utente.");
+                        }
+                    })
+                    .catch(error => console.error("Errore nella richiesta:", error));
             }
-            fetch(`http://localhost:3000/api/users/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                    'x-user-email': requesterEmail,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                this.loadUsers();
-            })
-            .catch(err => alert('Errore nella rimozione dell\'utente: ' + err.message));
         },
     },
     created() {

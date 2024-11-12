@@ -399,3 +399,106 @@ button:hover {
         width: 100%; /* Una card per riga */
     }
 }
+
+/* Distanza tra navbar e contenitore delle card */
+#userApp {
+    margin-top: 100px; /* Imposta una distanza sufficiente dalla navbar */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px; /* Spazio tra le card */
+    max-width: 1200px;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto; /* Centra il contenitore */
+}
+
+
+/* Singola card */
+.user-card {
+
+    background-color: #ffffff; /* Sfondo della card */
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 8px; /* Angoli arrotondati */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+    width: 30%; /* Ogni card occupa circa 30% dello spazio */
+    margin: 10px; /* Spaziatura tra le card */
+    padding: 20px; /* Spaziatura interna */
+    text-align: center; /* Testo centrato */
+    display: flex;
+    flex-direction: column; /* Layout verticale */
+    justify-content: space-between; /* Distribuisce uniformemente i contenuti */
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Effetto hover sulle card */
+.user-card:hover {
+    transform: translateY(-5px); /* Alza leggermente la card */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Ombra più accentuata */
+}
+
+/* Stile del titolo della card */
+.user-card h2 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Stile delle informazioni */
+.user-card p {
+    font-size: 1em;
+    color: #555;
+    margin: 5px 0;
+}
+
+/* Stile dei pulsanti */
+.user-card button {
+    background-color: #ff6347; /* Colore pulsante primario */
+    color: #fff; /* Testo bianco */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+/* Stile pulsante "Sospendi" */
+.user-card .suspend-button {
+    background-color: #ffa500; /* Arancione per sospensione */
+}
+
+/* Stile hover sui pulsanti */
+.user-card button:hover {
+    background-color: #d9534f; /* Rosso scuro in hover */
+}
+
+/* Adattamento per schermi piccoli */
+@media (max-width: 768px) {
+    .user-card {
+        width: 45%; /* Riduce la larghezza per due card per fila */
+    }
+}
+
+@media (max-width: 480px) {
+    .user-card {
+        width: 100%; /* Card a tutta larghezza su schermi molto piccoli */
+    }
+}
+
+.delete-button {
+    background-color: #e74c3c; /* Rosso */
+    color: #fff; /* Testo bianco */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #c0392b; /* Rosso scuro */
+}

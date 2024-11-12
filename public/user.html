@@ -14,21 +14,23 @@
             </figure>
         </div>
         <ul class="nav-links">
-            <li><a href="user.html">Home</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="user.html">Utenti</a></li>
             <li><a href="products.html">Prodotti</a></li>
         </ul>
     </nav>
 
-    <div v-for="(user, index) in users" :key="index" class="user-card">
-        <h2>{{ user.name }}</h2>
-        <p>Email: {{ user.email }}</p>
-        <p>Telefono: {{ user.phone || 'N/A' }}</p>
-        <p>Nazionalità: {{ user.nationality || 'N/A' }}</p>
-        <button v-if="isOwner" @click="suspendUser(user.id)" class="suspend-button">Sospendi</button>
-        <button v-if="isOwner" @click="removeUser(user.id)" class="remove-button">Rimuovi</button>
+    <br><br><br><br><br>
+    <!-- Wrapper Vue -->
+    <div id="userApp">
+        <div v-for="(user, index) in users" :key="index" class="user-card">
+            <h2>{{ user.name }}</h2>
+            <p>Email: {{ user.email }}</p>
+            <p>Telefono: {{ user.phone || 'N/A' }}</p>
+            <p>Nazionalità: {{ user.nationality || 'N/A' }}</p>
+            <button @click="deleteUser(user.id, index)" class="delete-button">Cancella</button>
+        </div>
     </div>
-    
-    
     
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
