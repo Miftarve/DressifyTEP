@@ -259,3 +259,144 @@ button:hover::after {
     width: 100%;
     left: 0;
 }
+#ricerca-filtri-card {
+    width: 300px; /* Dimensione ridotta */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: relative;
+}
+
+#ricerca-filtri-card.hidden {
+    transform: translateX(-100%); /* Nasconde la card a sinistra */
+    opacity: 0; /* Effetto dissolvenza */
+}
+
+#toggle-ricerca-filtri {
+    position: absolute;
+    top: 10px;
+    right: -20px; /* Posizionata fuori dalla card */
+    background-color: #238636;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+#toggle-ricerca-filtri:hover {
+    background-color: #2ea043;
+}
+/* Contenitore principale con layout orizzontale */
+.container {
+    display: flex;
+    align-items: flex-start; /* Allinea le card in alto */
+    gap: 1rem; /* Spazio tra le card */
+    transition: all 0.3s ease;
+}
+
+/* Card dei filtri */
+#ricerca-filtri-card {
+    width: 300px; /* Larghezza iniziale della card dei filtri */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: relative;
+}
+
+#ricerca-filtri-card.hidden {
+    transform: translateX(-100%); /* Sposta fuori dalla vista */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Card dei prodotti */
+#noleggio-vendita-card {
+    flex: 1; /* Occupa lo spazio rimanente */
+    transition: width 0.3s ease;
+}
+
+#noleggio-vendita-card.expanded {
+    width: 100%; /* Quando i filtri sono nascosti, occupa tutta la larghezza */
+}
+
+/* Pulsante per mostrare i filtri */
+#show-ricerca-filtri {
+    display: none; /* Nascosto inizialmente */
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    background-color: #238636;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+#show-ricerca-filtri.visible {
+    display: block; /* Appare quando i filtri sono nascosti */
+    opacity: 1;
+}
+
+#show-ricerca-filtri:hover {
+    background-color: #2ea043;
+}
+
+/* Responsività: Colonne verticali per schermi piccoli */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Cambia in layout verticale */
+    }
+
+    #ricerca-filtri-card {
+        width: 100%; /* Card dei filtri a tutta larghezza */
+    }
+
+    #noleggio-vendita-card {
+        width: 100%; /* Card dei prodotti a tutta larghezza */
+    }
+
+    #noleggio-vendita-card.expanded {
+        width: 100%; /* Continua a occupare tutta la larghezza */
+    }
+}
+/* Spostare le card più in alto */
+main {
+    padding: 3rem 2rem; /* Riduce lo spazio sopra le card */
+    margin-top: 40px; /* Avvicina ulteriormente le card alla navbar */
+    transition: all 0.3s ease;
+}
+
+/* Contenitore principale con layout orizzontale */
+.container {
+    display: flex;
+    align-items: flex-start; /* Allinea le card in alto */
+    gap: 1rem; /* Spazio tra le card */
+    transition: all 0.3s ease;
+}
+
+/* Pulsante per mostrare i filtri (freccia destra) */
+#show-ricerca-filtri {
+    position: absolute;
+    top: 150px; /* Posizione invariata del pulsante */
+    left: 10px;
+    background-color: #238636;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: none; /* Nascosto inizialmente */
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+#show-ricerca-filtri.visible {
+    display: block; /* Appare quando i filtri sono nascosti */
+    opacity: 1;
+}
+
+#show-ricerca-filtri:hover {
+    background-color: #2ea043;
+}

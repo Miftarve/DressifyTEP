@@ -60,3 +60,29 @@ function resetFiltri() {
 function mostraTuttiProdotti() {
     caricaProdotti();
 }
+document.getElementById('toggle-ricerca-filtri').addEventListener('click', function () {
+    const filtriCard = document.getElementById('ricerca-filtri-card');
+    filtriCard.classList.toggle('hidden');
+
+    // Cambia la direzione della freccia
+    this.textContent = filtriCard.classList.contains('hidden') ? '⮞' : '⮜';
+});
+
+const toggleRicercaFiltriButton = document.getElementById('toggle-ricerca-filtri');
+const showRicercaFiltriButton = document.getElementById('show-ricerca-filtri');
+const filtriCard = document.getElementById('ricerca-filtri-card');
+const prodottiCard = document.getElementById('noleggio-vendita-card');
+
+// Nasconde i filtri e espande la card dei prodotti
+toggleRicercaFiltriButton.addEventListener('click', () => {
+    filtriCard.classList.add('hidden'); // Nasconde i filtri
+    prodottiCard.classList.add('expanded'); // Espande la card dei prodotti
+    showRicercaFiltriButton.classList.add('visible'); // Mostra il pulsante di riattivazione
+});
+
+// Mostra i filtri e ripristina la dimensione della card dei prodotti
+showRicercaFiltriButton.addEventListener('click', () => {
+    filtriCard.classList.remove('hidden'); // Mostra i filtri
+    prodottiCard.classList.remove('expanded'); // Ripristina la dimensione originale della card dei prodotti
+    showRicercaFiltriButton.classList.remove('visible'); // Nasconde il pulsante di riattivazione
+});
