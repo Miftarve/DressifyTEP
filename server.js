@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 
 const app = express();
 const PORT = 3000;
@@ -27,6 +29,20 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
     }
 });
 
+// Configurazione Swagger
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: "3.0.0",
+        info: {
+            title: "API Noleggio e Vendita Abbigliamento",
+            version: "1.0.0",
+            description: "Documentazione delle API per la gestione di prodotti",
+        },
+    },
+    apis: ["./server.js"],
+};
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Crea le tabelle "users" e "products" nel database
 db.serialize(() => {
@@ -140,12 +156,77 @@ app.post('/products', (req, res) => {
 
 
 
-// Route per ottenere tutti i prodotti
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Ottiene tutti i prodotti
+ *     responses:
+ *       200:
+ *         description: Lista di prodotti
+ */
 app.get('/api/products', (req, res) => {
     db.all('SELECT * FROM products', [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json({ products: rows });
+    });
+});
+
+/**
+ * @swagger
+ * /api/products/search:
+ *   get:
+ *     summary: Cerca prodotti in base ai filtri
+ *     parameters:
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *         description: Prezzo minimo
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *         description: Prezzo massimo
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: Filtra per marca
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: string
+ *         description: Filtra per taglia
+ *       - in: query
+ *         name: condition
+ *         schema:
+ *           type: string
+ *         description: Filtra per condizione
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filtra per categoria
+ *     responses:
+ *       200:
+ *         description: Prodotti filtrati
+ */
+app.get('/api/products/search', (req, res) => {
+    const { minPrice, maxPrice, brand, size, condition, category } = req.query;
+
+    let query = 'SELECT * FROM products WHERE 1=1';
+    const params = [];
+
+    if (minPrice) { query += ' AND price >= ?'; params.push(minPrice); }
+    if (maxPrice) { query += ' AND price <= ?'; params.push(maxPrice); }
+    if (brand) { query += ' AND brand LIKE ?'; params.push(`%${brand}%`); }
+    if (size) { query += ' AND size = ?'; params.push(size); }
+    if (condition) { query += ' AND condition = ?'; params.push(condition); }
+    if (category) { query += ' AND category LIKE ?'; params.push(`%${category}%`); }
+
+    db.all(query, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.status(200).json({ products: rows });
     });
 });

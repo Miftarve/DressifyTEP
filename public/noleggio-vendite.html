@@ -29,26 +29,18 @@
             <div class="card" id="ricerca-filtri-card">
                 <button id="toggle-ricerca-filtri">☰</button>
                 <section id="ricerca-filtri">
-                    <h2>Ricerca e Filtri</h2>
-                    <div id="ricerca">
-                        <h3>Ricerca</h3>
-                        <input type="text" id="ricerca-capo" name="ricerca-capo"
-                            placeholder="Cerca per nome o descrizione">
-                        <button>Cerca</button>
-                    </div>
-                    <h3>Filtri</h3>
-                    <div>
-                        <input type="text" id="nameFilter" placeholder="Nome del prodotto">
-                        <button onclick="filterByName(document.getElementById('nameFilter').value)">Cerca per Nome</button>
-
+                    <div id="ricerca-filtri">
+                        <h2>Ricerca e Filtri</h2>
                         <input type="number" id="minPriceFilter" placeholder="Prezzo Minimo">
                         <input type="number" id="maxPriceFilter" placeholder="Prezzo Massimo">
-                        <button onclick="filterByPrice(document.getElementById('minPriceFilter').value, document.getElementById('maxPriceFilter').value)">Cerca per Prezzo</button>
+                        <input type="text" id="brandFilter" placeholder="Marca">
+                        <input type="text" id="sizeFilter" placeholder="Taglia">
+                        <input type="text" id="conditionFilter" placeholder="Condizione">
+                        <input type="text" id="categoryFilter" placeholder="Categoria">
+                        <button onclick="cercaProdotti()">Cerca</button>
+                        <button onclick="mostraTuttiProdotti()">Mostra Tutti</button>
                     </div>
-                    <div id="salvataggio">
-                        <h3>Salvataggio</h3>
-                        <button>Salva Ricerca</button>
-                    </div>
+                    
                 </section>
             </div>
             <div class="card" id="noleggio-vendita-card">
@@ -62,97 +54,61 @@
         </div>
         <section id="carrello">
             <h2>Carrello</h2>
-            <div id="carrello-items">
-                <!-- Qui verranno mostrati gli oggetti nel carrello -->
-            </div>
+            <ul id="cart-list"></ul>
             <button id="rimuovi-carrello">Rimuovi dal Carrello</button>
         </section>
     </main>
     <script src="noleggio-vendite.js"></script>
     <script>
-        // Carrello che memorizza i prodotti aggiunti
-        let cart = [];
-
-        // Funzione per aggiungere un prodotto al carrello
-        function addToCart(productId) {
-            fetch(`/api/products/${productId}`)
-                .then(response => response.json())
-                .then(product => {
-                    cart.push(product);
-                    updateCart();
-                });
-        }
-
-        // Funzione per aggiornare la visualizzazione del carrello
-        function updateCart() {
-            const cartContainer = document.getElementById('cartItems');
-            cartContainer.innerHTML = '';  // Pulizia degli elementi precedenti
-
-            cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.innerHTML = `${item.category} - Prezzo: ${item.price} € <button onclick="removeFromCart(${item.id})">Rimuovi</button>`;
-                cartContainer.appendChild(cartItem);
-            });
-        }
-
-        // Funzione per rimuovere un prodotto dal carrello
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCart();
-        }
-
-        // Funzione per visualizzare tutti i prodotti
-        function fetchAllProducts() {
-            fetch('/api/products')
-                .then(response => response.json())
-                .then(data => {
-                    displayProducts(data.products);
-                });
-        }
-
-        // Funzione per filtrare i prodotti per nome
-        function filterByName() {
-            const nameFilter = document.getElementById('nameFilter').value;
-            fetch('/api/products')
-                .then(response => response.json())
-                .then(data => {
-                    const filteredProducts = data.products.filter(product => product.category.toLowerCase().includes(nameFilter.toLowerCase()));
-                    displayProducts(filteredProducts);
-                });
-        }
-
-        // Funzione per filtrare i prodotti per prezzo
-        function filterByPrice() {
-            const minPrice = document.getElementById('minPriceFilter').value || 0;
-            const maxPrice = document.getElementById('maxPriceFilter').value || Number.MAX_VALUE;
-
-            fetch('/api/products')
-                .then(response => response.json())
-                .then(data => {
-                    const filteredProducts = data.products.filter(product => product.price >= minPrice && product.price <= maxPrice);
-                    displayProducts(filteredProducts);
-                });
-        }
-
-        // Funzione per visualizzare i prodotti filtrati
-        function displayProducts(products) {
-            const productContainer = document.getElementById('productList');
-            productContainer.innerHTML = '';  // Pulizia della lista
-
+        function loadProducts() {
+          $.get('/api/products', function(products) {
+            const productList = $('#product-list');
+            productList.empty(); // Pulisce la lista dei prodotti
+      
             products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.innerHTML = `
-                    <h4>${product.category}</h4>
-                    <p>Prezzo: ${product.price} €</p>
-                    <button onclick="addToCart(${product.id})">Aggiungi al Carrello</button>
-                `;
-                productContainer.appendChild(productCard);
+              const productDiv = $('<div></div>').html(`
+                <p>${product.name} - €${product.price}</p>
+                <button class="add-to-cart" data-id="${product.id}">Aggiungi al Carrello</button>
+              `);
+              productList.append(productDiv);
             });
+          }).fail(function(xhr, status, error) {
+            console.log("Errore nel recupero dei prodotti: ", error);
+          });
         }
-
-        // Carica tutti i prodotti all'avvio
-        fetchAllProducts();
-    </script>
+      
+        $(document).on('click', '.add-to-cart', function() {
+          const productId = $(this).data('id');
+          console.log("Aggiungendo prodotto con ID: " + productId);
+      
+          $.ajax({
+            url: '/api/cart/add',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ productId: productId }),
+            success: function(response) {
+              updateCart(response.cart);
+            },
+            error: function(xhr, status, error) {
+              console.log("Errore nell'aggiunta al carrello: ", error);
+              alert('Errore nell\'aggiunta al carrello.');
+            }
+          });
+        });
+      
+        function updateCart(cart) {
+          const cartList = $('#cart-list');
+          cartList.empty(); // Pulisce la lista del carrello
+      
+          cart.forEach(item => {
+            const cartItem = $('<li></li>').text(`${item.name} - €${item.price}`);
+            cartList.append(cartItem);
+          });
+        }
+      
+        loadProducts();
+      </script>
+      
 </body>
 
 </html>

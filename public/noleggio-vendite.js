@@ -1,69 +1,62 @@
-// Funzione per ottenere i prodotti dal server
+document.addEventListener('DOMContentLoaded', caricaProdotti);
+
 function caricaProdotti() {
-    fetch('/api/products')  // Usa la rotta API esistente nel server
+    fetch('/api/products')
         .then(response => response.json())
         .then(data => {
             mostraProdotti(data.products);
         })
-        .catch(error => {
-            console.error('Errore nel caricamento dei prodotti:', error);
-        });
+        .catch(error => console.error('Errore nel caricamento dei prodotti:', error));
 }
 
-// Funzione per generare una card prodotto
-function creaCardProdotto(prodotto) {
-    const card = document.createElement('div');
-    card.classList.add('prodotto-card');
-    
-    card.innerHTML = `
-        <h3>${prodotto.category}</h3>
-        <p>Taglia: ${prodotto.size}</p>
-        <p>Colore: ${prodotto.color}</p>
-        <p>Marca: ${prodotto.brand}</p>
-        <p>Condizione: ${prodotto.condition}</p>
-        <p>Prezzo: ${prodotto.price} €</p>
-        <button onclick="aggiungiAlCarrello(${prodotto.id})">Aggiungi al Carrello</button>
-    `;
-    return card;
+function cercaProdotti() {
+    const minPrice = document.getElementById('minPriceFilter').value;
+    const maxPrice = document.getElementById('maxPriceFilter').value;
+    const brand = document.getElementById('brandFilter').value;
+    const size = document.getElementById('sizeFilter').value;
+    const condition = document.getElementById('conditionFilter').value;
+    const category = document.getElementById('categoryFilter').value;
+
+    const params = new URLSearchParams({ minPrice, maxPrice, brand, size, condition, category });
+
+    fetch(`/api/products/search?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            mostraProdotti(data.products);
+            resetFiltri();
+        })
+        .catch(error => console.error('Errore nella ricerca dei prodotti:', error));
 }
 
-// Funzione per visualizzare i prodotti nel contenitore
 function mostraProdotti(prodotti) {
     const container = document.getElementById('prodotti-container');
-    container.innerHTML = '';  // Pulisce il contenitore prima di inserire nuovi prodotti
+    container.innerHTML = '';
 
     prodotti.forEach(prodotto => {
-        const card = creaCardProdotto(prodotto);
+        const card = document.createElement('div');
+        card.classList.add('prodotto-card');
+        card.innerHTML = `
+            <h3>${prodotto.category}</h3>
+            <p>Taglia: ${prodotto.size}</p>
+            <p>Colore: ${prodotto.color}</p>
+            <p>Marca: ${prodotto.brand}</p>
+            <p>Condizione: ${prodotto.condition}</p>
+            <p>Prezzo: ${prodotto.price} €</p>
+            <button onclick="aggiungiAlCarrello(${prodotto.id})">Aggiungi al Carrello</button>
+        `;
         container.appendChild(card);
     });
 }
 
-// Funzione per aggiungere un prodotto al carrello
-let carrello = [];
-
-function aggiungiAlCarrello(idProdotto) {
-    const prodotto = prodotti.find(p => p.id === idProdotto);
-    carrello.push(prodotto);
-    mostraCarrello();
+function resetFiltri() {
+    document.getElementById('minPriceFilter').value = '';
+    document.getElementById('maxPriceFilter').value = '';
+    document.getElementById('brandFilter').value = '';
+    document.getElementById('sizeFilter').value = '';
+    document.getElementById('conditionFilter').value = '';
+    document.getElementById('categoryFilter').value = '';
 }
 
-// Funzione per mostrare il carrello
-function mostraCarrello() {
-    const carrelloContainer = document.getElementById('carrello-items');
-    carrelloContainer.innerHTML = '';  // Pulisce il contenitore del carrello
-
-    carrello.forEach(item => {
-        const div = document.createElement('div');
-        div.textContent = `${item.category} - ${item.price} €`;
-        carrelloContainer.appendChild(div);
-    });
+function mostraTuttiProdotti() {
+    caricaProdotti();
 }
-
-// Funzione per svuotare il carrello
-document.getElementById('rimuovi-carrello').addEventListener('click', function() {
-    carrello = [];  // Svuota il carrello
-    mostraCarrello();  // Aggiorna la visualizzazione del carrello
-});
-
-// Avvia il caricamento dei prodotti quando la pagina è pronta
-document.addEventListener('DOMContentLoaded', caricaProdotti);
