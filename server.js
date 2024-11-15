@@ -330,4 +330,3 @@ app.delete('/api/users/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
 });
- 

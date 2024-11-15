@@ -1,4 +1,39 @@
-document.addEventListener('DOMContentLoaded', caricaProdotti);
+// Aggiunge un listener per il pulsante di ricerca nella pagina di noleggio
+window.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('searchButton').addEventListener('click', function() {
+        // Recupera il valore dell'input di ricerca
+        const searchTerm = document.getElementById('searchInput').value;
+
+        // Crea una richiesta AJAX con `fetch`
+        fetch(`/api/products/search?q=${encodeURIComponent(searchTerm)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore nella risposta del server');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Mostra i risultati della ricerca
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '';
+                
+                if (data.length === 0) {
+                    resultsContainer.textContent = 'Nessun prodotto trovato';
+                    return;
+                }
+
+                data.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.textContent = `${product.name} - Prezzo: €${product.price}`;
+                    resultsContainer.appendChild(productElement);
+                });
+            })
+            .catch(error => {
+                console.error('Si è verificato un errore:', error);
+                document.getElementById('results').textContent = 'Errore durante la ricerca dei prodotti';
+            });
+    });
+});
 
 function caricaProdotti() {
     fetch('/api/products')
