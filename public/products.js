@@ -42,7 +42,10 @@ new Vue({
                 },
                 body: JSON.stringify(this.newProduct)
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Risposta del server:', response);
+                return response.json();
+            })
             .then(data => {
                 alert(data.message);
                 this.loadProducts();
@@ -50,6 +53,7 @@ new Vue({
             })
             .catch(err => alert('Errore nell\'aggiunta del prodotto: ' + err.message));
         },        
+               
     
         removeProduct(index) {
             const productId = this.products[index].id;

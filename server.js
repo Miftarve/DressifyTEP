@@ -136,23 +136,26 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Aggiungi un nuovo prodotto
 app.post('/products', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
-
-    if (!category || !size || !color || !brand || !condition || price == null) {
-        return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+    
+    if (!category || !size || !color || !brand || !condition || !price) {
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
-    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)` ,
-        [category, size, color, brand, condition, price],
-        function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Errore durante l\'aggiunta del prodotto.' });
-            }
-            res.status(201).json({ message: 'Prodotto aggiunto con successo!', id: this.lastID });
+    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`, 
+    [category, size, color, brand, condition, price], 
+    function (err) {
+        if (err) {
+            console.error('Errore nell\'inserimento del prodotto:', err.message);
+            return res.status(500).json({ message: 'Errore interno del server' });
         }
-    );
+        res.status(201).json({ message: 'Prodotto aggiunto con successo', id: this.lastID });
+    });
 });
+
+
 
 
 
