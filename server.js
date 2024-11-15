@@ -21,13 +21,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 // Inizializza il database SQLite
-const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
+const db = new sqlite3.Database('./database.db', (err) => {
     if (err) {
-        console.error('Errore nell\'apertura del database:', err.message);
+        console.error('Errore di connessione al database:', err.message);
     } else {
-        console.log('Connessione al database riuscita');
+        console.log('Connessione al database riuscita.');
     }
 });
+
 
 // Configurazione Swagger
 const swaggerOptions = {
@@ -139,19 +140,25 @@ app.post('/login', (req, res) => {
 // Aggiungi un nuovo prodotto
 app.post('/products', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
-    
+
+    // Controllo dei campi obbligatori
     if (!category || !size || !color || !brand || !condition || !price) {
         return res.status(400).json({ message: 'Tutti i campi sono obbligatori' });
     }
 
-    db.run(`INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`, 
-    [category, size, color, brand, condition, price], 
-    function (err) {
+    // Definizione della query
+    const query = `INSERT INTO prodotti (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`;
+
+    // Esecuzione della query
+    db.run(query, [category, size, color, brand, condition, price], function (err) {
         if (err) {
             console.error('Errore nell\'inserimento del prodotto:', err.message);
-            return res.status(500).json({ message: 'Errore interno del server' });
+            // Invio della risposta con errore
+            return res.status(500).json({ message: 'Errore nel salvataggio del prodotto', error: err.message });
         }
-        res.status(201).json({ message: 'Prodotto aggiunto con successo', id: this.lastID });
+        console.log('Prodotto aggiunto con successo con ID:', this.lastID);
+        // Invio della risposta di successo
+        res.status(201).json({ message: 'Prodotto aggiunto con successo!', id: this.lastID });
     });
 });
 
