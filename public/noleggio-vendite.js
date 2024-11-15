@@ -60,13 +60,24 @@ function resetFiltri() {
 function mostraTuttiProdotti() {
     caricaProdotti();
 }
-document.getElementById('toggle-ricerca-filtri').addEventListener('click', function () {
-    const filtriCard = document.getElementById('ricerca-filtri-card');
-    filtriCard.classList.toggle('hidden');
+document.addEventListener("DOMContentLoaded", function () {
+    const filterCard = document.querySelector("#ricerca-filtri-card");
+    const productCard = document.querySelector("#noleggio-vendita-card");
+    const toggleButton = document.querySelector("#toggle-filter-button");
 
-    // Cambia la direzione della freccia
-    this.textContent = filtriCard.classList.contains('hidden') ? '⮞' : '⮜';
+    toggleButton.addEventListener("click", function () {
+        if (filterCard.classList.contains("hidden")) {
+            // Show filter card
+            filterCard.classList.remove("hidden");
+            productCard.classList.remove("expanded");
+        } else {
+            // Hide filter card
+            filterCard.classList.add("hidden");
+            productCard.classList.add("expanded");
+        }
+    });
 });
+
 
 const toggleRicercaFiltriButton = document.getElementById('toggle-ricerca-filtri');
 const showRicercaFiltriButton = document.getElementById('show-ricerca-filtri');

@@ -260,7 +260,7 @@ button:hover::after {
     left: 0;
 }
 #ricerca-filtri-card {
-    width: 300px; /* Dimensione ridotta */
+    width: 100px; /* Dimensione ridotta */
     transition: transform 0.3s ease, opacity 0.3s ease;
     position: relative;
 }
@@ -400,3 +400,18 @@ main {
 #show-ricerca-filtri:hover {
     background-color: #2ea043;
 }
+#ricerca-filtri-card {
+    transition: width 0.3s ease-in-out;
+    width: 250px; /* Initial width */
+}
+
+#noleggio-vendita-card {
+    transition: width 0.3s ease-in-out;
+    width: 70%; /* Initial width */
+}
+
+#noleggio-vendita-card.expanded {
+    width: 100%; /* Adjust this width to fit your layout */
+}
+
+
