@@ -335,6 +335,25 @@ app.delete('/api/users/:id', (req, res) => {
     }
 });
 
+app.post('/recover-password', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email è richiesta.' });
+    }
+
+    db.get(`SELECT password FROM users WHERE email = ?`, [email], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: 'Errore durante l\'accesso al database.' });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+        // Nota: la password viene mostrata direttamente per semplicità, ma in un'applicazione reale non si dovrebbero mai inviare password non criptate.
+        res.status(200).json({ message: `La tua password è: ${row.password}` });
+    });
+});
+
 
 // Avvia il server
 app.listen(PORT, () => {
