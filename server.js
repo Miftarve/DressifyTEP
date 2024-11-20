@@ -6,7 +6,6 @@ const path = require('path');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
-const crypto =require('crypto')
 
 const app = express();
 const PORT = 3000;
@@ -86,19 +85,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Funzione per generare un hash dalla password
-function generateHash(password) {
-    const salt = crypto.randomBytes(16).toString('hex');  // Crea un salt casuale
-    const hash = crypto.createHmac('sha256', salt).update(password).digest('hex'); // Crea l'hash
-    return { salt, hash };
-}
-
-// Funzione per verificare se una password corrisponde all'hash
-function verifyPassword(storedHash, storedSalt, password) {
-    const hash = crypto.createHmac('sha256', storedSalt).update(password).digest('hex');
-    return storedHash === hash;
-}
-
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
     const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
@@ -107,10 +93,10 @@ app.post('/register', async (req, res) => {
     }
 
     try {
-        const { salt, hash } = generateHash(password); // Usa la funzione generateHash
+        const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
-            `INSERT INTO users (name, email, password, salt, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [name, email, hash, salt, dob, phone, nationality], // Includi i nuovi campi qui
+            `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
+            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
             function (err) {
                 if (err) {
                     if (err.message.includes('UNIQUE constraint failed')) {
@@ -127,7 +113,6 @@ app.post('/register', async (req, res) => {
     }
 });
 
-
 // Route per gestire il login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -143,7 +128,7 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ success: false, message: 'Email o password errati.' });
         }
 
-        const match = verifyPassword(row.password, row.salt, password); // Usa la funzione verifyPassword
+        const match = await bcrypt.compare(password, row.password);
         if (!match) {
             return res.status(401).json({ success: false, message: 'Email o password errati.' });
         }
@@ -151,7 +136,6 @@ app.post('/login', (req, res) => {
         res.status(200).json({ success: true, message: 'Login avvenuto con successo!' });
     });
 });
-
 
 // Aggiungi un nuovo prodotto
 app.post('/products', (req, res) => {
@@ -351,7 +335,6 @@ app.delete('/api/users/:id', (req, res) => {
     }
 });
 
-// Route per il recupero della password
 app.post('/recover-password', (req, res) => {
     const { email } = req.body;
 
@@ -366,12 +349,10 @@ app.post('/recover-password', (req, res) => {
         if (!row) {
             return res.status(404).json({ error: 'Utente non trovato.' });
         }
-
-        // Mostra la password in chiaro
+        // Nota: la password viene mostrata direttamente per semplicità, ma in un'applicazione reale non si dovrebbero mai inviare password non criptate.
         res.status(200).json({ message: `La tua password è: ${row.password}` });
     });
 });
-
 
 
 // Avvia il server
