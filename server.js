@@ -372,30 +372,21 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-// Rotta per eliminare un utente
+// Eliminazione utente
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
-    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
+    db.run('DELETE FROM users WHERE id = ?', [userId], function (err) {
         if (err) {
-            return res.status(500).json({ message: 'Errore nella rimozione dell\'utente.' });
+            console.error('Errore durante l\'eliminazione dell\'utente:', err.message);
+            return res.status(500).json({ message: 'Errore durante l\'eliminazione dell\'utente.' });
         }
-        res.status(200).json({ message: 'Utente rimosso con successo.' });
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Utente non trovato.' });
+        }
+        res.status(200).json({ message: 'Utente eliminato con successo.' });
     });
 });
 
-
-app.delete('/api/users/:id', (req, res) => {
-    const userId = req.params.id;
-
-    // Trova l'indice dell'utente nel database
-    const index = users.findIndex(user => user.id === parseInt(userId));
-    if (index !== -1) {
-        users.splice(index, 1); // Rimuovi l'utente
-        res.status(200).send({ message: "Utente eliminato con successo!" });
-    } else {
-        res.status(404).send({ message: "Utente non trovato." });
-    }
-});
 
 app.post('/recover-password', (req, res) => {
     const { email } = req.body;
