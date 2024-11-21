@@ -29,7 +29,6 @@ const db = new sqlite3.Database('./database.db', (err) => {
     }
 });
 
-
 // Configurazione Swagger
 const swaggerOptions = {
     swaggerDefinition: {
@@ -85,6 +84,45 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Registra un nuovo utente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Mario Rossi
+ *               email:
+ *                 type: string
+ *                 example: mario.rossi@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *                 example: 1990-01-01
+ *               phone:
+ *                 type: string
+ *                 example: +393401234567
+ *               nationality:
+ *                 type: string
+ *                 example: Italian
+ *     responses:
+ *       200:
+ *         description: Registrazione avvenuta con successo
+ *       400:
+ *         description: Richiesta non valida
+ *       500:
+ *         description: Errore del server
+ */
 // Route per gestire la registrazione
 app.post('/register', async (req, res) => {
     const { name, email, password, dob, phone, nationality } = req.body; // Includi i nuovi campi
@@ -162,18 +200,45 @@ app.post('/products', (req, res) => {
     });
 });
 
-
-
-
-
 /**
  * @swagger
  * /api/products:
  *   get:
- *     summary: Ottiene tutti i prodotti
+ *     summary: Ottieni tutti i prodotti
  *     responses:
  *       200:
- *         description: Lista di prodotti
+ *         description: Lista di tutti i prodotti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       category:
+ *                         type: string
+ *                         example: Abbigliamento
+ *                       size:
+ *                         type: string
+ *                         example: M
+ *                       color:
+ *                         type: string
+ *                         example: Rosso
+ *                       brand:
+ *                         type: string
+ *                         example: Gucci
+ *                       condition:
+ *                         type: string
+ *                         example: Usato
+ *                       price:
+ *                         type: number
+ *                         example: 99.99
  */
 app.get('/api/products', (req, res) => {
     db.all('SELECT * FROM products', [], (err, rows) => {
@@ -306,9 +371,6 @@ app.get('/api/users', (req, res) => {
         res.status(200).json({ users: rows });
     });
 });
-
-
-
 
 // Rotta per eliminare un utente
 app.delete('/users/:id', (req, res) => {
