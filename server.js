@@ -387,7 +387,6 @@ app.delete('/users/:id', (req, res) => {
     });
 });
 
-
 app.post('/recover-password', (req, res) => {
     const { email } = req.body;
 
@@ -406,7 +405,6 @@ app.post('/recover-password', (req, res) => {
         res.status(200).json({ message: `La tua password è: ${row.password}` });
     });
 });
-
 
 // Avvia il server
 app.listen(PORT, () => {
