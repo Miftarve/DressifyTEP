@@ -29,6 +29,10 @@
             <p>Telefono: {{ user.phone || 'N/A' }}</p>
             <p>Nazionalità: {{ user.nationality || 'N/A' }}</p>
             <button @click="deleteUser(user.id, index)" class="delete-button">Cancella</button>
+            <button @click="suspendUser(user.id)" :class="user.is_suspended ? 'active-button' : 'suspend-button'">
+                {{ user.is_suspended ? 'Riattiva' : 'Sospendi' }}
+            </button>
+            
         </div>
     </div>
     

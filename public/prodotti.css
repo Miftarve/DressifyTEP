@@ -502,3 +502,20 @@ button:hover {
 .delete-button:hover {
     background-color: #c0392b; /* Rosso scuro */
 }
+.suspend-button {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.active-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
