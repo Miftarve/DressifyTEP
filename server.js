@@ -46,22 +46,20 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Crea le tabelle "users" e "products" nel database
 db.serialize(() => {
-
-        db.run(`CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT,
-            size TEXT,
-            color TEXT,
-            brand TEXT,
-            condition TEXT,
-            price REAL
-        )`, (err) => {
-            if (err) {
-                console.error('Errore nella creazione della tabella products:', err.message);
-            }
-        });
-
-
+    // Crea la tabella "users" se non esiste
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        dob TEXT NOT NULL, -- Data di nascita
+        phone TEXT NOT NULL,
+        nationality TEXT NOT NULL
+    )`, (err) => {
+        if (err) {
+            console.error('Errore nella creazione della tabella users:', err.message);
+        }
+    });
 
     // Crea la tabella "products" se non esiste
     db.run(`CREATE TABLE IF NOT EXISTS products (
@@ -78,6 +76,7 @@ db.serialize(() => {
         }
     });
 });
+
 
 // Route principale
 app.get('/', (req, res) => {
@@ -134,18 +133,18 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
             `INSERT INTO users (name, email, password, dob, phone, nationality) VALUES (?, ?, ?, ?, ?, ?)`,
-            [name, email, hashedPassword, dob, phone, nationality], // Includi i nuovi campi qui
+            [name, email, hashedPassword, dob, phone, nationality],
             function (err) {
                 if (err) {
+                    console.error('Errore durante la registrazione:', err.message); // Log dettagliato
                     if (err.message.includes('UNIQUE constraint failed')) {
                         return res.status(400).json({ message: 'Email già in uso' });
-                    } else {
-                        return res.status(500).json({ message: 'Errore durante la registrazione' });
                     }
+                    return res.status(500).json({ message: 'Errore durante la registrazione', error: err.message });
                 }
                 res.status(200).json({ message: 'Registrazione avvenuta con successo!' });
             }
-        );
+        );        
     } catch (error) {
         res.status(500).json({ message: 'Errore nel server', error });
     }
@@ -185,7 +184,7 @@ app.post('/products', (req, res) => {
     }
 
     // Definizione della query
-    const query = `INSERT INTO prodotti (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO products (category, size, color, brand, condition, price) VALUES (?, ?, ?, ?, ?, ?)`;
 
     // Esecuzione della query
     db.run(query, [category, size, color, brand, condition, price], function (err) {
