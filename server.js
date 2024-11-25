@@ -241,10 +241,15 @@ app.post('/products', (req, res) => {
  */
 app.get('/api/products', (req, res) => {
     db.all('SELECT * FROM products', [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) {
+            console.error('Errore nel caricamento dei prodotti:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log('Prodotti recuperati dal database:', rows);
         res.status(200).json({ products: rows });
     });
 });
+
 
 /**
  * @swagger

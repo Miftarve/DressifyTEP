@@ -13,21 +13,23 @@ new Vue({
     },
     methods: {
         loadProducts() {
-            console.log('Caricamento prodotti...');
             fetch('http://37.27.40.78:3000/api/products')
                 .then(response => {
-                    console.log('Risposta del server:', response);
                     if (!response.ok) {
-                        throw new Error('Errore nel caricamento dei prodotti');
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Prodotti ricevuti:', data);
-                    this.products = data.products;
+                    if (data && Array.isArray(data.products)) {
+                        this.products = data.products;
+                        console.log('Prodotti caricati:', this.products);
+                    } else {
+                        console.error('Formato della risposta non valido:', data);
+                    }
                 })
-                .catch(err => console.error('Errore nel caricamento dei prodotti:', err));
-        },
+                .catch(err => console.error('Errore durante il caricamento:', err));
+        },        
     
         addProduct() {
             if (!this.newProduct.price || isNaN(this.newProduct.price)) {
@@ -90,6 +92,7 @@ new Vue({
     },    
 
     created() {
+        console.log('Caricamento dei prodotti...');
         this.loadProducts();
     }
 });
