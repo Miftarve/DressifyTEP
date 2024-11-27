@@ -134,6 +134,7 @@ showRicercaFiltriButton.addEventListener('click', () => {
 });
 let carrello = [];
 
+
 // Funzione per aggiungere un prodotto al carrello
 function aggiungiAlCarrello(productId) {
   fetch(`/api/products/${productId}`)

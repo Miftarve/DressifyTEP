@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrello</title>
+  <link rel="stylesheet" href="noleggio-vendite.css">
+</head>
+<body>
+  <nav>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="noleggio-vendite.html">Prodotti</a></li>
+        <li><a href="sicurezza.html">Sicurezza</a></li>
+        <li><a href="feedback.html">Feedback</a></li>
+      </ul>
+  </nav>
+  <section id="carrello">
+    <h2>Il tuo Carrello</h2>
+    <div id="cart-items-container">
+      <!-- Gli articoli aggiunti al carrello verranno caricati qui -->
+    </div>
+    <div id="cart-actions">
+      <button id="clear-cart">Svuota Carrello</button>
+      <button id="checkout">Procedi al Pagamento</button>
+    </div>
+  </section>
+  <script src="carrello.js"></script>
+  <script>
+    // Funzione per caricare il carrello dalla memoria
+function caricaCarrello() {
+  const carrello = JSON.parse(localStorage.getItem('carrello')) || [];
+
+  // Trova il contenitore del carrello nella pagina
+  const carrelloContainer = document.getElementById('carrello-container');
+  if (!carrelloContainer) return;
+
+  // Controlla se ci sono articoli nel carrello
+  if (carrello.length === 0) {
+    carrelloContainer.innerHTML = "<p>Il carrello è vuoto!</p>";
+  } else {
+    carrelloContainer.innerHTML = ''; // Pulisce il contenitore
+
+    // Aggiungi i prodotti al carrello
+    carrello.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.classList.add('cart-item');
+      itemElement.innerHTML = `
+        <p>${item.name}</p>
+        <p>Prezzo: ${item.rentalPrice} €</p>
+      `;
+      carrelloContainer.appendChild(itemElement);
+    });
+  }
+}
+
+// Carica il carrello quando la pagina è pronta
+document.addEventListener('DOMContentLoaded', caricaCarrello);
+
+  </script>
+</body>
+</html>

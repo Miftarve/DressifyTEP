@@ -19,6 +19,9 @@
       <li><a href="noleggio-vendite.html">Prodotti</a></li>
       <li><a href="sicurezza.html">Sicurezza</a></li>
       <li><a href="feedback.html">Feedback</a></li>
+      <li><a href="carrello.html" id="cart-icon">
+          🛒 <span id="cart-count">0</span>
+        </a></li>
     </ul>
   </nav>
   <br><br>
@@ -27,97 +30,98 @@
   <main>
     <main>
       <div class="container">
-          <!-- Card Ricerca e Filtri -->
-          <div class="card" id="ricerca-filtri-card">
-              <button id="toggle-ricerca-filtri">⮜</button> <!-- Pulsante per nascondere -->
-              <section id="ricerca-filtri">
-                  <h2>Ricerca e Filtri</h2>
-                  <input type="number" id="minPriceFilter" placeholder="Prezzo Minimo">
-                  <input type="number" id="maxPriceFilter" placeholder="Prezzo Massimo">
-                  <input type="text" id="brandFilter" placeholder="Marca">
-                  <input type="text" id="sizeFilter" placeholder="Taglia">
-                  <input type="text" id="conditionFilter" placeholder="Condizione">
-                  <input type="text" id="categoryFilter" placeholder="Categoria">
-                  <button onclick="cercaProdotti()">Cerca</button>
-                  <button onclick="mostraTuttiProdotti()">Mostra Tutti</button>
-              </section>
-          </div>
-  
-          <!-- Pulsante per mostrare i filtri -->
-          <button id="show-ricerca-filtri" class="hidden">⮞</button>
-  
-          <!-- Card Noleggio e Vendita -->
-          <div class="card" id="noleggio-vendita-card">
-              <section id="noleggio-vendita">
-                  <h2>Noleggio e Vendita</h2>
-                  <div id="prodotti-container">
-                      <!-- Qui verranno mostrate le card dei prodotti -->
-                  </div>
-              </section>
-          </div>
-      </div>
-    </div>
-    <section id="carrello">
-      <h2>Carrello</h2>
-      <div id="cart-items-container">
-        <!-- Gli articoli verranno aggiunti dinamicamente qui -->
-      </div>
-      <div id="cart-actions">
-        <button id="clear-cart">Svuota Carrello</button>
-      </div>
-    </section>
-    
-  </main>
-  <script src="noleggio-vendite.js"></script>
-  <script>
-    function loadProducts() {
-      $.get('/api/products', function (products) {
-        const productList = $('#product-list');
-        productList.empty(); // Pulisce la lista dei prodotti
+        <!-- Card Ricerca e Filtri -->
+        <div class="card" id="ricerca-filtri-card">
+          <button id="toggle-ricerca-filtri">⮜</button> <!-- Pulsante per nascondere -->
+          <section id="ricerca-filtri">
+            <h2>Ricerca e Filtri</h2>
+            <input type="number" id="minPriceFilter" placeholder="Prezzo Minimo">
+            <input type="number" id="maxPriceFilter" placeholder="Prezzo Massimo">
+            <input type="text" id="brandFilter" placeholder="Marca">
+            <input type="text" id="sizeFilter" placeholder="Taglia">
+            <input type="text" id="conditionFilter" placeholder="Condizione">
+            <input type="text" id="categoryFilter" placeholder="Categoria">
+            <button onclick="cercaProdotti()">Cerca</button>
+            <button onclick="mostraTuttiProdotti()">Mostra Tutti</button>
+          </section>
+        </div>
 
-        products.forEach(product => {
-          const productDiv = $('<div></div>').html(`
+        <!-- Pulsante per mostrare i filtri -->
+        <button id="show-ricerca-filtri" class="hidden">⮞</button>
+
+        <!-- Card Noleggio e Vendita -->
+        <div class="card" id="noleggio-vendita-card">
+          <section id="noleggio-vendita">
+            <h2>Noleggio e Vendita</h2>
+            <div id="prodotti-container">
+              <!-- Qui verranno mostrate le card dei prodotti -->
+            </div>
+          </section>
+        </div>
+      </div>
+      </div>
+      <section id="carrello">
+        <h2>Carrello</h2>
+        <div id="cart-items-container">
+          <!-- Gli articoli verranno aggiunti dinamicamente qui -->
+        </div>
+        <div id="cart-actions">
+          <button id="clear-cart">Svuota Carrello</button>
+        </div>
+      </section>
+      
+
+    </main>
+    <script src="noleggio-vendite.js"></script>
+    <script>
+      function loadProducts() {
+        $.get('/api/products', function (products) {
+          const productList = $('#product-list');
+          productList.empty(); // Pulisce la lista dei prodotti
+
+          products.forEach(product => {
+            const productDiv = $('<div></div>').html(`
                 <p>${product.name} - €${product.price}</p>
                 <button class="add-to-cart" data-id="${product.id}">Aggiungi al Carrello</button>
               `);
-          productList.append(productDiv);
+            productList.append(productDiv);
+          });
+        }).fail(function (xhr, status, error) {
+          console.log("Errore nel recupero dei prodotti: ", error);
         });
-      }).fail(function (xhr, status, error) {
-        console.log("Errore nel recupero dei prodotti: ", error);
+      }
+
+      $(document).on('click', '.add-to-cart', function () {
+        const productId = $(this).data('id');
+        console.log("Aggiungendo prodotto con ID: " + productId);
+
+        $.ajax({
+          url: '/api/cart/add',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ productId: productId }),
+          success: function (response) {
+            updateCart(response.cart);
+          },
+          error: function (xhr, status, error) {
+            console.log("Errore nell'aggiunta al carrello: ", error);
+            alert('Errore nell\'aggiunta al carrello.');
+          }
+        });
       });
-    }
 
-    $(document).on('click', '.add-to-cart', function () {
-      const productId = $(this).data('id');
-      console.log("Aggiungendo prodotto con ID: " + productId);
+      function updateCart(cart) {
+        const cartList = $('#cart-list');
+        cartList.empty(); // Pulisce la lista del carrello
 
-      $.ajax({
-        url: '/api/cart/add',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ productId: productId }),
-        success: function (response) {
-          updateCart(response.cart);
-        },
-        error: function (xhr, status, error) {
-          console.log("Errore nell'aggiunta al carrello: ", error);
-          alert('Errore nell\'aggiunta al carrello.');
-        }
-      });
-    });
+        cart.forEach(item => {
+          const cartItem = $('<li></li>').text(`${item.name} - €${item.price}`);
+          cartList.append(cartItem);
+        });
+      }
 
-    function updateCart(cart) {
-      const cartList = $('#cart-list');
-      cartList.empty(); // Pulisce la lista del carrello
-
-      cart.forEach(item => {
-        const cartItem = $('<li></li>').text(`${item.name} - €${item.price}`);
-        cartList.append(cartItem);
-      });
-    }
-
-    loadProducts();
-  </script>
+      loadProducts();
+    </script>
 
 </body>
 

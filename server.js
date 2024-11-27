@@ -245,7 +245,7 @@ app.get('/api/products', (req, res) => {
             console.error('Errore nel caricamento dei prodotti:', err.message);
             return res.status(500).json({ error: err.message });
         }
-        console.log('Prodotti recuperati dal database:', rows);
+        //console.log('Prodotti recuperati dal database:', rows);
         res.status(200).json({ products: rows });
     });
 });
@@ -441,6 +441,8 @@ app.post('/api/cart/checkout', (req, res) => {
     res.status(200).json({ message: 'Ordine processato con successo!' });
   });
   
+  
+
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
