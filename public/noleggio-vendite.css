@@ -414,4 +414,30 @@ main {
     width: 100%; /* Adjust this width to fit your layout */
 }
 
-
+#carrello {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  #cart-items-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .cart-item .actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .cart-item input {
+    width: 60px;
+  }
+  

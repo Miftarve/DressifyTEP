@@ -409,7 +409,38 @@ app.post('/recover-password', (req, res) => {
         res.status(200).json({ message: `La tua password è: ${row.password}` });
     });
 });
+const cart = { items: [] };
 
+app.post('/api/cart/add', (req, res) => {
+  const { productId, rentalDays, rentalPrice } = req.body;
+
+  db.get('SELECT * FROM products WHERE id = ?', [productId], (err, product) => {
+    if (err) return res.status(500).json({ error: "Errore nel database" });
+    if (!product) return res.status(404).json({ error: "Prodotto non trovato" });
+
+    const cartItem = {
+      id: product.id,
+      name: product.category + " - " + product.brand,
+      rentalPrice: rentalPrice || product.price,
+    };
+    cart.items.push(cartItem);
+    res.status(200).json({ cart });
+  });
+});
+
+app.get('/api/cart', (req, res) => {
+  res.status(200).json(cart);
+});
+
+// Salva il carrello e processa il checkout
+app.post('/api/cart/checkout', (req, res) => {
+    const { carrello } = req.body;
+  
+    // Simula il salvataggio e restituisce una risposta
+    console.log('Carrello ricevuto:', carrello);
+    res.status(200).json({ message: 'Ordine processato con successo!' });
+  });
+  
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);

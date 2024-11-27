@@ -132,3 +132,68 @@ showRicercaFiltriButton.addEventListener('click', () => {
     prodottiCard.classList.remove('expanded'); // Ripristina la dimensione originale della card dei prodotti
     showRicercaFiltriButton.classList.remove('visible'); // Nasconde il pulsante di riattivazione
 });
+let carrello = [];
+
+// Funzione per aggiungere un prodotto al carrello
+function aggiungiAlCarrello(productId) {
+  fetch(`/api/products/${productId}`)
+    .then((res) => res.json())
+    .then((product) => {
+      carrello.push({ ...product, tipo: 'acquisto' }); // Default: acquisto
+      aggiornaCarrello();
+    });
+}
+
+// Funzione per aggiornare la visualizzazione del carrello
+function aggiornaCarrello() {
+  const container = document.getElementById('cart-items-container');
+  container.innerHTML = '';
+
+  carrello.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <p>${item.name} - €${item.price}</p>
+      <div class="actions">
+        <label>
+          Noleggio (giorni):
+          <input type="number" min="1" value="1" onchange="calcolaPrezzo(${index}, this.value)" />
+        </label>
+        <button onclick="setTipo(${index}, 'acquisto')">Acquista</button>
+        <button onclick="setTipo(${index}, 'contrattazione')">Contratta</button>
+        <button onclick="rimuoviDalCarrello(${index})">Rimuovi</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Funzione per calcolare il prezzo per il noleggio
+function calcolaPrezzo(index, giorni) {
+  const item = carrello[index];
+  const prezzoBase = item.price;
+  carrello[index].prezzoNoleggio = prezzoBase * giorni;
+  aggiornaCarrello();
+}
+
+// Funzione per impostare il tipo di acquisto
+function setTipo(index, tipo) {
+  carrello[index].tipo = tipo;
+  if (tipo === 'contrattazione') {
+    const nuovaOfferta = prompt('Inserisci la tua offerta:');
+    carrello[index].offerta = nuovaOfferta;
+  }
+  aggiornaCarrello();
+}
+
+// Funzione per rimuovere un prodotto dal carrello
+function rimuoviDalCarrello(index) {
+  carrello.splice(index, 1);
+  aggiornaCarrello();
+}
+
+// Funzione per svuotare il carrello
+document.getElementById('clear-cart').addEventListener('click', () => {
+  carrello = [];
+  aggiornaCarrello();
+});
