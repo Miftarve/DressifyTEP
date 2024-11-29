@@ -189,28 +189,72 @@ function rimuoviDalCarrello(index) {
 }
 
 // Funzione per aggiungere un prodotto al carrello
+// Funzione per aggiungere un prodotto al carrello con dettagli
 function aggiungiAlCarrello(productId) {
-  fetch(`/api/products/${productId}`)
-      .then((res) => res.json())
-      .then((product) => {
-          const prodottoEsistente = carrello.find((item) => item.id === product.id);
-          if (prodottoEsistente) {
-              prodottoEsistente.quantita += 1; // Incrementa la quantità se il prodotto esiste già
-          } else {
-              carrello.push({ ...product, quantita: 1, tipo: 'acquisto' }); // Aggiungi nuovo prodotto
-          }
-          localStorage.setItem('carrello', JSON.stringify(carrello)); // Salva il carrello nel localStorage
-          aggiornaContatoreCarrello(); // Aggiorna il contatore
-          alert(`Prodotto "${product.name}" aggiunto al carrello!`);
-      })
-      .catch((error) => {
-          console.error("Errore nell'aggiunta al carrello:", error);
-          alert("Errore nell'aggiunta al carrello. Riprova.");
-      });
+  fetch(`/api/products/${productId}`) // Recupera i dati del prodotto dal server
+    .then((res) => res.json())
+    .then((product) => {
+      const prodottoEsistente = carrello.find((item) => item.id === product.id);
+      if (prodottoEsistente) {
+        prodottoEsistente.quantita += 1; // Incrementa la quantità se esiste già
+      } else {
+        // Aggiungi il prodotto al carrello con tutti i dettagli
+        carrello.push({
+          id: product.id,
+          name: product.name,
+          size: product.size, // Taglia
+          color: product.color, // Colore
+          brand: product.brand, // Marca
+          condition: product.condition, // Condizione
+          price: parseFloat(product.price), // Prezzo
+          quantita: 1,
+          tipo: 'acquisto', // Default: acquisto
+        });
+      }
+
+      // Salva il carrello e aggiorna la UI
+      localStorage.setItem('carrello', JSON.stringify(carrello));
+      aggiornaContatoreCarrello();
+      alert(`Prodotto "${product.name}" aggiunto al carrello!`);
+    })
+    .catch((error) => {
+      console.error('Errore nell\'aggiunta al carrello:', error);
+      alert('Errore nell\'aggiunta al carrello. Riprova.');
+    });
 }
 
-// Aggiorna la visualizzazione del carrello all'avvio
+// Aggiorna il contatore degli articoli nel carrello
+function aggiornaContatoreCarrello() {
+  const cartCount = document.getElementById('cart-count');
+  cartCount.textContent = carrello.reduce((total, item) => total + item.quantita, 0);
+}
+
+// Aggiorna la visualizzazione completa del carrello
+function aggiornaCarrello() {
+  const container = document.getElementById('cart-items-container');
+  container.innerHTML = '';
+
+  if (carrello.length === 0) {
+    container.innerHTML = '<p>Il carrello è vuoto!</p>';
+    return;
+  }
+
+  carrello.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <p><strong>${item.name}</strong> (${item.size}, ${item.color}, ${item.brand}, ${item.condition})</p>
+      <p>Prezzo: €${item.price} - Quantità: ${item.quantita}</p>
+      <div class="actions">
+        <button onclick="rimuoviDalCarrello(${index})">Rimuovi</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Carica il carrello all'avvio della pagina
 document.addEventListener('DOMContentLoaded', () => {
-  aggiornaCarrello(); // Mostra gli articoli nel carrello
-  aggiornaContatoreCarrello(); // Aggiorna il contatore
+  aggiornaCarrello();
+  aggiornaContatoreCarrello();
 });
