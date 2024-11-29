@@ -198,3 +198,36 @@ document.getElementById('clear-cart').addEventListener('click', () => {
   carrello = [];
   aggiornaCarrello();
 });
+
+
+// Funzione per aggiungere un prodotto al carrello
+function aggiungiAlCarrello(productId) {
+  fetch(`/api/products/${productId}`)
+    .then((res) => res.json())
+    .then((product) => {
+      const prodottoEsistente = carrello.find((item) => item.id === product.id);
+      if (prodottoEsistente) {
+        prodottoEsistente.quantita += 1; // Incrementa la quantità se il prodotto esiste già
+      } else {
+        carrello.push({ ...product, quantita: 1, tipo: 'acquisto' }); // Aggiungi nuovo prodotto
+      }
+      // Salva il carrello nel localStorage
+      localStorage.setItem('carrello', JSON.stringify(carrello));
+      aggiornaContatoreCarrello();
+      alert(`Prodotto "${product.name}" aggiunto al carrello!`);
+    })
+    .catch((error) => {
+      console.error('Errore nell\'aggiunta al carrello:', error);
+      alert('Errore nell\'aggiunta al carrello. Riprova.');
+    });
+}
+
+// Aggiorna il contatore degli articoli nel carrello
+function aggiornaContatoreCarrello() {
+  const cartCount = document.getElementById('cart-count');
+  cartCount.textContent = carrello.reduce((total, item) => total + item.quantita, 0);
+}
+
+// Carica i prodotti all'avvio della pagina
+document.addEventListener('DOMContentLoaded', aggiornaContatoreCarrello);
+
