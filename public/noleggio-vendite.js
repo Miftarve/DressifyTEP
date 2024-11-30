@@ -190,7 +190,9 @@ function setTipo(index, tipo) {
 // Funzione per rimuovere un prodotto dal carrello
 function rimuoviDalCarrello(index) {
   carrello.splice(index, 1);
+  localStorage.setItem('carrello', JSON.stringify(carrello)); // Aggiorna il localStorage
   aggiornaCarrello();
+  aggiornaContatoreCarrello();
 }
 
 // Funzione per svuotare il carrello
@@ -209,7 +211,7 @@ function aggiungiAlCarrello(productId) {
       if (prodottoEsistente) {
         prodottoEsistente.quantita += 1; // Incrementa la quantità se il prodotto esiste già
       } else {
-        carrello.push({ ...product, quantita: 1, tipo: 'acquisto' }); // Aggiungi nuovo prodotto
+        carrello.push({ ...product, quantita: 1 }); // Aggiungi nuovo prodotto
       }
       // Salva il carrello nel localStorage
       localStorage.setItem('carrello', JSON.stringify(carrello));
@@ -222,12 +224,27 @@ function aggiungiAlCarrello(productId) {
     });
 }
 
+function recuperaCarrello() {
+  const carrelloSalvato = localStorage.getItem('carrello');
+  if (carrelloSalvato) {
+    carrello = JSON.parse(carrelloSalvato);
+  } else {
+    carrello = [];
+  }
+  aggiornaContatoreCarrello();
+}
+
+
 // Aggiorna il contatore degli articoli nel carrello
 function aggiornaContatoreCarrello() {
   const cartCount = document.getElementById('cart-count');
   cartCount.textContent = carrello.reduce((total, item) => total + item.quantita, 0);
 }
 
+
 // Carica i prodotti all'avvio della pagina
 document.addEventListener('DOMContentLoaded', aggiornaContatoreCarrello);
 
+document.addEventListener('DOMContentLoaded', () => {
+  recuperaCarrello(); // Recupera il carrello dal localStorage
+});

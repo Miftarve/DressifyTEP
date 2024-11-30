@@ -33,6 +33,7 @@
           <button v-if="item.price > 100" @click="setTipoOperazione(index, 'noleggio')">Noleggia</button>
           <button @click="setTipoOperazione(index, 'acquisto')">Acquista</button>
           <button v-if="item.price <= 100" @click="setTipoOperazione(index, 'contrattazione')">Proponi Prezzo</button>
+          <button @click="rimuoviProdotto(index)">Rimuovi</button>
         </div>
 
         <!-- Dettagli aggiuntivi -->
@@ -82,6 +83,14 @@
           }
         },
 
+        rimuoviProdotto(index) {
+    if (confirm(`Sei sicuro di voler rimuovere ${this.carrello[index].name} dal carrello?`)) {
+      this.carrello.splice(index, 1); // Rimuove il prodotto
+      this.salvaCarrello(); // Salva il carrello aggiornato
+      alert("Prodotto rimosso con successo!");
+    }
+  },
+  
         // Svuota il carrello
         svuotaCarrello() {
           if (confirm("Sei sicuro di voler svuotare il carrello?")) {
