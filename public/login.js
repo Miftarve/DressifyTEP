@@ -23,31 +23,36 @@ new Vue({
         handleLogin() {
             const data = {
                 email: this.email,
-                password: this.password
+                password: this.password,
             };
-
-
+    
             fetch('/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Controlla se l'email termina con "@dressify.com"
+                        // Salva il nome e l'email dell'utente nel localStorage
+                        localStorage.setItem('utenteLoggato', JSON.stringify({ 
+                            nome: data.userName, 
+                            email: this.email 
+                        }));
+    
+                        // Reindirizza in base al tipo di utente
                         if (this.email.endsWith('@dressify.com')) {
-                            window.location.href = 'products.html'; // Reindirizza alla pagina prodotti
+                            window.location.href = 'products.html';
                         } else {
-                            window.location.href = 'noleggio-vendite.html'; // Reindirizza alla pagina noleggio-vendite
+                            window.location.href = 'noleggio-vendite.html';
                         }
                     } else {
                         alert(data.message); // Mostra il messaggio di errore
                     }
                 })
                 .catch(err => alert('Errore: ' + err.message));
-        }
-    }
+        },
+    }    
 });

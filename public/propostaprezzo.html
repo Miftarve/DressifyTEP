@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proposte di Prezzo</title>
+  <link rel="stylesheet" href="proposte.css">
+</head>
+<body>
+  <nav>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Prodotti</a></li>
+      <li><a href="carello.html">Carrello</a></li>
+      <li><a href="propostaprezzo.html">Proposte di Prezzo</a></li>
+    </ul>
+  </nav>
+
+  <section id="proposte-prezzo">
+    <h2>Proposte di Prezzo Ricevute</h2>
+    <div id="proposte-container">
+      <p id="no-proposals">Non ci sono proposte di prezzo al momento.</p>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script>
+    new Vue({
+      el: "#proposte-prezzo",
+      data: {
+        utente: JSON.parse(localStorage.getItem("utenteLoggato")) || null,
+        proposte: JSON.parse(localStorage.getItem("propostePrezzo")) || [],
+      },
+      mounted() {
+        this.mostraProposte();
+      },
+      methods: {
+        mostraProposte() {
+          const container = document.getElementById("proposte-container");
+          const noProposals = document.getElementById("no-proposals");
+
+          if (this.proposte.length === 0) {
+            noProposals.style.display = "block";
+          } else {
+            noProposals.style.display = "none";
+            this.proposte.forEach((proposta) => {
+              const propostaDiv = document.createElement("div");
+              propostaDiv.classList.add("proposta-item");
+              propostaDiv.innerHTML = `
+                <p><strong>Email:</strong> ${this.utente ? this.utente.email : 'Non disponibile'}</p>
+                <p><strong>Dettagli Prodotto:</strong> ${proposta.dettagli}</p>
+                <p><strong>Prezzo Proposto:</strong> €${proposta.prezzo}</p>
+              `;
+              container.appendChild(propostaDiv);
+            });
+          }
+        },
+      },
+    });
+  </script>
+</body>
+</html>

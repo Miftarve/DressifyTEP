@@ -150,7 +150,6 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// Route per gestire il login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -170,7 +169,12 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ success: false, message: 'Email o password errati.' });
         }
 
-        res.status(200).json({ success: true, message: 'Login avvenuto con successo!' });
+        // Includi il nome dell'utente nella risposta
+        res.status(200).json({ 
+            success: true, 
+            message: 'Login avvenuto con successo!', 
+            userName: row.name 
+        });
     });
 });
 
@@ -442,6 +446,23 @@ app.post('/api/cart/checkout', (req, res) => {
   });
   
   
+// In-memory storage per le proposte (può essere sostituito con un database)
+let propostePrezzo = [];
+
+// Endpoint per inviare una proposta di prezzo
+app.post('/api/proposte', (req, res) => {
+    const proposta = req.body;
+    if (!proposta.cliente || !proposta.prodotto || !proposta.prezzoProposto) {
+        return res.status(400).json({ error: 'Dati mancanti nella proposta' });
+    }
+    propostePrezzo.push(proposta);
+    res.status(201).json({ message: 'Proposta salvata con successo', proposta });
+});
+
+// Endpoint per ottenere tutte le proposte
+app.get('/api/proposte', (req, res) => {
+    res.json(propostePrezzo);
+});
 
 // Avvia il server
 app.listen(PORT, () => {

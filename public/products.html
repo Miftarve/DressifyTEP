@@ -20,6 +20,7 @@
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="products.html">Prodotti</a></li>
+            <li><a href="propostaprezzo.html">propostaprezzo</a></li>
             <li><a href="user.html">Utenti</a></li>
             <li><a href="sicurezza.html">Sicurezza</a></li>
             <li><a href="feedback.html">Feedback</a></li>
@@ -71,7 +72,12 @@
                     <h2>Lista Prodotti</h2>
                     <ul>
                         <li v-for="(product, index) in products" :key="index" class="product-item">
-                            <span>{{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} - €{{ product.price }}</span>
+                            <span>
+                                {{ product.category }} - {{ product.size }} - {{ product.color }} - {{ product.brand }} 
+                                - €{{ product.price }} 
+                                <strong v-if="product.price > 100">(Noleggiabile)</strong>
+                              </span>
+                              
                             <div class="button-group">
                                 <button @click="editProduct(index)">Modifica</button>
                                 <button @click="removeProduct(index)" class="remove-button">Rimuovi</button>

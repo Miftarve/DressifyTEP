@@ -3,34 +3,34 @@ let carrello = JSON.parse(localStorage.getItem('carrello')) || [];
 console.log("Carrello caricato:", carrello); // Verifica cosa viene caricato
 
 function aggiungiAlCarrello(productId) {
-    fetch(`/api/products/${productId}`)
-        .then(res => res.json())
-        .then(product => {
-            const prodottoEsistente = carrello.find(item => item.id === product.id);
-            if (prodottoEsistente) {
-                prodottoEsistente.quantita += 1; // Incrementa la quantità
-            } else {
-                carrello.push({ ...product, tipo: 'acquisto', quantita: 1 }); // Aggiungi nuovo prodotto
-            }
-            aggiornaCarrello();
-        });
+  fetch(`/api/products/${productId}`)
+    .then(res => res.json())
+    .then(product => {
+      const prodottoEsistente = carrello.find(item => item.id === product.id);
+      if (prodottoEsistente) {
+        prodottoEsistente.quantita += 1; // Incrementa la quantità
+      } else {
+        carrello.push({ ...product, tipo: 'acquisto', quantita: 1 }); // Aggiungi nuovo prodotto
+      }
+      aggiornaCarrello();
+    });
 }
 
 // Funzione per aggiornare la visualizzazione del carrello
 function aggiornaCarrello() {
-    console.log("Aggiornamento carrello in corso..."); // Debug
-    const container = document.getElementById('cart-items-container');
-    container.innerHTML = '';
-  
-    if (carrello.length === 0) {
-      container.innerHTML = '<p>Il carrello è vuoto!</p>';
-      return;
-    }
-  
-    carrello.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'cart-item';
-      div.innerHTML = `
+  console.log("Aggiornamento carrello in corso..."); // Debug
+  const container = document.getElementById('cart-items-container');
+  container.innerHTML = '';
+
+  if (carrello.length === 0) {
+    container.innerHTML = '<p>Il carrello è vuoto!</p>';
+    return;
+  }
+
+  carrello.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
         <p>${item.name} - €${item.price}</p>
         <div class="actions">
           <label>
@@ -42,10 +42,10 @@ function aggiornaCarrello() {
           <button onclick="rimuoviDalCarrello(${index})">Rimuovi</button>
         </div>
       `;
-      container.appendChild(div);
-    });
-  }
-  
+    container.appendChild(div);
+  });
+}
+
 
 
 // Funzione per calcolare il prezzo per il noleggio
@@ -75,12 +75,12 @@ function rimuoviDalCarrello(index) {
   aggiornaCarrello();
 }
 
-// Funzione per salvare il carrello nel localStorage
 function salvaCarrello() {
-    console.log("Carrello salvato:", JSON.stringify(carrello)); // Aggiungi un log per vedere cosa viene salvato
-    localStorage.setItem('carrello', JSON.stringify(carrello));
-  }
-  
+  console.log("Carrello salvato:", JSON.stringify(carrello)); // Aggiungi un log per vedere cosa viene salvato
+  localStorage.setItem('carrello', JSON.stringify(carrello));
+}
+
+
 console.log(carrello);
 
 // Funzione per svuotare il carrello
@@ -152,6 +152,7 @@ function aggiungiAlCarrello(productId) {
           color: product.color, // Colore
           brand: product.brand, // Marca
           condition: product.condition, // Condizione
+          category: product.category, // Categoria
           price: parseFloat(product.price), // Prezzo
           quantita: 1,
           tipo: 'acquisto', // Default: acquisto
@@ -169,14 +170,15 @@ function aggiungiAlCarrello(productId) {
     });
 }
 
+
 // Funzione per aggiornare il contatore degli articoli nel carrello
 function aggiornaContatoreCarrello() {
   const cartCount = document.getElementById('cart-count');
   if (cartCount) {
-      const totaleProdotti = carrello.reduce((total, item) => total + item.quantita, 0);
-      cartCount.textContent = totaleProdotti;
+    const totaleProdotti = carrello.reduce((total, item) => total + item.quantita, 0);
+    cartCount.textContent = totaleProdotti;
   } else {
-      console.error("Elemento con ID 'cart-count' non trovato!");
+    console.error("Elemento con ID 'cart-count' non trovato!");
   }
 }
 
@@ -244,6 +246,7 @@ function aggiornaCarrello() {
     div.className = 'cart-item';
     div.innerHTML = `
       <p><strong>${item.name}</strong> (${item.size}, ${item.color}, ${item.brand}, ${item.condition})</p>
+      <p>Categoria: ${item.category}</p>
       <p>Prezzo: €${item.price} - Quantità: ${item.quantita}</p>
       <div class="actions">
         <button onclick="rimuoviDalCarrello(${index})">Rimuovi</button>
@@ -258,3 +261,60 @@ document.addEventListener('DOMContentLoaded', () => {
   aggiornaCarrello();
   aggiornaContatoreCarrello();
 });
+// Controlla il tipo di operazione in base al prezzo del prodotto
+function setTipoOperazione(index, tipo, giorniNoleggio = 1) {
+  const item = carrello[index];
+
+  if (item.price > 100 && tipo === 'noleggio') {
+    // Calcola il prezzo del noleggio
+    const prezzoNoleggio = item.price * giorniNoleggio;
+    item.tipo = 'noleggio';
+    item.prezzoNoleggio = prezzoNoleggio;
+    alert(`Hai scelto di noleggiare ${item.name} per €${prezzoNoleggio}`);
+  } else if (item.price <= 100 && tipo === 'contrattazione') {
+    // Richiede proposta di prezzo per il prodotto
+    const propostaPrezzo = prompt(`Inserisci il prezzo proposto per ${item.name}:`);
+    if (propostaPrezzo) {
+      inviaPropostaPrezzo(item, propostaPrezzo);
+    }
+  } else if (tipo === 'acquisto') {
+    item.tipo = 'acquisto';
+    alert(`Hai scelto di acquistare ${item.name}`);
+  } else {
+    alert("L'operazione non è consentita.");
+  }
+
+  salvaCarrello();
+  aggiornaCarrello();
+}
+
+
+// Invia la proposta di prezzo al server
+function inviaPropostaPrezzo(prodotto, prezzoProposto) {
+  const utente = JSON.parse(localStorage.getItem('utente')); // Supponendo che i dettagli dell'utente siano nel localStorage
+  if (!utente || !utente.email) {
+    alert("Devi essere loggato per inviare una proposta.");
+    return;
+  }
+
+  fetch('/api/proposte', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      cliente: utente.name,
+      email: utente.email,
+      prodotto: prodotto.name,
+      specifiche: prodotto, // Passa il prodotto con tutti i suoi dettagli
+      prezzoProposto: parseFloat(prezzoProposto),
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      alert("Proposta di prezzo inviata con successo!");
+    })
+    .catch((err) => {
+      console.error("Errore durante l'invio della proposta:", err);
+      alert("Errore durante l'invio della proposta. Riprova.");
+    });
+}
+

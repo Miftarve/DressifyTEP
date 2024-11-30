@@ -1,64 +1,113 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carrello</title>
   <link rel="stylesheet" href="noleggio-vendite.css">
 </head>
+
 <body>
+  <!-- Navbar -->
   <nav>
     <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="noleggio-vendite.html">Prodotti</a></li>
-        <li><a href="sicurezza.html">Sicurezza</a></li>
-        <li><a href="feedback.html">Feedback</a></li>
-      </ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="noleggio-vendite.html">Prodotti</a></li>
+      <li><a href="sicurezza.html">Sicurezza</a></li>
+      <li><a href="feedback.html">Feedback</a></li>
+    </ul>
   </nav>
+
+  <!-- Sezione Carrello -->
   <section id="carrello">
     <h2>Il tuo Carrello</h2>
     <div id="cart-items-container">
       <!-- Gli articoli aggiunti al carrello verranno caricati qui -->
+      <div class="cart-item" v-for="(item, index) in carrello" :key="index">
+        <p>{{ item.name }}</p>
+        <p>Prezzo: €{{ item.price }}</p>
+
+        <!-- Scelta operazione -->
+        <div class="operation">
+          <button v-if="item.price > 100" @click="setTipoOperazione(index, 'noleggio')">Noleggia</button>
+          <button @click="setTipoOperazione(index, 'acquisto')">Acquista</button>
+          <button v-if="item.price <= 100" @click="setTipoOperazione(index, 'contrattazione')">Proponi Prezzo</button>
+        </div>
+
+        <!-- Dettagli aggiuntivi -->
+        <div v-if="item.tipo === 'noleggio'">
+          <p>Noleggiato per {{ item.giorniNoleggio }} giorni a €{{ item.prezzoNoleggio }}</p>
+        </div>
+        <div v-if="item.tipo === 'contrattazione'">
+          <p>Prezzo proposto: €{{ item.prezzoProposto }}</p>
+        </div>
+      </div>
     </div>
-    <span id="cart-count">0</span>
 
     <div id="cart-actions">
-      <button id="clear-cart">Svuota Carrello</button>
-      <button id="checkout">Procedi al Pagamento</button>
+      <button id="clear-cart" @click="svuotaCarrello">Svuota Carrello</button>
+      <button id="checkout" @click="checkout">Procedi al Pagamento</button>
     </div>
   </section>
-  <script src="carrello.js"></script>
+
+  <!-- Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script>
-    // Funzione per caricare il carrello dalla memoria
-function caricaCarrello() {
-  const carrello = JSON.parse(localStorage.getItem('carrello')) || [];
+    new Vue({
+      el: "#carrello",
+      data: {
+        carrello: JSON.parse(localStorage.getItem("carrello")) || [],
+      },
+      methods: {
+        // Setta l'operazione scelta per un prodotto
+        setTipoOperazione(index, tipo) {
+          const item = this.carrello[index];
+          if (tipo === "contrattazione" && item.price <= 100) {
+            const proposta = parseFloat(prompt(`Proponi un prezzo per ${item.name}:`));
+            if (proposta && proposta > 0) {
+              // Salva i dettagli della proposta
+              const propostePrezzo = JSON.parse(localStorage.getItem("propostePrezzo")) || [];
+              const nuovaProposta = {
+                cliente: "Nome Cliente", // Sostituisci con il nome del cliente se disponibile
+                prodotto: item.name,
+                dettagli: `Marca: ${item.brand}, Colore: ${item.color}, Taglia: ${item.size}`,
+                prezzo: proposta,
+              };
+              propostePrezzo.push(nuovaProposta);
+              localStorage.setItem("propostePrezzo", JSON.stringify(propostePrezzo));
 
-  // Trova il contenitore del carrello nella pagina
-  const carrelloContainer = document.getElementById('carrello-container');
-  if (!carrelloContainer) return;
+              alert(`Hai proposto €${proposta} per ${item.name}`);
+            }
+          }
+        },
 
-  // Controlla se ci sono articoli nel carrello
-  if (carrello.length === 0) {
-    carrelloContainer.innerHTML = "<p>Il carrello è vuoto!</p>";
-  } else {
-    carrelloContainer.innerHTML = ''; // Pulisce il contenitore
+        // Svuota il carrello
+        svuotaCarrello() {
+          if (confirm("Sei sicuro di voler svuotare il carrello?")) {
+            this.carrello = [];
+            this.salvaCarrello();
+          }
+        },
 
-    // Aggiungi i prodotti al carrello
-    carrello.forEach(item => {
-      const itemElement = document.createElement('div');
-      itemElement.classList.add('cart-item');
-      itemElement.innerHTML = `
-        <p>${item.name}</p>
-        <p>Prezzo: ${item.rentalPrice} €</p>
-      `;
-      carrelloContainer.appendChild(itemElement);
+        // Procedi al pagamento
+        checkout() {
+          if (this.carrello.length === 0) {
+            alert("Il carrello è vuoto.");
+            return;
+          }
+          alert("Pagamento completato con successo!");
+          this.carrello = [];
+          this.salvaCarrello();
+        },
+
+        // Salva il carrello
+        salvaCarrello() {
+          localStorage.setItem("carrello", JSON.stringify(this.carrello));
+        },
+      },
     });
-  }
-}
-
-// Carica il carrello quando la pagina è pronta
-document.addEventListener('DOMContentLoaded', caricaCarrello);
-
   </script>
 </body>
+
 </html>
