@@ -150,6 +150,32 @@ app.post('/register', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login di un utente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: mario.rossi@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login avvenuto con successo
+ *       401:
+ *         description: Credenziali errate
+ *       500:
+ *         description: Errore del server
+ */
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -177,6 +203,45 @@ app.post('/login', (req, res) => {
         });
     });
 });
+
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Aggiungi un nuovo prodotto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 example: Abbigliamento
+ *               size:
+ *                 type: string
+ *                 example: M
+ *               color:
+ *                 type: string
+ *                 example: Rosso
+ *               brand:
+ *                 type: string
+ *                 example: Gucci
+ *               condition:
+ *                 type: string
+ *                 example: Nuovo
+ *               price:
+ *                 type: number
+ *                 example: 100.99
+ *     responses:
+ *       201:
+ *         description: Prodotto aggiunto con successo
+ *       400:
+ *         description: Richiesta non valida
+ *       500:
+ *         description: Errore del server
+ */
 
 // Aggiungi un nuovo prodotto
 app.post('/products', (req, res) => {
@@ -328,6 +393,26 @@ app.get('/api/products/:id', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Ottieni un prodotto specifico
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del prodotto
+ *     responses:
+ *       200:
+ *         description: Dettagli del prodotto
+ *       404:
+ *         description: Prodotto non trovato
+ *       500:
+ *         description: Errore del server
+ */
 // Route per ottenere un prodotto specifico
 app.get('/products/:id', (req, res) => {
     const productId = req.params.id;
@@ -342,6 +427,49 @@ app.get('/products/:id', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Aggiorna un prodotto
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del prodotto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 example: Abbigliamento
+ *               size:
+ *                 type: string
+ *                 example: M
+ *               color:
+ *                 type: string
+ *                 example: Rosso
+ *               brand:
+ *                 type: string
+ *                 example: Gucci
+ *               condition:
+ *                 type: string
+ *                 example: Nuovo
+ *               price:
+ *                 type: number
+ *                 example: 99.99
+ *     responses:
+ *       200:
+ *         description: Prodotto aggiornato con successo
+ *       500:
+ *         description: Errore del server
+ */
 // Route per aggiornare un prodotto
 app.put('/products/:id', (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
@@ -358,6 +486,49 @@ app.put('/products/:id', (req, res) => {
     );
 });
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Aggiorna un prodotto
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del prodotto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 example: Abbigliamento
+ *               size:
+ *                 type: string
+ *                 example: M
+ *               color:
+ *                 type: string
+ *                 example: Rosso
+ *               brand:
+ *                 type: string
+ *                 example: Gucci
+ *               condition:
+ *                 type: string
+ *                 example: Nuovo
+ *               price:
+ *                 type: number
+ *                 example: 99.99
+ *     responses:
+ *       200:
+ *         description: Prodotto aggiornato con successo
+ *       500:
+ *         description: Errore del server
+ */
 // Route per rimuovere un prodotto
 app.delete('/products/:id', (req, res) => {
     const productId = req.params.id;
@@ -415,6 +586,35 @@ app.post('/recover-password', (req, res) => {
 });
 const cart = { items: [] };
 
+/**
+ * @swagger
+ * /api/cart/add:
+ *   post:
+ *     summary: Aggiungi un prodotto al carrello
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: integer
+ *                 example: 1
+ *               rentalDays:
+ *                 type: integer
+ *                 example: 7
+ *               rentalPrice:
+ *                 type: number
+ *                 example: 50.99
+ *     responses:
+ *       200:
+ *         description: Prodotto aggiunto al carrello
+ *       404:
+ *         description: Prodotto non trovato
+ *       500:
+ *         description: Errore del server
+ */
 app.post('/api/cart/add', (req, res) => {
   const { productId, rentalDays, rentalPrice } = req.body;
 
@@ -432,10 +632,39 @@ app.post('/api/cart/add', (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /api/cart:
+ *   get:
+ *     summary: Visualizza il contenuto del carrello
+ *     responses:
+ *       200:
+ *         description: Contenuto del carrello
+ */
 app.get('/api/cart', (req, res) => {
   res.status(200).json(cart);
 });
 
+/**
+ * @swagger
+ * /api/cart/checkout:
+ *   post:
+ *     summary: Effettua il checkout del carrello
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               carrello:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *     responses:
+ *       200:
+ *         description: Checkout completato con successo
+ */
 // Salva il carrello e processa il checkout
 app.post('/api/cart/checkout', (req, res) => {
     const { carrello } = req.body;
@@ -467,4 +696,5 @@ app.get('/api/proposte', (req, res) => {
 // Avvia il server
 app.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
+    console.log(`Swagger disponibile su http://localhost:${PORT}/api-docs`);
 });

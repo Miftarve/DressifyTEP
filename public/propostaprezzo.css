@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f9f9f9;
+  }
+  
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  nav {
+    background: #2c3e50;
+    padding: 1em 0;
+  }
+  
+  nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  nav .logo {
+    font-size: 1.5em;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  
+  nav .nav-links {
+    list-style: none;
+    display: flex;
+  }
+  
+  nav .nav-links li {
+    margin: 0 1em;
+  }
+  
+  nav .nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  nav .nav-links a:hover {
+    color: #1abc9c;
+  }
+  
+  header {
+    background: #1abc9c;
+    color: #fff;
+    padding: 2em 0;
+    text-align: center;
+  }
+  
+  header .header-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  header h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  header p {
+    font-size: 1.2em;
+  }
+  
+  h2 {
+    font-size: 1.8em;
+    margin-bottom: 1em;
+  }
+  
+  .proposte-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+  }
+  
+  .proposta-item {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 1.5em;
+    flex: 1 1 calc(33.333% - 1em);
+    min-width: 250px;
+  }
+  
+  .proposta-item p {
+    margin-bottom: 0.5em;
+  }
+  
+  .no-proposals {
+    text-align: center;
+    font-size: 1.2em;
+    color: #7f8c8d;
+  }
+  
+  footer {
+    background: #2c3e50;
+    color: #fff;
+    text-align: center;
+    padding: 1em 0;
+    margin-top: 2em;
+  }
+  

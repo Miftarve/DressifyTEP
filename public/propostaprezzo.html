@@ -4,24 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proposte di Prezzo</title>
-  <link rel="stylesheet" href="proposte.css">
+  <link rel="stylesheet" href="propostaprezzo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="products.html">Prodotti</a></li>
-      <li><a href="carello.html">Carrello</a></li>
-      <li><a href="propostaprezzo.html">Proposte di Prezzo</a></li>
-    </ul>
+    <div class="container">
+      <a href="index.html" class="logo">Dressify</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Prodotti</a></li>
+        <li><a href="carrello.html">Carrello</a></li>
+        <li><a href="propostaprezzo.html">Proposte di Prezzo</a></li>
+      </ul>
+    </div>
   </nav>
 
-  <section id="proposte-prezzo">
-    <h2>Proposte di Prezzo Ricevute</h2>
-    <div id="proposte-container">
-      <p id="no-proposals">Non ci sono proposte di prezzo al momento.</p>
+  <header>
+    <div class="header-content">
+      <h1>Proposte di Prezzo</h1>
+      <p>Visualizza le offerte ricevute sui tuoi prodotti.</p>
+    </div>
+  </header>
+
+  <section id="proposte-prezzo" class="container">
+    <h2>Proposte Ricevute</h2>
+    <div id="proposte-container" class="proposte-container">
+      <p id="no-proposals" class="no-proposals">Non ci sono proposte di prezzo al momento.</p>
     </div>
   </section>
+
+  <footer>
+    <p>© 2024 Dressify. Tutti i diritti riservati.</p>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script>
