@@ -204,6 +204,30 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Route per il logout
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel logout.' });
+        }
+        res.status(200).json({ message: 'Logout avvenuto con successo!' });
+    });
+});
+
+// Verifica della sessione utente
+app.get('/profile', (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: 'Devi effettuare il login.' });
+    }
+
+    db.get(`SELECT * FROM users WHERE id = ?`, [req.session.userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore nel recupero dell\'utente.' });
+        }
+        res.status(200).json({ user: row });
+    });
+});
+
 /**
  * @swagger
  * /products:

@@ -248,3 +248,12 @@ document.addEventListener('DOMContentLoaded', aggiornaContatoreCarrello);
 document.addEventListener('DOMContentLoaded', () => {
   recuperaCarrello(); // Recupera il carrello dal localStorage
 });
+// Add event listener for the logout button
+document.getElementById('logoutButton').addEventListener('click', function() {
+  // Clear session or authentication data
+  sessionStorage.removeItem('userToken');  // Example, replace with actual storage logic
+  localStorage.removeItem('userToken');  // Example, replace with actual storage logic
+
+  // Redirect to the login page or home page
+  window.location.href = 'index.html';  // Redirect to home or login page
+});
