@@ -18,7 +18,8 @@
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f0f2f5;
+        background-color: black;
+        background-size: cover;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -50,7 +51,7 @@
 
     /* Form Container */
     .form-container {
-        background-color: #fff;
+        background-color: rgba(255, 255, 255, 0.9);
         padding: 40px;
         border-radius: 12px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -64,8 +65,7 @@
     }
 
     /* Input Fields */
-    input,
-    button {
+    input, button {
         width: 100%;
         padding: 12px;
         margin: 12px 0;
@@ -75,8 +75,7 @@
         transition: border-color 0.3s ease, background-color 0.3s ease;
     }
 
-    input[type="text"],
-    input[type="password"] {
+    input[type="text"], input[type="password"] {
         background-color: #f9f9f9;
     }
 
@@ -99,6 +98,25 @@
         background-color: #2980b9;
     }
 
+    /* Custom Title and Effects */
+    .custom-title {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+        from {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        to {
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
         body {
@@ -113,8 +131,7 @@
             font-size: 2rem;
         }
 
-        input,
-        button {
+        input, button {
             font-size: 0.9rem;
         }
     }
@@ -128,8 +145,7 @@
             font-size: 1.8rem;
         }
 
-        input,
-        button {
+        input, button {
             font-size: 0.85rem;
         }
     }
@@ -137,6 +153,7 @@
 
 <body>
     <div class="form-container">
+        <div class="custom-title">DRESSIMIFY</div>
         <h1>Registrazione Utente</h1>
         <form action="/register" method="post">
             <label for="nome">Nome:</label>

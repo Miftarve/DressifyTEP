@@ -15,7 +15,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-color: black;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,7 +48,7 @@
 
         /* Form Container */
         .form-container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -94,6 +95,25 @@
             background-color: #2980b9;
         }
 
+        /* Custom Title and Effects */
+        .custom-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            to {
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
@@ -130,6 +150,8 @@
 </head>
 <body>
     <div class="form-container">
+        <div class="custom-title">DRESSIMIFY</div>
+
         <h1>Login</h1>
         <form action="/login" method="post">
             <input type="text" name="username" id="username" placeholder="Username o Email" required>
