@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acquisto</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-size: 2.5rem;
+        }
+
+        .product-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            margin: 8px 0;
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Dettagli Acquisto</h1>
+    <div class="product-container">
+        <div class="card">
+            <h3>{{product.category}} - {{product.brand}}</h3>
+            <p>Taglia: {{product.size}}</p>
+            <p>Colore: {{product.color}}</p>
+            <p>Condizione: {{product.condition}}</p>
+            <p>Prezzo: {{product.price}}&euro;</p>
+            <form action="/acquista" method="post">
+                <input type="hidden" name="id" value="{{product.id}}">
+                <button type="submit">Conferma Acquisto</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

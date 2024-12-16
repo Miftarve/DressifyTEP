@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noleggio e Vendita</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            color: #16a085;
+        }
+
+        #products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            margin: 8px 0;
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* Form Styles */
+        form {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        form label {
+            font-size: 0.9rem;
+            color: #34495e;
+        }
+
+        form input {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #products {
+                gap: 10px;
+            }
+
+            .card {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Noleggio e Vendita</h1>
+
+    <div id="products">
+        {{#each products}}
+        <div class="card">
+            <h3>{{category}} - {{brand}}</h3>
+            <p>Taglia: {{size}}</p>
+            <p>Colore: {{color}}</p>
+            <p>Condizione: {{condition}}</p>
+            <p>Prezzo: {{price}}&euro;</p>
+            <form action="/noleggio" method="post">
+                <input type="hidden" name="id" value="{{id}}">
+                <label for="durata">Durata (giorni):</label>
+                <input type="number" name="durata" min="1" required>
+                <button type="submit">Noleggia</button>
+            </form>
+            <form action="/acquista" method="post">
+                <input type="hidden" name="id" value="{{id}}">
+                <button type="submit">Acquista</button>
+            </form>
+        </div>
+        {{/each}}
+    </div>
+
+    {{#if prezzo}}
+    <h2>Prezzo totale del noleggio: {{prezzo}}&euro;</h2>
+    {{/if}}
+</body>
+
+</html>

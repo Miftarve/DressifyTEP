@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f1f1f1;
+        }
+
+        #chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            height: 80%;
+        }
+
+        header {
+            background-color: #2980b9;
+            color: white;
+            padding: 18px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.5rem;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #input-container {
+            display: flex;
+            padding: 12px;
+            border-top: 2px solid #ddd;
+            background-color: #fafafa;
+        }
+
+        #input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        #input-container input:focus {
+            border-color: #2980b9;
+        }
+
+        #input-container button {
+            padding: 12px 24px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            margin-left: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #input-container button:hover {
+            background-color: #3498db;
+        }
+
+        #input-container button:active {
+            background-color: #2980b9;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            word-wrap: break-word;
+            font-size: 1rem;
+        }
+
+        .message.self {
+            background-color: #d5f5e3;
+            align-self: flex-end;
+        }
+
+        .message.other {
+            background-color: #ecf0f1;
+            align-self: flex-start;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            #chat-container {
+                width: 100%;
+                height: 90%;
+            }
+
+            header {
+                font-size: 1.3rem;
+                padding: 16px;
+            }
+
+            #input-container input,
+            #input-container button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <header>
+            <h1>Chat</h1>
+        </header>
+        <div id="messages"></div>
+        <div id="input-container">
+            <input id="message-input" type="text" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const messages = document.getElementById('messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Identificatore univoco per il client
+        let userId;
+
+        socket.on('connect', () => {
+            // Imposta l'ID dell'utente quando si connette
+            userId = socket.id;
+            console.log(`User connected with ID: ${userId}`);
+        });
+
+        function addMessage(msg, isSelf) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(isSelf ? 'self' : 'other');
+            messageElement.textContent = msg;
+            messages.appendChild(messageElement);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                // Mostra il messaggio solo sulla scheda che lo invia
+                addMessage(message, true);
+
+                // Invia il messaggio al server
+                socket.emit('send message', { senderId: userId, message });
+
+                // Resetta il campo di input
+                messageInput.value = '';
+            }
+        });
+
+        // Ricezione dei messaggi
+        socket.on('receive message', (data) => {
+            // Mostra i messaggi ricevuti da altri client
+            if (data.senderId !== userId) {
+                addMessage(data.message, false); // Mostra il messaggio solo se non è il proprio
+            }
+        });
+
+    </script>
+
+
+</body>
+
+</html>
