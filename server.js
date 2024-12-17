@@ -3,6 +3,10 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+
 //const cors = require('cors');
 
 //const sqlite3 = require('sqlite3').verbose();
@@ -60,6 +64,46 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+passport.use(new GoogleStrategy({
+    clientID: 'CLIENT_ID',
+    clientSecret: 'CLIENT_SECRET',
+    callbackURL: '/auth/google/callback'
+},
+    function (accessToken, refreshToken, profile, done) {
+        // Salva l'utente nel database
+        return done(null, profile);
+    }
+));
+
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => res.redirect('/home')
+);
+// Google OAuth
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// Callback dopo l'autenticazione Google
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+        res.redirect('/dashboard'); // Redirect di successo
+    });
+
+// Facebook OAuth
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+// Callback dopo l'autenticazione Facebook
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    (req, res) => {
+        res.redirect('/dashboard'); // Redirect di successo
+    });
 
 // route
 
@@ -574,13 +618,13 @@ app.get('/noleggio', (req, res) => {
     }
 
     // Rendiamo il template passando i prodotti filtrati
-    res.render('noleggio', { 
-        products: filteredProducts, 
-        brand, 
-        colore, 
-        condizione, 
-        prezzoMin, 
-        prezzoMax 
+    res.render('noleggio', {
+        products: filteredProducts,
+        brand,
+        colore,
+        condizione,
+        prezzoMin,
+        prezzoMax
     });
 });
 
@@ -602,5 +646,5 @@ app.post('/acquista', (req, res) => {
 // Start server
 const port = 3000;
 app.listen(port, () => console.log(`Server started on port ${port}. 
-    Vai su http://localhost:${port}.
-    Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
+Vai su http://localhost:${port}.
+Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
