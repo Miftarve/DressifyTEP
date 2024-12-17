@@ -6,208 +6,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noleggio e Vendita</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-        }
+        /* Global styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fb;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            padding: 10px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+h1, h2 {
+    color: #2c3e50;
+    text-align: center;
+}
 
-        .navbar .logo img {
-            height: 50px;
-        }
+h1 {
+    margin-top: 40px;
+    font-size: 2.5em;
+}
 
-        .navbar .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-            margin: 0;
-            padding: 0;
-        }
+h2 {
+    margin-top: 20px;
+    font-size: 1.8em;
+}
 
-        .navbar .nav-links li {
-            display: inline;
-        }
+/* Filter container styles */
+.filter-container {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 250px;  /* Ridotta la larghezza della card dei filtri */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 30px 0;
+    align-self: flex-start;  /* Allineato a sinistra */
+}
 
-        .navbar .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background-color 0.3s ease;
-        }
+.filter-container label {
+    font-size: 1.1em;
+    color: #34495e;
+    margin-bottom: 5px;
+    display: block;
+}
 
-        .navbar .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
+.filter-container input {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1em;
+    color: #333;
+}
 
-        .navbar .nav-links a i {
-            font-size: 1.2rem;
-        }
+.filter-container button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+.filter-container button:hover {
+    background-color: #2980b9;
+}
 
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-            color: #2c3e50;
-            font-size: 2.5rem;
-        }
+/* Card styles for products */
+#products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* Tre card per riga */
+    gap: 20px;
+    width: 80%;
+    max-width: 1100px;
+    margin: 20px 0;
+    justify-content: flex-start; /* Allineamento a sinistra */
+}
 
-        h2 {
-            text-align: center;
-            margin-top: 20px;
-            color: #16a085;
-        }
+.card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;  /* Bordo arrotondato più morbido */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    max-width: 280px;  /* Limita la larghezza massima delle card */
+    width: 100%;
+    margin: 0 auto;
+}
 
-        #products {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
 
-        /* Card Styles */
-        .card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+.card h3 {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    text-transform: capitalize; /* Aggiunto per stilizzare il nome */
+}
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
+.card p {
+    font-size: 1.1em;
+    color: #7f8c8d;
+    margin: 5px 0;
+}
 
-        .card h3 {
-            font-size: 1.5rem;
-            color: #2980b9;
-            margin-bottom: 10px;
-        }
+/* Button styles inside cards */
+.card button {
+    padding: 10px 20px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Fai i pulsanti della card più grandi */
+}
 
-        .card p {
-            margin: 8px 0;
-            font-size: 1rem;
-            color: #7f8c8d;
-        }
+.card button:hover {
+    background-color: #2ecc71;
+}
 
-        /* Form Styles */
-        form {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
+.card form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        form label {
-            font-size: 0.9rem;
-            color: #34495e;
-        }
+/* Responsive styles */
+@media (max-width: 768px) {
+    .filter-container {
+        width: 90%;
+    }
 
-        form input {
-            width: 80%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
+    #products {
+        grid-template-columns: repeat(2, 1fr);  /* Due card per riga su schermi più piccoli */
+    }
 
-        form button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
+    .card {
+        width: 100%;
+        margin: 10px 0;
+    }
 
-        form button:hover {
-            background-color: #2980b9;
-        }
+    h1 {
+        font-size: 2em;
+    }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            #products {
-                gap: 10px;
-            }
+    h2 {
+        font-size: 1.5em;
+    }
+}
 
-            .card {
-                width: 90%;
-            }
-
-            .navbar .nav-links {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .navbar .nav-links {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .navbar {
-                flex-direction: column;
-                padding: 15px;
-            }
-        }
     </style>
 </head>
 
 <body>
 
-    <div class="navbar">
-        <ul class="nav-links">
-            <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="/static/index.html"><i class="fas fa-comments"></i> Chat</a></li>
-            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-        </ul>
+    <h1>Catalogo Noleggio</h1>
+
+    <!-- Form per i filtri -->
+    <div class="filter-container">
+        <form action="/noleggio" method="get">
+            <label for="brand">Brand:</label>
+            <input type="text" name="brand" placeholder="Es. Nike" value="{{brand}}">
+
+            <label for="colore">Colore:</label>
+            <input type="text" name="colore" placeholder="Es. Rosso" value="{{colore}}">
+
+            <label for="condizione">Condizione:</label>
+            <input type="text" name="condizione" placeholder="Es. Nuovo" value="{{condizione}}">
+
+            <label for="prezzoMin">Prezzo Minimo:</label>
+            <input type="number" name="prezzoMin" value="{{prezzoMin}}">
+
+            <label for="prezzoMax">Prezzo Massimo:</label>
+            <input type="number" name="prezzoMax" value="{{prezzoMax}}">
+
+
+            <button type="submit">Filtra</button>
+        </form>
     </div>
-    <h1>Noleggio e Vendita</h1>
+
+    <h2>Risultati:</h2>
+
+    <!-- Visualizza i prodotti filtrati -->
+    {{#if products.length}}
     <div id="products">
         {{#each products}}
         <div class="card">
-            <h3>{{category}} - {{brand}}</h3>
-            <p>Taglia: {{size}}</p>
-            <p>Colore: {{color}}</p>
+            <h3>{{brand}} - {{category}}</h3>
+            <p>Prezzo: {{price}}€</p>
             <p>Condizione: {{condition}}</p>
-            <p>Prezzo: {{price}}&euro;</p>
+            <p>Colore: {{color}}</p>
+
+            <!-- Form per il noleggio -->
             <form action="/noleggio" method="post">
                 <input type="hidden" name="id" value="{{id}}">
                 <label for="durata">Durata (giorni):</label>
                 <input type="number" name="durata" min="1" required>
                 <button type="submit">Noleggia</button>
             </form>
+
+            <!-- Form per l'acquisto -->
             <form action="/acquista" method="post">
                 <input type="hidden" name="id" value="{{id}}">
                 <button type="submit">Acquista</button>
@@ -215,10 +229,10 @@
         </div>
         {{/each}}
     </div>
-
-    {{#if prezzo}}
-    <h2>Prezzo totale del noleggio: {{prezzo}}&euro;</h2>
+    {{else}}
+    <p>Nessun prodotto trovato con i filtri applicati.</p>
     {{/if}}
+
 </body>
 
 </html>

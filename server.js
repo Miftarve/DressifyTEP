@@ -22,6 +22,10 @@ app.use(session({ secret: 'ssshhhhh' }));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
+hbs.registerHelper('json', context => JSON.stringify(context, null, 2));
+
+
+
 // Body parser middleware
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -377,10 +381,68 @@ app.post('/calcolaPrezzo', (req, res) => {
     });
 });
 
+
+app.use(express.urlencoded({ extended: true }));
+
+// Rotta per la pagina del catalogo
 app.get('/noleggio', (req, res) => {
-    const products = db.getAllProducts(); // Ottieni i prodotti dal mock del database
-    res.render('noleggio', { products }); // Passa i prodotti al template
+    let filteredProducts = db.getAllProducts(); // Prendi tutti i prodotti dal DBMock
+
+    // Parametri di query
+    const { brand, colore, condizione, prezzoMin, prezzoMax } = req.query;
+
+    // Aggiungi un log per vedere i parametri di query
+    console.log('Parametri di filtro ricevuti:', req.query);
+
+    // Filtro per brand
+    if (brand) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.brand.toLowerCase().includes(brand.toLowerCase()) // Confronto case-insensitive
+        );
+    }
+
+    // Filtro per colore
+    if (colore) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.color.toLowerCase() === colore.toLowerCase() // Confronto esatto per colore
+        );
+    }
+
+    // Filtro per condizione
+    if (condizione) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.condition.toLowerCase() === condizione.toLowerCase() // Confronto esatto per condizione
+        );
+    }
+
+    // Filtro per prezzo minimo
+    if (prezzoMin) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.price >= parseFloat(prezzoMin) // Confronto per prezzo minimo
+        );
+    }
+
+    // Filtro per prezzo massimo
+    if (prezzoMax) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.price <= parseFloat(prezzoMax) // Confronto per prezzo massimo
+        );
+    }
+
+    // Aggiungi un log per vedere i risultati filtrati
+    console.log('Prodotti filtrati:', filteredProducts);
+
+    // Rendiamo il template passando i prodotti filtrati
+    res.render('noleggio', { 
+        products: filteredProducts, 
+        brand, 
+        colore, 
+        condizione, 
+        prezzoMin, 
+        prezzoMax 
+    });
 });
+
 
 
 // Route per calcolare il prezzo del noleggio

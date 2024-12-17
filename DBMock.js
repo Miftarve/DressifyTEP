@@ -28,9 +28,12 @@ class DBMock {
     }
 
     // Ottieni tutti i prodotti
+
     getAllProducts() {
+        console.log('Tutti i prodotti:', this.products); // Debug per controllare i dati
         return this.products;
     }
+    
 
     // Aggiungi un nuovo prodotto
     createProduct(product) {
