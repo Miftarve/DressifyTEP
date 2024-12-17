@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 //const cors = require('cors');
 
 //const sqlite3 = require('sqlite3').verbose();
@@ -37,65 +39,127 @@ app.set('view engine', 'hbs')
 // Set public folder
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
+// Swagger Configuration
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Documentazione',
+            version: '1.0.0',
+            description: 'Swagger per il progetto Express',
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000',
+                description: 'Local server',
+            },
+        ],
+    },
+    apis: [__filename], // Legge la documentazione Swagger da questo file
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 // route
 
-// Reindirizza la root ("/") a "/home"
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Reindirizza alla pagina home
+ *     responses:
+ *       302:
+ *         description: Redirect alla home page.
+ */
 app.get('/', (req, res) => {
     res.redirect('/home');
 });
 
-
-// Login Page
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     summary: Mostra la pagina di login
+ *     responses:
+ *       200:
+ *         description: Ritorna la pagina di login
+ */
 app.get('/login', (req, res) => {
-    //
     if (req.session.loggedin) {
         res.redirect('/home');
     }
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
-})
+});
 
-// Registra Utente da admin
+/**
+ * @swagger
+ * /registraUtente:
+ *   post:
+ *     summary: Registra un nuovo utente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               cognome:
+ *                 type: string
+ *               dataNascita:
+ *                 type: string
+ *               luogoNascita:
+ *                 type: string
+ *               ruolo:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       302:
+ *         description: Redirect alla home page con messaggio di successo
+ */
 app.post('/registraUtente', (req, res) => {
-    // Leggi i dati dal form
     const { nome, cognome, dataNascita, luogoNascita, ruolo, email, password } = req.body;
 
-    // Controlla che tutti i campi siano stati forniti
     if (!nome || !cognome || !dataNascita || !luogoNascita || !ruolo || !email || !password) {
-        res.render('error', {
-            message: 'Tutti i campi sono obbligatori!'
-        });
+        res.render('error', { message: 'Tutti i campi sono obbligatori!' });
         return;
     }
 
-    // Salva l'utente nel database mock
-    const user = db.createUser({
-        nome,
-        cognome,
-        dataNascita,
-        luogoNascita,
-        ruolo,
-        email,
-        password
-    });
-
-    // Messaggio di successo
+    const user = db.createUser({ nome, cognome, dataNascita, luogoNascita, ruolo, email, password });
     req.session.message = `Utente con id: (${user.id}) creato con successo`;
     res.redirect('/home');
 });
 
-
-// Login Post
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Esegue il login dell'utente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       302:
+ *         description: Login effettuato con successo, redirect alla home
+ */
 app.post('/login', (req, res) => {
-    if (req.body === undefined) {
-        res.send('Undefined body');
-        return;
-    }
-
-    // Leggi l'username/email e la password dal form HTML
-    const identifier = req.body.username; // può essere username o email
+    const identifier = req.body.username;
     const password = req.body.password;
 
-    // Cerca l'utente per username o email
     const user = db.getUserByUsername(identifier);
 
     if (user && user.password === password) {
@@ -104,18 +168,22 @@ app.post('/login', (req, res) => {
         req.session.role = user.ruolo;
         res.redirect('/home');
     } else {
-        res.render('error', {
-            message: 'Username o email e/o password errati!'
-        });
+        res.render('error', { message: 'Username o email e/o password errati!' });
     }
 });
 
-
-app.get('/logout', (req, res) => {
-    req.session.loggedin = false;
-    res.redirect('/login');
-});
-
+/**
+ * @swagger
+ * /home:
+ *   get:
+ *     summary: Pagina home per utenti autenticati
+ *     tags: [Home]
+ *     responses:
+ *       200:
+ *         description: Pagina home con messaggi di benvenuto.
+ *       401:
+ *         description: Utente non autenticato.
+ */
 app.get('/home', (req, res) => {
     if (req.session.loggedin) {
         if (req.session.role === 'admin') {
@@ -151,6 +219,41 @@ app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html')); // Serve la pagina di registrazione
 });
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Registra un nuovo utente
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               cognome:
+ *                 type: string
+ *               dataNascita:
+ *                 type: string
+ *                 format: date
+ *               luogoNascita:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Utente registrato con successo.
+ *       400:
+ *         description: Email o username già in uso.
+ */
 // Gestione della registrazione
 app.post('/register', (req, res) => {
     const { nome, cognome, dataNascita, luogoNascita, email, username, password } = req.body;
@@ -222,6 +325,7 @@ hbs.registerHelper('eq', function (a, b) {
     return a === b;
 });
 
+
 // Visualizza tutti i prodotti (solo admin)
 app.get('/prodotti', (req, res) => {
     if (!req.session.loggedin || req.session.role !== 'admin') {
@@ -231,6 +335,45 @@ app.get('/prodotti', (req, res) => {
     res.render('prodotti', { products });
 });
 
+/**
+ * @swagger
+ * /prodotti:
+ *   get:
+ *     summary: Ottiene la lista dei prodotti (solo admin)
+ *     tags: [Prodotti]
+ *     responses:
+ *       200:
+ *         description: Ritorna la lista dei prodotti.
+ *       401:
+ *         description: Non autorizzato.
+ *   post:
+ *     summary: Aggiunge un nuovo prodotto (solo admin)
+ *     tags: [Prodotti]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *               size:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *               brand:
+ *                 type: string
+ *               condition:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Prodotto creato con successo.
+ *       401:
+ *         description: Non autorizzato.
+ */
 // Aggiungi un prodotto (solo admin)
 app.post('/prodotti', (req, res) => {
     if (!req.session.loggedin || req.session.role !== 'admin') {
@@ -390,10 +533,6 @@ app.get('/noleggio', (req, res) => {
 
     // Parametri di query
     const { brand, colore, condizione, prezzoMin, prezzoMax } = req.query;
-
-    // Aggiungi un log per vedere i parametri di query
-    console.log('Parametri di filtro ricevuti:', req.query);
-
     // Filtro per brand
     if (brand) {
         filteredProducts = filteredProducts.filter(product =>
@@ -429,9 +568,6 @@ app.get('/noleggio', (req, res) => {
         );
     }
 
-    // Aggiungi un log per vedere i risultati filtrati
-    console.log('Prodotti filtrati:', filteredProducts);
-
     // Rendiamo il template passando i prodotti filtrati
     res.render('noleggio', { 
         products: filteredProducts, 
@@ -460,5 +596,4 @@ app.post('/acquista', (req, res) => {
 
 // Start server
 const port = 3000;
-app.listen(port, () => console.log(`Server started on port ${port}`));
-
+app.listen(port, () => console.log(`Server started on port ${port}. Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
