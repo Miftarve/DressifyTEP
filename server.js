@@ -172,6 +172,11 @@ app.post('/login', (req, res) => {
     }
 });
 
+app.get('/logout', (req, res) => {
+    req.session.loggedin = false;
+    res.redirect('/login');
+});
+
 /**
  * @swagger
  * /home:
@@ -596,4 +601,6 @@ app.post('/acquista', (req, res) => {
 
 // Start server
 const port = 3000;
-app.listen(port, () => console.log(`Server started on port ${port}. Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
+app.listen(port, () => console.log(`Server started on port ${port}. 
+    Vai su http://localhost:${port}.
+    Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
