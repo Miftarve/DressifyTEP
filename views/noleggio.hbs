@@ -6,171 +6,235 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noleggio e Vendita</title>
     <style>
-        /* Global styles */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f7fb;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-h1, h2 {
-    color: #2c3e50;
-    text-align: center;
-}
+        /* Reset Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-h1 {
-    margin-top: 40px;
-    font-size: 2.5em;
-}
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
 
-h2 {
-    margin-top: 20px;
-    font-size: 1.8em;
-}
+        h1,
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
 
-/* Filter container styles */
-.filter-container {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    width: 250px;  /* Ridotta la larghezza della card dei filtri */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 30px 0;
-    align-self: flex-start;  /* Allineato a sinistra */
-}
+        h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-top: 20px;
+        }
 
-.filter-container label {
-    font-size: 1.1em;
-    color: #34495e;
-    margin-bottom: 5px;
-    display: block;
-}
+        h2 {
+            font-size: 2em;
+            font-weight: 500;
+        }
 
-.filter-container input {
-    padding: 10px;
-    width: 100%;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1em;
-    color: #333;
-}
+        /* Filter Container - LAYOUT ORIZZONTALE */
+        .filter-container {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            /* Occupa la larghezza completa */
+            margin: 20px auto;
+            gap: 10px;
+            /* Spaziatura tra gli elementi */
+        }
 
-.filter-container button {
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .filter-container form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+            /* Spaziatura tra input e pulsanti */
+        }
 
-.filter-container button:hover {
-    background-color: #2980b9;
-}
+        .filter-container label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
 
-/* Card styles for products */
-#products {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);  /* Tre card per riga */
-    gap: 20px;
-    width: 80%;
-    max-width: 1100px;
-    margin: 20px 0;
-    justify-content: flex-start; /* Allineamento a sinistra */
-}
+        .filter-container input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 150px;
+            /* Larghezza fissa per gli input */
+        }
 
-.card {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;  /* Bordo arrotondato più morbido */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    max-width: 280px;  /* Limita la larghezza massima delle card */
-    width: 100%;
-    margin: 0 auto;
-}
+        .filter-container button {
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: 500;
+            color: white;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+        .filter-container button:hover {
+            background-color: #2980b9;
+        }
 
-.card h3 {
-    font-size: 1.4em;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    text-transform: capitalize; /* Aggiunto per stilizzare il nome */
-}
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-container form {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-.card p {
-    font-size: 1.1em;
-    color: #7f8c8d;
-    margin: 5px 0;
-}
+            .filter-container input {
+                width: 100%;
+                /* Gli input occupano tutta la larghezza su schermi piccoli */
+            }
 
-/* Button styles inside cards */
-.card button {
-    padding: 10px 20px;
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1em;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-    width: 100%; /* Fai i pulsanti della card più grandi */
-}
+            .filter-container button {
+                width: 100%;
+                /* I pulsanti si adattano alla larghezza */
+            }
+        }
 
-.card button:hover {
-    background-color: #2ecc71;
-}
 
-.card form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        /* Product Grid */
+        #products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-    .filter-container {
-        width: 90%;
-    }
+        /* Card Styles */
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
 
-    #products {
-        grid-template-columns: repeat(2, 1fr);  /* Due card per riga su schermi più piccoli */
-    }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
 
-    .card {
-        width: 100%;
-        margin: 10px 0;
-    }
+        .card h3 {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
 
-    h1 {
-        font-size: 2em;
-    }
+        .card p {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin: 8px 0;
+        }
 
-    h2 {
-        font-size: 1.5em;
-    }
-}
+        /* Buttons in Cards */
+        .card button {
+            padding: 10px;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
+        .card form {
+            margin-top: 10px;
+        }
+
+        .card button[type="submit"] {
+            background-color: #27ae60;
+        }
+
+        .card button[type="submit"]:hover {
+            background-color: #2ecc71;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-container {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            #products {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-container .filter-group {
+                width: 100%;
+                /* Ogni filtro occupa l'intera larghezza */
+                margin-right: 0;
+            }
+
+            .filter-container button {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #products {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+        }
     </style>
 </head>
 
@@ -179,25 +243,30 @@ h2 {
     <h1>Catalogo Noleggio</h1>
 
     <!-- Form per i filtri -->
+    <!-- Form per i filtri -->
     <div class="filter-container">
-        <form action="/noleggio" method="get">
+        <form id="filterForm" action="/noleggio" method="get">
             <label for="brand">Brand:</label>
-            <input type="text" name="brand" placeholder="Es. Nike" value="{{brand}}">
+            <input type="text" id="brand" name="brand" placeholder="Es. Nike" value="{{brand}}">
 
             <label for="colore">Colore:</label>
-            <input type="text" name="colore" placeholder="Es. Rosso" value="{{colore}}">
+            <input type="text" id="colore" name="colore" placeholder="Es. Rosso" value="{{colore}}">
 
             <label for="condizione">Condizione:</label>
-            <input type="text" name="condizione" placeholder="Es. Nuovo" value="{{condizione}}">
+            <input type="text" id="condizione" name="condizione" placeholder="Es. Nuovo" value="{{condizione}}">
 
             <label for="prezzoMin">Prezzo Minimo:</label>
-            <input type="number" name="prezzoMin" value="{{prezzoMin}}">
+            <input type="number" id="prezzoMin" name="prezzoMin" value="{{prezzoMin}}">
 
             <label for="prezzoMax">Prezzo Massimo:</label>
-            <input type="number" name="prezzoMax" value="{{prezzoMax}}">
+            <input type="number" id="prezzoMax" name="prezzoMax" value="{{prezzoMax}}">
 
-
-            <button type="submit">Filtra</button>
+            <!-- Pulsante per filtrare -->
+            <button type="submit" onclick="clearInputs()">Filtra</button>
+        </form>
+        <!-- Pulsante per mostrare tutti i prodotti -->
+        <form action="/noleggio" method="get">
+            <button type="submit">Mostra Tutti</button>
         </form>
     </div>
 

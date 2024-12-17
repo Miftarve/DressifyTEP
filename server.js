@@ -443,8 +443,6 @@ app.get('/noleggio', (req, res) => {
     });
 });
 
-
-
 // Route per calcolare il prezzo del noleggio
 app.post('/noleggio', (req, res) => {
     const { id, durata } = req.body; // Ottieni l'ID prodotto e la durata dal form
