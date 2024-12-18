@@ -6,93 +6,113 @@
   <link rel="stylesheet" href="public/style.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
+  <style>
+    /* General Reset and Fonts */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<style>
-  /* General Styles */
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom, #74ebd5, #acb6e5);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
 
-  /* Navbar Styles */
-  .navbar {
-    width: 100%;
-    background-color: #2c3e50;
-    overflow: hidden;
-  }
+    /* Navbar Styling */
+    .navbar {
+      width: 100%;
+      background-color: #2c3e50;
+      padding: 10px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
 
-  .navbar a {
-    float: left;
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 20px;
-    text-decoration: none;
-  }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  .navbar a:hover {
-    background-color: #ddd;
-    color: black;
-  }
+    .navbar a:hover {
+      background-color: #1abc9c;
+      color: #fff;
+    }
 
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7fc;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: 3rem;
-    color: #2c3e50;
-    margin-bottom: 20px;
-  }
-
-  p {
-    font-size: 1.2rem;
-    color: #7f8c8d;
-    margin-bottom: 15px;
-  }
-
-  a {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  /* Responsive Design */
-  @media (max-width: 600px) {
+    /* Welcome Section */
     h1 {
-      font-size: 2.5rem;
+      font-size: 3rem;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
     }
 
     p {
-      font-size: 1rem;
+      font-size: 1.2rem;
+      color: #34495e;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease-in-out;
     }
-  }
-</style>
+
+    a {
+      color: #1abc9c;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #16a085;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
 
 <body>
   <div class="navbar">
     <a href="/">Home</a>
-    <a href="/noleggio">noleggio</a>
+    <a href="/noleggio">Noleggio</a>
     <a href="/static/index.html">Chat</a>
     <a href="/logout">Logout</a>
   </div>
-  <h1>Welcome back</h1>
-  <p>{{message}}</p>
+
+  <main>
+    <h1>Welcome Back</h1>
+    <p>{{message}}</p>
+  </main>
 </body>
 
 </html>
