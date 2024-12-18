@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Login</title>
     <meta charset="UTF-8">
@@ -62,7 +63,8 @@
         }
 
         /* Input Fields */
-        input, button {
+        input,
+        button {
             width: 100%;
             padding: 12px;
             margin: 12px 0;
@@ -72,7 +74,8 @@
             transition: border-color 0.3s ease, background-color 0.3s ease;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"],
+        input[type="password"] {
             background-color: #f9f9f9;
         }
 
@@ -109,6 +112,7 @@
             from {
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             }
+
             to {
                 text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
@@ -128,7 +132,8 @@
                 font-size: 2rem;
             }
 
-            input, button {
+            input,
+            button {
                 font-size: 0.9rem;
             }
         }
@@ -142,12 +147,36 @@
                 font-size: 1.8rem;
             }
 
-            input, button {
+            input,
+            button {
                 font-size: 0.85rem;
             }
         }
+
+        .google-login-button {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #db4437; /* Rosso tipico di Google */
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.google-login-button:hover {
+    background-color: #c23321; /* Colore leggermente più scuro per hover */
+}
+
     </style>
 </head>
+
 <body>
     <div class="form-container">
         <div class="custom-title">DRESSIMIFY</div>
@@ -158,18 +187,12 @@
             <input type="password" name="password" id="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
-        <p>Oppure accedi con:</p>
-        <!-- Google OAuth Button -->
-        <a href="/auth/google" class="oauth-btn" style="background-color: #DB4437; color: white; padding: 10px; border-radius: 5px; display: block; margin: 10px 0; text-align: center;">
-            <img src="https://img.icons8.com/color/16/000000/google-logo.png"/> Accedi con Google
-        </a>
 
-        <!-- Facebook OAuth Button -->
-        <a href="/auth/facebook" class="oauth-btn" style="background-color: #4267B2; color: white; padding: 10px; border-radius: 5px; display: block; margin: 10px 0; text-align: center;">
-            <img src="https://img.icons8.com/ios-filled/16/ffffff/facebook-new.png"/> Accedi con Facebook
-        </a>
+        <p>Oppure accedi con:</p>
+        <a href="/auth/google" class="google-login-button">Accedi con Google</a>
 
         <p>Non hai un account? <a href="/register">Registrati qui</a>.</p>
     </div>
 </body>
+
 </html>

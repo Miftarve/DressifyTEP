@@ -7,6 +7,8 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 
+
+
 //const cors = require('cors');
 
 //const sqlite3 = require('sqlite3').verbose();
@@ -66,44 +68,30 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
+
 passport.use(new GoogleStrategy({
-    clientID: 'CLIENT_ID',
-    clientSecret: 'CLIENT_SECRET',
-    callbackURL: '/auth/google/callback'
+    clientID: 'YOUR_GOOGLE_CLIENT_ID',
+    clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
+    callbackURL: 'http://localhost:3000/auth/google/callback'
 },
-    function (accessToken, refreshToken, profile, done) {
-        // Salva l'utente nel database
-        return done(null, profile);
+(accessToken, refreshToken, profile, done) => {
+    // Gestisci l'utente qui
+    User.findOrCreate({ googleId: profile.id }, (err, user) => done(err, user));
+}));
+
+// Inizia l'autenticazione
+app.get('/auth/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+}));
+
+// Callback dopo l'autenticazione
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+        res.redirect('/dashboard'); // Reindirizza l'utente dopo il login
     }
-));
-
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => res.redirect('/home')
-);
-// Google OAuth
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// Callback dopo l'autenticazione Google
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-        res.redirect('/dashboard'); // Redirect di successo
-    });
-
-// Facebook OAuth
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-
-// Callback dopo l'autenticazione Facebook
-app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
-    (req, res) => {
-        res.redirect('/dashboard'); // Redirect di successo
-    });
 
 // route
 
