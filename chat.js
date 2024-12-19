@@ -28,7 +28,7 @@ io.on('connection', (socket) => {
 });
 
 // Avvio del server
-const PORT = 3000;
+const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`Chat server running on http://localhost:${PORT}`);
 });

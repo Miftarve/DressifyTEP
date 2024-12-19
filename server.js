@@ -6,9 +6,6 @@ const swaggerUi = require('swagger-ui-express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-
-
-
 //const cors = require('cors');
 
 //const sqlite3 = require('sqlite3').verbose();
