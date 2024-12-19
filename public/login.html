@@ -16,8 +16,14 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: black;
+            background-image: url('public/assets/1.jpeg');
+            /* Percorso dell'immagine */
             background-size: cover;
+            /* Adatta l'immagine a tutta la pagina */
+            background-position: center;
+            /* Centra l'immagine */
+            background-repeat: no-repeat;
+            /* Evita di ripetere l'immagine */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -154,26 +160,27 @@
         }
 
         .google-login-button {
-    display: inline-block;
-    width: 100%;
-    padding: 12px;
-    margin: 12px 0;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    color: white;
-    background-color: #db4437; /* Rosso tipico di Google */
-    border: none;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background-color: #db4437;
+            /* Rosso tipico di Google */
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-.google-login-button:hover {
-    background-color: #c23321; /* Colore leggermente più scuro per hover */
-}
-
+        .google-login-button:hover {
+            background-color: #c23321;
+            /* Colore leggermente più scuro per hover */
+        }
     </style>
 </head>
 

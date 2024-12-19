@@ -412,29 +412,40 @@ app.get('/prodotti', (req, res) => {
  *         description: Non autorizzato.
  */
 // Aggiungi un prodotto (solo admin)
-app.post('/prodotti', (req, res) => {
+app.get('/prodotti', (req, res) => {
     if (!req.session.loggedin || req.session.role !== 'admin') {
         return res.redirect('/login');
     }
-    const { category, size, color, brand, condition, price } = req.body;
-    db.createProduct({ category, size, color, brand, condition, price });
-    res.redirect('/prodotti');
+    const products = db.getAllProducts(); // Recupera la lista aggiornata
+    res.render('prodotti', { products });
 });
 
-// Modifica un prodotto (solo admin)
-app.post('/modificaProdotto/:id', (req, res) => {
-    if (!req.session.loggedin || req.session.role !== 'admin') {
-        return res.redirect('/login');
+
+app.get('/modificaProdotto/:id', (req, res) => {
+    const { id } = req.params;
+    const product = db.getProductById(Number(id)); // Trova il prodotto dal database
+
+    if (!product) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
     }
+
+    res.render('modificaProdotti', { product }); // Renderizza la vista di modifica
+});
+
+app.post('/modificaProdotto/:id', (req, res) => {
     const { id } = req.params;
     const { category, size, color, brand, condition, price } = req.body;
+
     const updatedProduct = db.updateProduct(Number(id), { category, size, color, brand, condition, price });
-    if (updatedProduct) {
-        res.redirect('/prodotti');
-    } else {
-        res.send('Prodotto non trovato');
+
+    if (!updatedProduct) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
     }
+
+    res.redirect('/prodotti'); // Reindirizza alla pagina prodotti
 });
+
+
 
 // Elimina un prodotto (solo admin)
 app.get('/eliminaProdotto/:id', (req, res) => {

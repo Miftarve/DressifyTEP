@@ -60,16 +60,15 @@ class DBMock {
     }
 
     // Aggiorna un prodotto esistente
-    updateProduct(id, updates) {
-        const product = this.products.find(product => product.id === id);
-        if (!product) {
-            return null;
+    updateProduct(id, updatedData) {
+        const productIndex = this.products.findIndex(product => product.id === id);
+        if (productIndex === -1) {
+            return null; // Prodotto non trovato
         }
-        if (updates.nome) product.nome = updates.nome;
-        if (updates.descrizione) product.descrizione = updates.descrizione;
-        if (updates.prezzo) product.prezzo = updates.prezzo;
-        return product;
+        this.products[productIndex] = { ...this.products[productIndex], ...updatedData };
+        return this.products[productIndex];
     }
+    
 
     // Elimina un prodotto
     deleteProduct(id) {
