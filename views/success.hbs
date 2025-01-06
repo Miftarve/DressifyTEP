@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operazione completata</title>
+</head>
+<style>
+    /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333;
+    background-color: #f4f8ff;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container Styling */
+.container {
+    background-color: #ffffff;
+    padding: 40px 50px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Heading */
+h1 {
+    font-size: 28px;
+    color: #4caf50;
+    margin-bottom: 20px;
+}
+
+/* Message Styling */
+p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Link Button Styling */
+a.button-link {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+a.button-link:hover {
+    background-color: #45a049;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 25px 30px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    a.button-link {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 15px 20px;
+        box-shadow: none;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    p {
+        font-size: 12px;
+    }
+
+    a.button-link {
+        padding: 10px 20px;
+        font-size: 12px;
+    }
+}
+
+</style>
+<body>
+    <h1>Operazione completata!</h1>
+    <p>{{message}}</p>
+    <a href="/login">Torna al login</a>
+</body>
+</html>

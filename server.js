@@ -68,18 +68,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 passport.use(new GoogleStrategy({
-    
     callbackURL: 'http://localhost:3000/auth/google/callback'
 },
-(accessToken, refreshToken, profile, done) => {
-    // Implementa qui la logica per gestire l'utente
-    const user = {
-        googleId: profile.id,
-        displayName: profile.displayName,
-        emails: profile.emails,
-    };
-    return done(null, user);
-}));
+    (accessToken, refreshToken, profile, done) => {
+        // Implementa qui la logica per gestire l'utente
+        const user = {
+            googleId: profile.id,
+            displayName: profile.displayName,
+            emails: profile.emails,
+        };
+        return done(null, user);
+    }));
 
 passport.serializeUser((user, done) => {
     done(null, user);
@@ -242,17 +241,17 @@ app.get('/home', (req, res) => {
     if (req.isAuthenticated()) {
         if (req.session.role === 'admin') {
             const users = db.getAllUsers(); // Recupera gli utenti dal DBMock
-            res.render('admin/home', { 
-                name: req.session.name, 
-                role: req.session.role, 
-                message: req.session.message, 
-                users: users 
+            res.render('admin/home', {
+                name: req.session.name,
+                role: req.session.role,
+                message: req.session.message,
+                users: users
             });
         } else {
-            res.render('home', { 
-                name: req.session.name, 
-                role: req.session.role, 
-                message: `Benvenuto, ${req.session.name}!` 
+            res.render('home', {
+                name: req.session.name,
+                role: req.session.role,
+                message: `Benvenuto, ${req.session.name}!`
             });
         }
     } else {
@@ -653,6 +652,56 @@ app.post('/acquista', (req, res) => {
     const { id } = req.body; // Ottieni l'ID prodotto dal form
     const product = db.getProductById(Number(id));
     res.render('acquista', { product }); // Mostra i dettagli del prodotto acquistato
+});
+
+
+
+// Route per il recupero della password
+app.get('/recuperoDati', (req, res) => {
+    const username = req.query.username; // Supponendo che il nome utente venga passato come query param
+    const user = db.getUserByUsername(username);
+
+    if (user) {
+        res.render('success', {
+            message: `La password per l'utente ${user.username} è: ${user.password}`, // Passa la password alla vista
+        });
+    } else {
+        res.render('error', {
+            message: 'Utente non trovato!',
+        });
+    }
+});
+
+app.get('/success', (req, res) => {
+    res.render('success', {
+        message: 'Il messaggio che vuoi mostrare nella vista',
+    });
+});
+
+
+// Route per gestire il recupero dati
+app.post('/recuperoDati', (req, res) => {
+    const { tipoRecupero, username, email } = req.body;
+
+    if (tipoRecupero === 'password') {
+        const user = email ? db.getUserByUsername(email) : db.getUserByUsername(username);
+
+        if (user) {
+            res.render('success', { message: `La password dell'account è: ${user.password}` });
+        } else {
+            res.render('error', { message: 'Utente non trovato!' });
+        }
+    } else if (tipoRecupero === 'username') {
+        const user = db.getUserByUsername(email);
+
+        if (user) {
+            res.render('success', { message: `Il nome utente associato all'email è: ${user.username}` });
+        } else {
+            res.render('error', { message: 'Email non trovata!' });
+        }
+    } else {
+        res.render('error', { message: 'Metodo di recupero non valido!' });
+    }
 });
 
 // Start server

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recupero Dati</title>
+</head>
+<style>
+    /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333;
+    background-color: #f7f9fc;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container Styling */
+.form-container {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Heading */
+.form-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #0056b3;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Labels and Inputs */
+label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 86, 179, 0.3);
+}
+
+/* Button Styling */
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #003d80;
+}
+
+/* Link Styling */
+a {
+    color: #0056b3;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .form-container {
+        padding: 15px 20px;
+    }
+
+    .form-container h1 {
+        font-size: 22px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+    }
+
+    .form-container {
+        width: 100%;
+        box-shadow: none;
+        padding: 10px 15px;
+    }
+
+    .form-container h1 {
+        font-size: 18px;
+    }
+
+    label {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    button[type="submit"] {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    a {
+        font-size: 12px;
+    }
+}
+
+</style>
+<body>
+    <div class="form-container">
+        <h1>Recupero Dati</h1>
+        <form action="/recuperoDati" method="post">
+            <p>Seleziona il metodo di recupero:</p>
+            <div>
+                <label>
+                    <input type="radio" name="tipoRecupero" value="password" required>
+                    Recupera Password
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" name="tipoRecupero" value="username" required>
+                    Recupera Username
+                </label>
+            </div>
+            <div>
+                <label for="username">Inserisci il Nome Utente (se necessario):</label>
+                <input type="text" name="username" id="username" placeholder="Username">
+            </div>
+            <div>
+                <label for="email">Inserisci l'Email (se necessario):</label>
+                <input type="email" name="email" id="email" placeholder="Email">
+            </div>
+            <button type="submit">Recupera</button>
+        </form>
+        <p><a href="/login">Torna al login</a></p>
+    </div>
+</body>
+</html>
