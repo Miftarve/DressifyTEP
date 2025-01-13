@@ -69,7 +69,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-
+   
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
@@ -92,7 +92,7 @@ app.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/login'
 }), (req, res) => {
     // Reindirizza dopo il successo del login tramite Google
-    res.redirect('/dashboard');
+    res.redirect('/home');
 });
 
 // Middleware per verificare se l'utente è autenticato
@@ -104,13 +104,6 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
-// Rotta protetta (dashboard)
-app.get('/dashboard', ensureAuthenticated, (req, res) => {
-    const user = req.user || req.session.user;
-    res.send(`Benvenuto, ${user.displayName || user.email}`);
-});
-
-
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
         res.redirect('/home'); // Se già autenticato, reindirizza alla home
@@ -119,13 +112,7 @@ app.get('/login', (req, res) => {
     }
 });
 
-app.get('/dashboard', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.send(`Benvenuto, ${req.user.displayName}!`);
-    } else {
-        res.redirect('/login'); // Redirect al login se non autenticato
-    }
-});
+
 
 
 /**
