@@ -181,6 +181,19 @@
             background-color: #c23321;
             /* Colore leggermente più scuro per hover */
         }
+        .facebook-login-button {
+            background-color: #1877f2;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            border: none;
+            font-weight: bold;
+        }
+
+        .facebook-login-button:hover {
+            background-color: #145db2;
+        }
     </style>
 </head>
 
@@ -196,6 +209,8 @@
         </form>
 
         <p>Oppure accedi con:</p>
+        <a href="/auth/facebook" class="btn btn-primary">Accedi con Facebook</a>
+
         <a href="/auth/google" class="google-login-button">Accedi con Google</a>
 
         <p>Non hai un account? <a href="/register">Registrati qui</a>.</p>

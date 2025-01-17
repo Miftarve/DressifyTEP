@@ -5,6 +5,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 
 //const cors = require('cors');
 
@@ -69,7 +70,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-   
+    
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
@@ -103,6 +104,40 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
+// Configura Passport con la strategia Facebook
+passport.use(new FacebookStrategy({
+
+    callbackURL: '/auth/facebook/callback',
+    profileFields: ['id', 'displayName', 'photos', 'email']
+}, (accessToken, refreshToken, profile, done) => {
+    // Puoi gestire l'utente qui: salvare nel database, controllare se esiste già, ecc.
+    const user = {
+        id: profile.id,
+        name: profile.displayName,
+        email: profile.emails && profile.emails[0]?.value,
+        photo: profile.photos && profile.photos[0]?.value
+    };
+    return done(null, user);
+}));
+
+// Rotte per il login tramite Facebook
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    failureRedirect: '/login'
+}), (req, res) => {
+    // Reindirizza alla home dopo il login
+    res.redirect('/home');
+});
+
+// Serializzazione e deserializzazione utente (sezione già presente)
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
@@ -112,7 +147,13 @@ app.get('/login', (req, res) => {
     }
 });
 
+app.get('/privacy-policy', (req, res) => {
+    res.sendFile(__dirname + '/privacy-policy.html');
+});
 
+app.get('/terms-and-conditions', (req, res) => {
+    res.sendFile(__dirname + '/terms-and-conditions.html');
+});
 
 
 /**
