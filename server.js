@@ -70,7 +70,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-    
+
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
@@ -104,40 +104,62 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-// Configura Passport con la strategia Facebook
+
+
+
+//facebook
+app.post('/api/delete-user-data', async (req, res) => {
+    const userId = req.body.user_id; // ID utente fornito da Facebook
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    try {
+        // Logica per eliminare i dati dal database
+        await deleteUserDataFromDatabase(userId);
+
+        res.status(200).json({ success: true, message: 'User data deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to delete user data' });
+    }
+});
+
 passport.use(new FacebookStrategy({
 
-    callbackURL: '/auth/facebook/callback',
-    profileFields: ['id', 'displayName', 'photos', 'email']
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
 }, (accessToken, refreshToken, profile, done) => {
-    // Puoi gestire l'utente qui: salvare nel database, controllare se esiste già, ecc.
-    const user = {
-        id: profile.id,
-        name: profile.displayName,
-        email: profile.emails && profile.emails[0]?.value,
-        photo: profile.photos && profile.photos[0]?.value
-    };
-    return done(null, user);
+    // Logica per gestire l'utente autenticato
+    User.findOrCreate({ facebookId: profile.id }, (err, user) => {
+        return done(err, user);
+    });
 }));
 
-// Rotte per il login tramite Facebook
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+// Rotta per avviare l'autenticazione
+app.get('/auth/facebook', passport.authenticate('facebook'));
 
-app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    failureRedirect: '/login'
-}), (req, res) => {
-    // Reindirizza alla home dopo il login
-    res.redirect('/home');
-});
+// Rotta per gestire il callback
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+        successRedirect: '/home',
+        failureRedirect: '/login'
+    })
+);
 
-// Serializzazione e deserializzazione utente (sezione già presente)
-passport.serializeUser((user, done) => {
-    done(null, user);
-});
+// Serializzazione e deserializzazione utente
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
-});
+
+
+
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated() || req.session.user) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
 
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
@@ -147,13 +169,7 @@ app.get('/login', (req, res) => {
     }
 });
 
-app.get('/privacy-policy', (req, res) => {
-    res.sendFile(__dirname + '/privacy-policy.html');
-});
 
-app.get('/terms-and-conditions', (req, res) => {
-    res.sendFile(__dirname + '/terms-and-conditions.html');
-});
 
 
 /**
