@@ -70,7 +70,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-    
+
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
@@ -124,75 +124,32 @@ app.post('/api/delete-user-data', async (req, res) => {
     }
 });
 
+passport.use(new FacebookStrategy({
 
+    clientID: '464089043416431', // Sostituisci con il tuo ID app
 
-const firebase = require('firebase/app');
-// If you're using specific Firebase services, import them as well
-require('firebase/auth');
-require('firebase/firestore');
-
-
-// Configura Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAM1cUlBm-Sgmy9nfSvB6sjwiZ49-vAeKM",
-  authDomain: "dressimify.firebaseapp.com",
-  projectId: "dressimify",
-  storageBucket: "dressimify.appspot.com",
-  messagingSenderId: "1057705002752",
-  appId: "1:1057705002752:web:dfda063a77bad0f93d95e5",
-  measurementId: "G-JV66QE2GXC"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-// Rotta per il login tramite Facebook
-app.get('/auth/facebook', (req, res) => {
-  const provider = new firebase.auth.FacebookAuthProvider();
-
-  // Redirect per l'autenticazione
-  firebase
-    .auth()
-    .signInWithRedirect(provider)
-    .then(() => res.redirect('/home'))
-    .catch((error) => {
-      console.error("Errore durante il login con Facebook:", error);
-      res.render('error', { message: 'Errore durante il login con Facebook' });
+}, (accessToken, refreshToken, profile, done) => {
+    // Logica per gestire l'utente autenticato
+    User.findOrCreate({ facebookId: profile.id }, (err, user) => {
+        return done(err, user);
     });
-});
+}));
 
-// Callback dopo l'autenticazione
-app.get('/auth/facebook/callback', async (req, res) => {
-  try {
-    const result = await firebase.auth().getRedirectResult();
-    const user = result.user;
+// Rotta per avviare l'autenticazione
+app.get('/auth/facebook', passport.authenticate('facebook'));
 
-    if (user) {
-      // Salva i dati utente nella sessione
-      req.session.user = user;
-      req.session.loggedin = true;
-      res.redirect('/home');
-    } else {
-      res.redirect('/login');
-    }
-  } catch (error) {
-    console.error("Errore durante il callback di Facebook:", error);
-    res.render('error', { message: 'Errore durante il callback di Facebook' });
-  }
-});
-
-// Logout
-app.get('/logout', (req, res) => {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      req.session.destroy(() => res.redirect('/login'));
+// Rotta per gestire il callback
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+        successRedirect: '/home',
+        failureRedirect: '/login'
     })
-    .catch((error) => {
-      console.error("Errore durante il logout:", error);
-      res.render('error', { message: 'Errore durante il logout' });
-    });
-});
+);
+
+// Serializzazione e deserializzazione utente
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+
 
 
 
