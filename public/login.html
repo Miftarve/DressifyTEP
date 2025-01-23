@@ -209,13 +209,42 @@
         </form>
 
         <p>Oppure accedi con:</p>
-        <a href="/auth/facebook" class="btn btn-primary">Accedi con Facebook</a>
+        <button onclick="loginWithFacebook()">Login con Facebook</button>
+
+
 
         <a href="/auth/google" class="google-login-button">Accedi con Google</a>
 
         <p>Non hai un account? <a href="/register">Registrati qui</a>.</p>
         <p><a href="/recuperoDati">Hai dimenticato i tuoi dati? Recuperali qui</a>.</p>
     </div>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script>
+  // Inizializza Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAM1cUlBm-Sgmy9nfSvB6sjwiZ49-vAeKM",
+    authDomain: "dressimify.firebaseapp.com",
+    projectId: "dressimify",
+    storageBucket: "dressimify.appspot.com",
+    messagingSenderId: "1057705002752",
+    appId: "1:1057705002752:web:dfda063a77bad0f93d95e5",
+    measurementId: "G-JV66QE2GXC"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  // Funzione per login con Facebook
+  function loginWithFacebook() {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    firebase.auth().signInWithRedirect(provider);
+    provider.addScope('email'); 
+    firebase
+      .auth()
+      .signInWithRedirect(provider)
+      .then(() => console.log('Redirecting to Facebook login...'))
+      .catch(error => console.error("Errore:", error));
+  }
+</script>
 </body>
 
 
