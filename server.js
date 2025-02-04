@@ -70,7 +70,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-
+   
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
@@ -92,7 +92,8 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 app.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/login'
 }), (req, res) => {
-    // Reindirizza dopo il successo del login tramite Google
+    // Salva il nome dell'utente nella sessione
+    req.session.user = req.user.displayName;
     res.redirect('/home');
 });
 
@@ -125,9 +126,7 @@ app.post('/api/delete-user-data', async (req, res) => {
 });
 
 passport.use(new FacebookStrategy({
-
-    clientID: '464089043416431', // Sostituisci con il tuo ID app
-
+  
 }, (accessToken, refreshToken, profile, done) => {
     // Logica per gestire l'utente autenticato
     User.findOrCreate({ facebookId: profile.id }, (err, user) => {
@@ -325,7 +324,7 @@ app.get('/home', ensureAuthenticated, (req, res) => {
         res.render('home', {
             name: user.nome,
             role: user.ruolo,
-            message: `Benvenuto, ${user.nome}!`
+            message: `Benvenuto, ${req.session.nome}!`
         });
     }
 });
