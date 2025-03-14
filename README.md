@@ -9,37 +9,33 @@
 Una piattaforma digitale dedicata al noleggio e alla vendita di abbigliamento di marca di seconda mano.
 
 ## 🎯 Target
-
-- Chi cerca abbigliamento di marca usato a prezzi convenienti.
-- Persone che necessitano di abiti per eventi speciali.
-- Appassionati di moda sostenibile.
-- Giovani adulti desiderosi di indossare capi alla moda senza spendere una fortuna.
+- Persone che amano la moda
+- Chi fa fatica a decidere cosa mettersi
+- Chi vuole provare nuovi stili
+- Ragazzi e ragazze che cercano ispirazione
 
 ## 💡 Problema
+DressifyTEP risolve problemi come:
+- Non sapere cosa mettersi al mattino
+- Ripetere sempre gli stessi outfit
+- Comprare vestiti che poi non si abbinano con nulla
+- Non sfruttare al massimo il proprio guardaroba
 
-Dressmify risolve numerosi problemi legati all'acquisto e al noleggio di vestiti di marca, tra cui:
-
-- I costi elevati dei capi nuovi.
-- La difficoltà di trovare vestiti adatti per eventi senza svuotare il portafoglio.
-- La mancanza di piattaforme sicure e convenienti per acquistare o noleggiare abiti usati.
-- L'assenza di un'unica piattaforma che combini acquisto e noleggio in un solo posto.
-
-Con **Dressmify**, puoi facilmente acquistare o noleggiare abiti di marca usati a prezzi giusti, in modo sicuro e senza stress.
+Con DressifyTEP, puoi facilmente trovare nuove combinazioni e idee per i tuoi outfit quotidiani.
 
 ## 🏆 Concorrenti
-
-- Vinted
-- Depop
-- The RealReal
-- ThredUp
-- Poshmark
+- Pureple
+- Cladwell
+- Stylebook
+- Combyne
+- Lookastic
 
 ## 🛠️ Tecnologie
-
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Node.js, Express.js
-- **Database**: SQLite
-- **API**: RESTful API per la gestione di acquisti, noleggi e utenti
+- Frontend: HTML, Handlebars, JavaScript
+- Stile: CSS/SCSS
+- Backend: Node.js, Express
+- Database: MongoDB/MySQL
+- API: per gestire utenti e catalogo vestiti
 
 ## 🚀 Requisiti Iniziali
 
@@ -90,16 +86,25 @@ Con **Dressmify**, puoi facilmente acquistare o noleggiare abiti di marca usati 
 - **Scalabilità**: La piattaforma deve supportare un numero crescente di utenti e prodotti.
 - **Usabilità**: Design intuitivo e facile da usare per tutti.
 
-## 📥 Istruzioni per l'Installazione
+## 📥 Installazione
 
-1. Clona il repository:
-   git clone https://github.com/Miftarve/Dressmify.git
-2. Vai nella cartella del progetto:
-   cd Dressmify
-3. Installa le dipendenze:
-   npm install
-4. Avvia il server:
-   npm start
+```bash
+# Scarica il progetto
+git clone https://github.com/Miftarve/DressifyTEP.git
+
+# Vai nella cartella
+cd DressifyTEP
+
+# Installa le componenti necessarie
+npm install
+
+# Configura le impostazioni
+cp .env.example .env
+# Modifica le tue impostazioni nel file .env
+
+# Avvia l'app
+npm start
+```
 
 # Diagramma dei casi d'uso per Dressify
 - Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](https://yuml.me/mify/e4c6a5df.svg)
