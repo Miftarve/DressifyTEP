@@ -70,8 +70,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configurazione per il login tramite Google
 passport.use(new GoogleStrategy({
-   
-    callbackURL: '/auth/google/callback'
+
+    callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     // Puoi salvare o gestire il profilo utente qui
     return done(null, profile);
@@ -126,7 +126,7 @@ app.post('/api/delete-user-data', async (req, res) => {
 });
 
 passport.use(new FacebookStrategy({
-  
+
 }, (accessToken, refreshToken, profile, done) => {
     // Logica per gestire l'utente autenticato
     User.findOrCreate({ facebookId: profile.id }, (err, user) => {
@@ -136,7 +136,6 @@ passport.use(new FacebookStrategy({
 
 // Rotta per avviare l'autenticazione
 app.get('/auth/facebook', passport.authenticate('facebook'));
-
 // Rotta per gestire il callback
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', {
@@ -161,6 +160,39 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     summary: Shows the login page
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Returns the login page
+ *       302:
+ *         description: Redirects to home if already logged in
+ *   post:
+ *     summary: Processes user login
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       302:
+ *         description: Redirects to home on success or error page on failure
+ */
+
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
         res.redirect('/home'); // Se già autenticato, reindirizza alla home
@@ -176,10 +208,11 @@ app.get('/login', (req, res) => {
  * @swagger
  * /:
  *   get:
- *     summary: Reindirizza alla pagina home
+ *     summary: Redirects to the home page
+ *     tags: [Auth]
  *     responses:
  *       302:
- *         description: Redirect alla home page.
+ *         description: Redirects to the home page
  */
 app.get('/', (req, res) => {
     res.redirect('/home');
@@ -189,11 +222,35 @@ app.get('/', (req, res) => {
  * @swagger
  * /login:
  *   get:
- *     summary: Mostra la pagina di login
+ *     summary: Shows the login page
+ *     tags: [Auth]
  *     responses:
  *       200:
- *         description: Ritorna la pagina di login
+ *         description: Returns the login page
+ *       302:
+ *         description: Redirects to home if already logged in
+ *   post:
+ *     summary: Processes user login
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       302:
+ *         description: Redirects to home on success or error page on failure
  */
+
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
         res.redirect('/home');
@@ -205,11 +262,14 @@ app.get('/login', (req, res) => {
  * @swagger
  * /registraUtente:
  *   post:
- *     summary: Registra un nuovo utente
+ *     summary: Registers a new user (admin function)
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
  *             properties:
@@ -219,17 +279,28 @@ app.get('/login', (req, res) => {
  *                 type: string
  *               dataNascita:
  *                 type: string
+ *                 format: date
  *               luogoNascita:
  *                 type: string
  *               ruolo:
  *                 type: string
+ *                 enum: [user, admin]
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *             required:
+ *               - nome
+ *               - cognome
+ *               - dataNascita
+ *               - luogoNascita
+ *               - ruolo
+ *               - email
+ *               - password
  *     responses:
  *       302:
- *         description: Redirect alla home page con messaggio di successo
+ *         description: Redirects to home page with success message
  */
 app.post('/registraUtente', (req, res) => {
     const { nome, cognome, dataNascita, luogoNascita, ruolo, email, password } = req.body;
@@ -284,7 +355,16 @@ app.post('/login', (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /logout:
+ *   get:
+ *     summary: Logs out the current user
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to home page after logout
+ */
 app.get('/logout', (req, res) => {
     req.logout(err => {
         if (err) {
@@ -302,13 +382,15 @@ app.get('/logout', (req, res) => {
  * @swagger
  * /home:
  *   get:
- *     summary: Pagina home per utenti autenticati
- *     tags: [Home]
+ *     summary: Home page for authenticated users
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
- *         description: Pagina home con messaggi di benvenuto.
- *       401:
- *         description: Utente non autenticato.
+ *         description: Returns the home page with user information
+ *       302:
+ *         description: Redirects to login if not authenticated
  */
 app.get('/home', ensureAuthenticated, (req, res) => {
     const user = req.user || req.session.user || { nome: req.session.name, ruolo: req.session.role };
@@ -330,7 +412,53 @@ app.get('/home', ensureAuthenticated, (req, res) => {
 });
 
 
-
+/**
+ * @swagger
+ * /register:
+ *   get:
+ *     summary: Shows the registration page
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Returns the registration page
+ *       302:
+ *         description: Redirects to home if already logged in
+ *   post:
+ *     summary: Registers a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               cognome:
+ *                 type: string
+ *               dataNascita:
+ *                 type: string
+ *                 format: date
+ *               luogoNascita:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - nome
+ *               - cognome
+ *               - email
+ *               - username
+ *               - password
+ *     responses:
+ *       302:
+ *         description: Redirects to login on success or error page on failure
+ */
 // Pagina di registrazione
 app.get('/register', (req, res) => {
     if (req.session.loggedin) {
@@ -414,7 +542,71 @@ app.get('/modificaUtente/:id', (req, res) => {
     });
 });
 
-
+/**
+ * @swagger
+ * /modificaUtente/{id}:
+ *   get:
+ *     summary: Shows form to modify user data
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Returns the form to modify user data
+ *       302:
+ *         description: Redirects to error page if user not found
+ *   post:
+ *     summary: Updates user data
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               cognome:
+ *                 type: string
+ *               dataNascita:
+ *                 type: string
+ *                 format: date
+ *               ruolo:
+ *                 type: string
+ *                 enum: [user, admin]
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *             required:
+ *               - nome
+ *               - cognome
+ *               - dataNascita
+ *               - ruolo
+ *               - email
+ *               - password
+ *     responses:
+ *       302:
+ *         description: Redirects to home page on success or error page on failure
+ */
 // Modifica i dati dell'utente
 app.post('/modificaUtente/:id', (req, res) => {
     const userId = parseInt(req.params.id);
@@ -429,6 +621,25 @@ app.post('/modificaUtente/:id', (req, res) => {
     res.redirect('/home');
 });
 
+/**
+ * @swagger
+ * /eliminaUtente/{id}:
+ *   get:
+ *     summary: Deletes a user
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       302:
+ *         description: Redirects to home page on success or error page on failure
+ */
 // Elimina un utente
 app.get('/eliminaUtente/:id', (req, res) => {
     const userId = parseInt(req.params.id);
@@ -445,7 +656,20 @@ hbs.registerHelper('eq', function (a, b) {
     return a === b;
 });
 
-
+/**
+ * @swagger
+ * /prodotti:
+ *   get:
+ *     summary: Gets the list of products (admin only)
+ *     tags: [Products]
+ *     security:
+ *       - sessionAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns the list of products
+ *       302:
+ *         description: Redirects to login if not authenticated or not admin
+ */
 // Visualizza tutti i prodotti (solo admin)
 app.get('/prodotti', (req, res) => {
     if (!req.session.loggedin || req.session.role !== 'admin') {
@@ -569,6 +793,42 @@ app.post('/modificaProdotto/:id', (req, res) => {
     res.redirect('/prodotti');  // Reindirizza alla lista dei prodotti dopo la modifica
 });
 
+/**
+ * @swagger
+ * /eliminaProdotto/{id}:
+ *   get:
+ *     summary: Shows confirmation for product deletion
+ *     tags: [Products]
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Returns confirmation page
+ *       302:
+ *         description: Redirects to error page if product not found
+ *   post:
+ *     summary: Deletes a product
+ *     tags: [Products]
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Product ID
+ *     responses:
+ *       302:
+ *         description: Redirects to products page on success or error page on failure
+ */
 // Conferma eliminazione prodotto
 app.get('/eliminaProdotto/:id', (req, res) => {
     const { id } = req.params;
@@ -601,6 +861,52 @@ function isAuthenticated(req, res, next) {
     return res.redirect('/modificaProdotti');  // Altrimenti, reindirizza alla pagina di login
 }
 
+/**
+ * @swagger
+ * /noleggio/{id}:
+ *   get:
+ *     summary: Shows rental form for a specific product
+ *     tags: [Rentals]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Returns rental form
+ *       302:
+ *         description: Redirects to error page if product not found
+ *   post:
+ *     summary: Calculates rental price for a specific product
+ *     tags: [Rentals]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               days:
+ *                 type: integer
+ *                 description: Rental duration in days
+ *             required:
+ *               - days
+ *     responses:
+ *       200:
+ *         description: Returns confirmation page with calculated price
+ *       302:
+ *         description: Redirects to error page if validation fails
+ */
 // Visualizza la pagina per noleggiare un prodotto
 app.get('/noleggio/:id', (req, res) => {
     const productId = parseInt(req.params.id);
@@ -645,6 +951,29 @@ app.post('/completa', (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /calcolaPrezzo:
+ *   post:
+ *     summary: Calculates rental price
+ *     tags: [Rentals]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               durata:
+ *                 type: integer
+ *                 description: Rental duration in days
+ *             required:
+ *               - durata
+ *     responses:
+ *       200:
+ *         description: Returns rental page with calculated price
+ */
+
 app.post('/calcolaPrezzo', (req, res) => {
     const durata = parseInt(req.body.durata);
     const prezzoPerGiorno = 10; // Esempio di prezzo giornaliero
@@ -658,6 +987,64 @@ app.post('/calcolaPrezzo', (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 
+/**
+ * @swagger
+ * /noleggio:
+ *   get:
+ *     summary: Shows products available for rental with filtering options
+ *     tags: [Rentals]
+ *     parameters:
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: Filter products by brand
+ *       - in: query
+ *         name: colore
+ *         schema:
+ *           type: string
+ *         description: Filter products by color
+ *       - in: query
+ *         name: condizione
+ *         schema:
+ *           type: string
+ *         description: Filter products by condition
+ *       - in: query
+ *         name: prezzoMin
+ *         schema:
+ *           type: number
+ *         description: Minimum price filter
+ *       - in: query
+ *         name: prezzoMax
+ *         schema:
+ *           type: number
+ *         description: Maximum price filter
+ *     responses:
+ *       200:
+ *         description: Returns filtered list of products
+ *   post:
+ *     summary: Calculates rental price based on duration
+ *     tags: [Rentals]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: Product ID
+ *               durata:
+ *                 type: integer
+ *                 description: Rental duration in days
+ *             required:
+ *               - id
+ *               - durata
+ *     responses:
+ *       200:
+ *         description: Returns rental page with calculated price
+ */
 // Rotta per la pagina del catalogo
 app.get('/noleggio', (req, res) => {
     let filteredProducts = db.getAllProducts(); // Prendi tutti i prodotti dal DBMock
@@ -718,6 +1105,29 @@ app.post('/noleggio', (req, res) => {
     res.render('noleggio', { prezzo, products: db.getAllProducts() });
 });
 
+
+/**
+ * @swagger
+ * /acquista:
+ *   post:
+ *     summary: Process product purchase
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: Product ID
+ *             required:
+ *               - id
+ *     responses:
+ *       200:
+ *         description: Returns purchase confirmation page
+ */
 // Route per la pagina di acquisto
 app.post('/acquista', (req, res) => {
     const { id } = req.body; // Ottieni l'ID prodotto dal form
