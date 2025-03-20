@@ -5,19 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Noleggio e Vendita - Catalogo</title>
   <!-- Importa Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- (Facoltativo) Importa Font Awesome per le icone -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Importa Font Awesome per le icone -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     /* Variabili CSS per la palette professionale */
     :root {
-      --primary-color: #1f2937;   /* Blu scuro/grigio */
-      --secondary-color: #374151; /* Grigio medio */
-      --accent-color: #2563eb;    /* Blu brillante per evidenziare */
-      --light-bg: #f9fafb;        /* Bianco sporco per sfondi */
+      --primary-color: #3a6ea5;    /* Blu acceso professionale */
+      --secondary-color: #004e98;  /* Blu scuro */
+      --accent-color: #ff6b6b;     /* Rosso-arancio per evidenziazioni */
+      --light-bg: #f7f9fc;         /* Bianco-azzurro per sfondi */
+      --dark-bg: #293241;          /* Blu scurissimo per contrasto */
       --light-text: #ffffff;
-      --dark-text: #1f2937;
+      --dark-text: #293241;
+      --light-gray: #e6e9ef;
+      --medium-gray: #d1d5db;
+      --text-secondary: #5d7285;
+      --success-color: #06d6a0;    /* Verde per notifiche positive */
+      --error-color: #ef476f;      /* Rosso per errori */
       --transition-speed: 0.3s;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
     /* Reset globale */
@@ -28,7 +36,7 @@
     }
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: var(--light-bg);
       color: var(--dark-text);
       line-height: 1.6;
@@ -41,72 +49,109 @@
       top: 0;
       left: 0;
       width: 100%;
-      background-color: var(--primary-color);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, var(--dark-bg), var(--secondary-color));
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       z-index: 1000;
     }
 
     .navbar {
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
-      padding: 15px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .navbar .logo {
-      font-size: 1.5em;
+      font-size: 1.6em;
       font-weight: 700;
       color: var(--light-text);
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar .logo:before {
+      content: "\f115";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      margin-right: 10px;
+      color: var(--accent-color);
     }
 
     .nav-links {
       list-style: none;
       display: flex;
-      gap: 20px;
+      gap: 25px;
     }
 
     .nav-links li a {
       color: var(--light-text);
       text-decoration: none;
-      padding: 8px 15px;
+      padding: 8px 16px;
       border-radius: 25px;
-      transition: background var(--transition-speed), transform var(--transition-speed);
+      transition: all var(--transition-speed);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .nav-links li a:hover {
-      background-color: var(--secondary-color);
-      transform: scale(1.03);
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .nav-links li a i {
+      font-size: 1.1em;
     }
 
     /* Titoli */
     h1, h2 {
       text-align: center;
-      margin-bottom: 20px;
-      font-weight: 500;
+      margin-bottom: 25px;
+      font-weight: 600;
     }
 
     h1 {
       font-size: 2.8em;
       color: var(--primary-color);
-      margin-top: 20px;
+      margin-top: 30px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    h1:after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 4px;
+      background: var(--accent-color);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
     }
 
     h2 {
       font-size: 2em;
-      color: var(--accent-color);
+      color: var(--secondary-color);
+      margin-top: 30px;
     }
 
     /* Contenitore per i filtri */
     .filter-container {
-      max-width: 1200px;
-      margin: 20px auto;
-      background-color: var(--light-bg);
-      padding: 20px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 1300px;
+      margin: 30px auto;
+      background-color: var(--light-text);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      transition: transform var(--transition-speed);
+    }
+    
+    .filter-container:hover {
+      transform: translateY(-5px);
     }
 
     .filter-container form {
@@ -117,110 +162,338 @@
       justify-content: center;
     }
 
-    .filter-container label {
-      font-weight: 500;
+    .filter-container div {
+      flex: 1;
+      min-width: 180px;
     }
 
-    .filter-container input,
-    .filter-container button {
-      padding: 10px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
-      font-size: 1em;
+    .filter-container label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
     }
 
     .filter-container input {
-      flex: 1;
-      min-width: 120px;
-      background-color: #fff;
-      color: var(--dark-text);
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: 'Poppins', sans-serif;
+      transition: all var(--transition-speed);
+    }
+    
+    .filter-container input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
+      outline: none;
     }
 
     .filter-container button {
-      background-color: var(--accent-color);
-      color: var(--light-text);
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 500;
       cursor: pointer;
-      transition: background var(--transition-speed), transform var(--transition-speed);
+      transition: all var(--transition-speed);
+      font-family: 'Poppins', sans-serif;
     }
-
-    .filter-container button:hover {
-      background-color: #1d4ed8;
-      transform: translateY(-2px);
+    
+    #filterForm button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--light-text);
+      min-width: 120px;
+    }
+    
+    #filterForm button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    #showAllForm {
+      margin-top: 15px;
+      text-align: center;
+    }
+    
+    #showAllForm button {
+      background: transparent;
+      color: var(--secondary-color);
+      border: 1px solid var(--secondary-color);
+    }
+    
+    #showAllForm button:hover {
+      background-color: rgba(58, 110, 165, 0.1);
     }
 
     /* Sezione prodotti */
     #products {
-      max-width: 1200px;
-      margin: 30px auto;
+      max-width: 1300px;
+      margin: 30px auto 50px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 0 10px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      padding: 0 15px;
     }
 
     .card {
-      background-color: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+      background-color: var(--light-text);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: all var(--transition-speed);
+      position: relative;
     }
 
     .card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+    
+    .card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    .card-content {
+      padding: 25px;
     }
 
     .card h3 {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-size: 1.5em;
       color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .card .details {
+      margin-bottom: 20px;
     }
 
     .card p {
-      margin: 8px 0;
+      margin: 10px 0;
       font-size: 1em;
-      color: var(--secondary-color);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+    }
+    
+    .card p i {
+      margin-right: 10px;
+      color: var(--accent-color);
+      width: 20px;
+      text-align: center;
+    }
+    
+    .price {
+      font-size: 1.4em !important;
+      font-weight: 600;
+      color: var(--secondary-color) !important;
+      margin-bottom: 15px !important;
     }
 
     .card form {
-      margin-top: 15px;
+      margin-top: 20px;
     }
 
     .card input[type="number"] {
-      width: 80%;
-      margin: 8px 0;
-      padding: 8px;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      transition: all var(--transition-speed);
+    }
+    
+    .card input[type="number"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
+      outline: none;
     }
 
     .card button {
       width: 100%;
-      padding: 10px;
-      background-color: var(--accent-color);
-      color: var(--light-text);
-      border: 1px solid var(--accent-color);
-      border-radius: 5px;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 8px;
       font-size: 1em;
       font-weight: 500;
       cursor: pointer;
-      transition: background var(--transition-speed), transform var(--transition-speed);
+      transition: all var(--transition-speed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .noleggio-form button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--light-text);
+      margin-bottom: 10px;
+    }
+    
+    .acquisto-form button {
+      background: var(--accent-color);
+      color: var(--light-text);
     }
 
     .card button:hover {
-      background-color: #1d4ed8;
-      border-color: #1d4ed8;
-      transform: translateY(-2px);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* Responsive: disporre i campi in colonna per schermi piccoli */
+    /* Stili per notifiche */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .notification:before {
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+    }
+
+    .notification {
+      background: linear-gradient(135deg, var(--success-color), #08b389);
+    }
+    
+    .notification:before {
+      content: "\f058"; /* check icon */
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--error-color), #d64161);
+    }
+    
+    .notification.error:before {
+      content: "\f057"; /* x icon */
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Loading spinner */
+    .loader {
+      display: none;
+      width: 50px;
+      height: 50px;
+      margin: 30px auto;
+      position: relative;
+    }
+    
+    .loader:before, .loader:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 5px solid transparent;
+      border-top-color: var(--accent-color);
+    }
+    
+    .loader:before {
+      z-index: 10;
+      animation: spin 1s infinite;
+    }
+    
+    .loader:after {
+      border: 5px solid rgba(58, 110, 165, 0.1);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Messaggio nessun risultato */
+    #no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      background: var(--light-text);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      font-size: 1.2em;
+      color: var(--text-secondary);
+    }
+    
+    #no-results:before {
+      content: "\f57a"; /* Sad face icon */
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      display: block;
+      font-size: 2em;
+      color: var(--accent-color);
+      margin-bottom: 15px;
+    }
+
+    /* Responsive design */
     @media (max-width: 768px) {
+      .navbar {
+        padding: 12px 15px;
+      }
+      
+      .navbar .logo {
+        font-size: 1.4em;
+      }
+      
+      .nav-links {
+        gap: 10px;
+      }
+      
+      .nav-links li a {
+        padding: 8px 12px;
+      }
+      
+      h1 {
+        font-size: 2.2em;
+      }
+      
+      h2 {
+        font-size: 1.8em;
+      }
+      
+      .filter-container {
+        padding: 20px 15px;
+      }
+      
       .filter-container form {
         flex-direction: column;
-        align-items: stretch;
+      }
+      
+      .filter-container div {
+        width: 100%;
+      }
+      
+      #products {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 10px;
       }
     }
   </style>
@@ -263,45 +536,206 @@
           <input type="number" id="prezzoMax" name="prezzoMax" value="{{prezzoMax}}">
         </div>
         <div>
-          <button type="submit">Filtra</button>
+          <button type="submit"><i class="fas fa-filter"></i> Filtra</button>
         </div>
       </form>
-      <form action="/noleggio" method="get">
-        <button type="submit">Mostra Tutti</button>
+      <form id="showAllForm" action="/noleggio" method="get">
+        <button type="submit"><i class="fas fa-sync-alt"></i> Mostra Tutti</button>
       </form>
     </section>
 
     <h2>Risultati:</h2>
+    
+    <div id="loaderContainer" class="loader"></div>
 
     <!-- Sezione prodotti -->
-    {{#if products.length}}
-      <section id="products">
+    <section id="products">
+      {{#if products.length}}
         {{#each products}}
           <div class="card">
-            <h3>{{brand}} - {{category}}</h3>
-            <p>Prezzo: {{price}}€</p>
-            <p>Condizione: {{condition}}</p>
-            <p>Colore: {{color}}</p>
+            <div class="card-content">
+              <h3>{{brand}} - {{category}}</h3>
+              <div class="details">
+                <p class="price"><i class="fas fa-tag"></i> {{price}}€</p>
+                <p><i class="fas fa-info-circle"></i> Condizione: {{condition}}</p>
+                <p><i class="fas fa-palette"></i> Colore: {{color}}</p>
+              </div>
 
-            <!-- Form per il noleggio -->
-            <form action="/noleggio" method="post">
-              <input type="hidden" name="id" value="{{id}}">
-              <label for="durata-{{id}}">Durata (giorni):</label>
-              <input type="number" id="durata-{{id}}" name="durata" min="1" required>
-              <button type="submit">Noleggia</button>
-            </form>
+              <!-- Form per il noleggio -->
+              <form class="noleggio-form" action="/noleggio" method="post">
+                <input type="hidden" name="id" value="{{id}}">
+                <label for="durata-{{id}}">Durata (giorni):</label>
+                <input type="number" id="durata-{{id}}" name="durata" min="1" required>
+                <button type="submit"><i class="fas fa-calendar-alt"></i> Noleggia</button>
+              </form>
 
-            <!-- Form per l'acquisto -->
-            <form action="/acquista" method="post">
-              <input type="hidden" name="id" value="{{id}}">
-              <button type="submit">Acquista</button>
-            </form>
+              <!-- Form per l'acquisto -->
+              <form class="acquisto-form" action="/acquista" method="post">
+                <input type="hidden" name="id" value="{{id}}">
+                <button type="submit"><i class="fas fa-shopping-cart"></i> Acquista</button>
+              </form>
+            </div>
           </div>
         {{/each}}
-      </section>
-    {{else}}
-      <p style="text-align: center; margin-top: 20px;">Nessun prodotto trovato con i filtri applicati.</p>
-    {{/if}}
+      {{else}}
+        <p id="no-results">Nessun prodotto trovato con i filtri applicati.</p>
+      {{/if}}
+    </section>
   </main>
+
+  <!-- Contenitore per le notifiche -->
+  <div id="notification" class="notification"></div>
+  
+  <!-- Script per AJAX -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Gestione form filtro
+      document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const params = new URLSearchParams();
+        
+        // Aggiungi solo i campi non vuoti ai parametri
+        for (const [key, value] of formData.entries()) {
+          if (value.trim() !== '') {
+            params.append(key, value);
+          }
+        }
+        
+        fetchProducts('/noleggio?' + params.toString());
+      });
+      
+      // Gestione form "Mostra tutti"
+      document.getElementById('showAllForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetchProducts('/noleggio');
+      });
+      
+      // Gestione noleggio prodotti
+      document.querySelectorAll('.noleggio-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
+        });
+      });
+      
+      // Gestione acquisto prodotti
+      document.querySelectorAll('.acquisto-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
+        });
+      });
+      
+      // Funzione per caricare i prodotti
+      function fetchProducts(url) {
+        const productsContainer = document.getElementById('products');
+        const loader = document.getElementById('loaderContainer');
+        
+        // Mostra loader
+        loader.style.display = 'block';
+        
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Errore nel caricamento dei prodotti');
+            }
+            return response.text();
+          })
+          .then(html => {
+            // Crea un elemento temporaneo per estrarre la sezione prodotti dall'HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // Ottieni la sezione prodotti dalla risposta
+            const newProducts = tempDiv.querySelector('#products');
+            
+            if (newProducts) {
+              productsContainer.innerHTML = newProducts.innerHTML;
+              
+              // Riattacca gli event listener ai nuovi form
+              productsContainer.querySelectorAll('.noleggio-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  const formData = new FormData(this);
+                  submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
+                });
+              });
+              
+              productsContainer.querySelectorAll('.acquisto-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  const formData = new FormData(this);
+                  submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
+                });
+              });
+            } else {
+              // Fallback se non riesce a trovare la sezione prodotti
+              productsContainer.innerHTML = '<p id="no-results">Nessun prodotto trovato con i filtri applicati.</p>';
+            }
+          })
+          .catch(error => {
+            showNotification(error.message, true);
+            console.error('Errore:', error);
+          })
+          .finally(() => {
+            // Nascondi loader
+            loader.style.display = 'none';
+          });
+      }
+      
+      // Funzione per inviare form di noleggio o acquisto
+      function submitProductForm(url, formData, successMessage) {
+        const loader = document.getElementById('loaderContainer');
+        
+        // Mostra loader
+        loader.style.display = 'block';
+        
+        fetch(url, {
+          method: 'POST',
+          body: formData
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Errore durante l\'operazione');
+            }
+            return response.json();
+          })
+          .then(data => {
+            showNotification(successMessage);
+            
+            // Ricarica i prodotti se necessario
+            if (data.reload) {
+              fetchProducts('/noleggio');
+            }
+          })
+          .catch(error => {
+            showNotification(error.message, true);
+            console.error('Errore:', error);
+          })
+          .finally(() => {
+            // Nascondi loader
+            loader.style.display = 'none';
+          });
+      }
+      
+      // Funzione per mostrare notifiche
+      function showNotification(message, isError = false) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = 'notification' + (isError ? ' error' : '');
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+    });
+  </script>
 </body>
 </html>

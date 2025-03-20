@@ -68,15 +68,6 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
-// Configurazione per il login tramite Google
-passport.use(new GoogleStrategy({
-
-    callbackURL: 'http://localhost:3000/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    // Puoi salvare o gestire il profilo utente qui
-    return done(null, profile);
-}));
-
 // Serializzazione e deserializzazione utente
 passport.serializeUser((user, done) => {
     done(null, user);
@@ -86,29 +77,130 @@ passport.deserializeUser((user, done) => {
     done(null, user);
 });
 
-// Rotte per il login tramite Google
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback', passport.authenticate('google', {
-    failureRedirect: '/login'
-}), (req, res) => {
-    // Salva il nome dell'utente nella sessione
-    req.session.user = req.user.displayName;
-    res.redirect('/home');
-});
-
-// Middleware per verificare se l'utente è autenticato
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated() || req.session.loggedin) {
-        return next();
-    }
-    res.redirect('/login');
+// Funzione di utilità per trovare un utente tramite email
+function findUserByEmail(email) {
+    const allUsers = db.getAllUsers();
+    return allUsers.find(user => user.email === email);
 }
 
+// ===== GOOGLE AUTHENTICATION STRATEGY =====
+passport.use(new GoogleStrategy({
+    
+    callbackURL: 'http://localhost:3000/auth/google/callback'
+}, (accessToken, refreshToken, profile, done) => {
+    try {
+        // Verifica se l'utente esiste già nel DB utilizzando l'email
+        let user = null;
+        if (profile.emails && profile.emails.length > 0) {
+            user = findUserByEmail(profile.emails[0].value);
+        }
+        
+        // Se l'utente non esiste, lo creiamo
+        if (!user) {
+            user = db.createUser({
+                nome: profile.displayName || profile.name?.givenName || 'Google User',
+                cognome: profile.name?.familyName || '',
+                email: profile.emails ? profile.emails[0].value : `google_${profile.id}@example.com`,
+                ruolo: 'user', // Ruolo predefinito
+                googleId: profile.id,
+                // Aggiungi altri campi necessari con valori predefiniti
+                dataNascita: new Date().toISOString().split('T')[0],
+                luogoNascita: 'Non specificato',
+                username: profile.emails ? profile.emails[0].value : `google_${profile.id}`,
+                password: 'google-auth-' + Math.random().toString(36).substring(2)
+            });
+        } else {
+            // Aggiorniamo il googleId se l'utente esiste
+            db.updateUser(user.id, { ...user, googleId: profile.id });
+        }
+        
+        return done(null, user);
+    } catch (error) {
+        return done(error, null);
+    }
+}));
 
+// ===== FACEBOOK AUTHENTICATION STRATEGY =====
+passport.use(new FacebookStrategy({
+    
+    callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    profileFields: ['id', 'displayName', 'photos', 'email', 'name']
+}, (accessToken, refreshToken, profile, done) => {
+    try {
+        // Verifica se l'utente esiste già nel DB
+        let user = null;
+        
+        // Se il profilo contiene l'email, cerca l'utente per email
+        if (profile.emails && profile.emails.length > 0) {
+            user = findUserByEmail(profile.emails[0].value);
+        }
+        
+        // Se non trovato per email, cerca per facebookId
+        if (!user) {
+            const allUsers = db.getAllUsers();
+            user = allUsers.find(u => u.facebookId === profile.id);
+        }
+        
+        // Se l'utente non esiste, lo creiamo
+        if (!user) {
+            user = db.createUser({
+                nome: profile.displayName?.split(' ')[0] || profile.name?.givenName || 'Facebook User',
+                cognome: profile.name?.familyName || profile.displayName?.split(' ').slice(1).join(' ') || '',
+                email: profile.emails ? profile.emails[0].value : `facebook_${profile.id}@example.com`,
+                ruolo: 'user', // Ruolo predefinito
+                facebookId: profile.id,
+                // Aggiungi altri campi necessari con valori predefiniti
+                dataNascita: new Date().toISOString().split('T')[0],
+                luogoNascita: 'Non specificato',
+                username: profile.emails ? profile.emails[0].value : `facebook_${profile.id}`,
+                password: 'facebook-auth-' + Math.random().toString(36).substring(2)
+            });
+        } else {
+            // Aggiorniamo il facebookId se l'utente esiste
+            db.updateUser(user.id, { ...user, facebookId: profile.id });
+        }
+        
+        return done(null, user);
+    } catch (error) {
+        return done(error, null);
+    }
+}));
 
+// ===== GOOGLE AUTHENTICATION ROUTES =====
+app.get('/auth/google', passport.authenticate('google', { 
+    scope: ['profile', 'email']
+}));
 
-//facebook
+app.get('/auth/google/callback', 
+    passport.authenticate('google', {
+        failureRedirect: '/login'
+    }),
+    (req, res) => {
+        // Salva le informazioni dell'utente nella sessione
+        req.session.loggedin = true;
+        req.session.user = req.user;
+        res.redirect('/home');
+    }
+);
+
+// ===== FACEBOOK AUTHENTICATION ROUTES =====
+app.get('/auth/facebook', passport.authenticate('facebook', { 
+    scope: ['email', 'public_profile']
+}));
+
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+        failureRedirect: '/login'
+    }),
+    (req, res) => {
+        // Salva le informazioni dell'utente nella sessione
+        req.session.loggedin = true;
+        req.session.user = req.user;
+        res.redirect('/home');
+    }
+);
+
+// ===== DATA DELETION FOR FACEBOOK GDPR COMPLIANCE =====
 app.post('/api/delete-user-data', async (req, res) => {
     const userId = req.body.user_id; // ID utente fornito da Facebook
     if (!userId) {
@@ -116,44 +208,29 @@ app.post('/api/delete-user-data', async (req, res) => {
     }
 
     try {
-        // Logica per eliminare i dati dal database
-        await deleteUserDataFromDatabase(userId);
-
-        res.status(200).json({ success: true, message: 'User data deleted successfully.' });
+        // Cerca l'utente per facebookId
+        const allUsers = db.getAllUsers();
+        const user = allUsers.find(u => u.facebookId === userId);
+        
+        if (user) {
+            // Elimina l'utente dal database
+            const isDeleted = db.deleteUser(user.id);
+            if (isDeleted) {
+                res.status(200).json({ success: true, message: 'User data deleted successfully.' });
+            } else {
+                res.status(500).json({ error: 'Failed to delete user data' });
+            }
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete user data' });
+        res.status(500).json({ error: 'Failed to delete user data', details: error.message });
     }
 });
 
-passport.use(new FacebookStrategy({
-
-}, (accessToken, refreshToken, profile, done) => {
-    // Logica per gestire l'utente autenticato
-    User.findOrCreate({ facebookId: profile.id }, (err, user) => {
-        return done(err, user);
-    });
-}));
-
-// Rotta per avviare l'autenticazione
-app.get('/auth/facebook', passport.authenticate('facebook'));
-// Rotta per gestire il callback
-app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect: '/home',
-        failureRedirect: '/login'
-    })
-);
-
-// Serializzazione e deserializzazione utente
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
-
-
-
-
-
+// Middleware per verificare l'autenticazione
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated() || req.session.user) {
+    if (req.isAuthenticated() || req.session.loggedin) {
         return next();
     }
     res.redirect('/login');
@@ -192,7 +269,6 @@ function ensureAuthenticated(req, res, next) {
  *       302:
  *         description: Redirects to home on success or error page on failure
  */
-
 app.get('/login', (req, res) => {
     if (req.session.loggedin) {
         res.redirect('/home'); // Se già autenticato, reindirizza alla home
@@ -200,9 +276,6 @@ app.get('/login', (req, res) => {
         res.sendFile(path.join(__dirname, 'public', 'login.html')); // Mostra il login
     }
 });
-
-
-
 
 /**
  * @swagger
@@ -216,6 +289,105 @@ app.get('/login', (req, res) => {
  */
 app.get('/', (req, res) => {
     res.redirect('/home');
+});
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Esegue il login dell'utente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       302:
+ *         description: Login effettuato con successo, redirect alla home
+ */
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Recupera l'utente dal database
+    const user = db.getUserByUsername(username);
+
+    if (user && user.password === password) {
+        // Serializza l'utente per Passport
+        req.login(user, err => {
+            if (err) {
+                return res.render('error', { message: 'Errore durante il login!' });
+            }
+            req.session.loggedin = true;
+            req.session.user = user;
+            res.redirect('/home');
+        });
+    } else {
+        res.render('error', { message: 'Username o password errati!' });
+    }
+});
+
+/**
+ * @swagger
+ * /logout:
+ *   get:
+ *     summary: Logs out the current user
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to home page after logout
+ */
+app.get('/logout', (req, res) => {
+    req.logout(err => {
+        if (err) {
+            return res.render('error', { message: 'Errore durante il logout!' });
+        }
+        req.session.destroy(() => {
+            res.redirect('/');
+        });
+    });
+});
+
+/**
+ * @swagger
+ * /home:
+ *   get:
+ *     summary: Home page for authenticated users
+ *     tags: [Users]
+ *     security:
+ *       - sessionAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns the home page with user information
+ *       302:
+ *         description: Redirects to login if not authenticated
+ */
+app.get('/home', ensureAuthenticated, (req, res) => {
+    const user = req.user || req.session.user;
+    if (!user) {
+        return res.redirect('/login');
+    }
+    
+    if (user.ruolo === 'admin') {
+        const users = db.getAllUsers(); // Recupera gli utenti dal DBMock
+        res.render('admin/home', {
+            name: user.nome,
+            role: user.ruolo,
+            message: req.session.message,
+            users: users
+        });
+    } else {
+        res.render('home', {
+            name: user.nome,
+            role: user.ruolo,
+            message: `Benvenuto, ${user.nome}!`
+        });
+    }
 });
 
 /**
@@ -314,103 +486,6 @@ app.post('/registraUtente', (req, res) => {
     req.session.message = `Utente con id: (${user.id}) creato con successo`;
     res.redirect('/home');
 });
-
-/**
- * @swagger
- * /login:
- *   post:
- *     summary: Esegue il login dell'utente
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       302:
- *         description: Login effettuato con successo, redirect alla home
- */
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Recupera l'utente dal database
-    const user = db.getUserByUsername(username);
-
-    if (user && user.password === password) {
-        // Serializza l'utente per Passport
-        req.login(user, err => {
-            if (err) {
-                return res.render('error', { message: 'Errore durante il login!' });
-            }
-            req.session.loggedin = true;
-            res.redirect('/home');
-        });
-    } else {
-        res.render('error', { message: 'Username o password errati!' });
-    }
-});
-
-/**
- * @swagger
- * /logout:
- *   get:
- *     summary: Logs out the current user
- *     tags: [Auth]
- *     responses:
- *       302:
- *         description: Redirects to home page after logout
- */
-app.get('/logout', (req, res) => {
-    req.logout(err => {
-        if (err) {
-            return res.render('error', { message: 'Errore durante il logout!' });
-        }
-        req.session.destroy(() => {
-            res.redirect('/');
-        });
-    });
-});
-
-
-
-/**
- * @swagger
- * /home:
- *   get:
- *     summary: Home page for authenticated users
- *     tags: [Users]
- *     security:
- *       - sessionAuth: []
- *     responses:
- *       200:
- *         description: Returns the home page with user information
- *       302:
- *         description: Redirects to login if not authenticated
- */
-app.get('/home', ensureAuthenticated, (req, res) => {
-    const user = req.user || req.session.user || { nome: req.session.name, ruolo: req.session.role };
-    if (user.ruolo === 'admin') {
-        const users = db.getAllUsers(); // Recupera gli utenti dal DBMock
-        res.render('admin/home', {
-            name: user.nome,
-            role: user.ruolo,
-            message: req.session.message,
-            users: users
-        });
-    } else {
-        res.render('home', {
-            name: user.nome,
-            role: user.ruolo,
-            message: `Benvenuto, ${req.session.nome}!`
-        });
-    }
-});
-
 
 /**
  * @swagger
