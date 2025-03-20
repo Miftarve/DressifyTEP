@@ -2,12 +2,15 @@
 <html lang="en">
 
 <head>
-    <title>Login</title>
+    <title>Login - DRESSIMIFY</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css"> <!-- Link to external stylesheet for scalability -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* General Styles */
+        /* Font Import */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        /* General Reset */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,113 +18,215 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-image: url('public/assets/1.jpeg');
-            /* Percorso dell'immagine */
             background-size: cover;
-            /* Adatta l'immagine a tutta la pagina */
             background-position: center;
-            /* Centra l'immagine */
             background-repeat: no-repeat;
-            /* Evita di ripetere l'immagine */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: #333;
             margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: #2c3e50;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            font-weight: 600;
         }
 
         p {
             font-size: 0.9rem;
-            color: #7f8c8d;
+            color: #5d6778;
+            margin: 16px 0;
         }
 
         a {
-            color: #3498db;
+            color: #0056b3;
             text-decoration: none;
-            transition: text-decoration 0.3s ease;
+            transition: color 0.3s ease;
+            font-weight: 500;
         }
 
         a:hover {
-            text-decoration: underline;
+            color: #003d82;
         }
 
         /* Form Container */
         .form-container {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             max-width: 420px;
             width: 100%;
             text-align: center;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .form-container h1 {
-            font-size: 2rem;
+        /* Logo and Title */
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .brand-logo {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #0056b3;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #0056b3, #0078d7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-tagline {
+            font-size: 0.95rem;
+            color: #5d6778;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
         }
 
         /* Input Fields */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9dabc0;
+        }
+
         input,
         button {
             width: 100%;
-            padding: 12px;
-            margin: 12px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            padding: 14px 15px 14px 45px;
+            border-radius: 8px;
+            border: 1px solid #e1e5eb;
             font-size: 1rem;
-            transition: border-color 0.3s ease, background-color 0.3s ease;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
         }
 
         input[type="text"],
         input[type="password"] {
-            background-color: #f9f9f9;
+            background-color: #f9fafc;
+            color: #495057;
         }
 
         input:focus {
-            border-color: #3498db;
+            border-color: #0078d7;
+            box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.1);
             outline: none;
         }
 
-        /* Submit Button */
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
+        /* Buttons */
+        .btn {
+            font-weight: 600;
             cursor: pointer;
+            padding: 14px;
+            border: none;
+            display: inline-block;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0056b3;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #003d82;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 86, 179, 0.2);
+        }
+
+        .social-login-divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #9dabc0;
+        }
+
+        .social-login-divider::before,
+        .social-login-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #e1e5eb;
+        }
+
+        .social-login-divider span {
+            padding: 0 15px;
+            font-size: 0.9rem;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            font-weight: 500;
+        }
+
+        .social-btn i {
+            margin-right: 10px;
             font-size: 1.1rem;
-            transition: background-color 0.3s ease;
         }
 
-        button:hover {
-            background-color: #2980b9;
+        .google-btn {
+            background-color: #ffffff;
+            color: #5f6368;
+            border: 1px solid #e1e5eb;
         }
 
-        /* Custom Title and Effects */
-        .custom-title {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            animation: glow 2s infinite alternate;
+        .google-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        @keyframes glow {
-            from {
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            }
+        .facebook-btn {
+            background-color: #1877f2;
+            color: white;
+        }
 
-            to {
-                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-            }
+        .facebook-btn:hover {
+            background-color: #0e65d9;
+            box-shadow: 0 2px 10px rgba(24, 119, 242, 0.2);
+        }
+
+        .footer-links {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5eb;
+            font-size: 0.85rem;
         }
 
         /* Responsive Design */
@@ -133,119 +238,84 @@
             .form-container {
                 padding: 30px;
             }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            input,
-            button {
-                font-size: 0.9rem;
-            }
         }
 
         @media (max-width: 480px) {
             .form-container {
-                padding: 20px;
+                padding: 25px 20px;
             }
 
-            h1 {
-                font-size: 1.8rem;
+            .brand-logo {
+                font-size: 2rem;
             }
-
-            input,
-            button {
-                font-size: 0.85rem;
-            }
-        }
-
-        .google-login-button {
-            display: inline-block;
-            width: 100%;
-            padding: 12px;
-            margin: 12px 0;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-            background-color: #db4437;
-            /* Rosso tipico di Google */
-            border: none;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .google-login-button:hover {
-            background-color: #c23321;
-            /* Colore leggermente più scuro per hover */
-        }
-        .facebook-login-button {
-            background-color: #1877f2;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-            border: none;
-            font-weight: bold;
-        }
-
-        .facebook-login-button:hover {
-            background-color: #145db2;
         }
     </style>
 </head>
 
 <body>
     <div class="form-container">
-        <div class="custom-title">DRESSIMIFY</div>
+        <div class="logo-container">
+            <div class="brand-logo">DRESSIMIFY</div>
+            <div class="brand-tagline">Fashion simplified, style amplified</div>
+        </div>
 
-        <h1>Login</h1>
+        <h1>Welcome Back</h1>
         <form action="/login" method="post">
-            <input type="text" name="username" id="username" placeholder="Username o Email" required>
-            <input type="password" name="password" id="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" id="username" placeholder="Username or Email" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign In</button>
         </form>
 
-        <p>Oppure accedi con:</p>
-        <button onclick="loginWithFacebook()">Login con Facebook</button>
+        <div class="social-login-divider">
+            <span>or continue with</span>
+        </div>
 
+        <button onclick="loginWithFacebook()" class="btn social-btn facebook-btn">
+            <i class="fab fa-facebook-f"></i> Facebook
+        </button>
 
+        <a href="/auth/google" class="btn social-btn google-btn">
+            <i class="fab fa-google"></i> Google
+        </a>
 
-        <a href="/auth/google" class="google-login-button">Accedi con Google</a>
-
-        <p>Non hai un account? <a href="/register">Registrati qui</a>.</p>
-        <p><a href="/recuperoDati">Hai dimenticato i tuoi dati? Recuperali qui</a>.</p>
+        <div class="footer-links">
+            <p>Don't have an account? <a href="/register">Sign Up</a></p>
+        </div>
     </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-<script>
-  // Inizializza Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyAM1cUlBm-Sgmy9nfSvB6sjwiZ49-vAeKM",
-    authDomain: "dressimify.firebaseapp.com",
-    projectId: "dressimify",
-    storageBucket: "dressimify.appspot.com",
-    messagingSenderId: "1057705002752",
-    appId: "1:1057705002752:web:dfda063a77bad0f93d95e5",
-    measurementId: "G-JV66QE2GXC"
-  };
-  firebase.initializeApp(firebaseConfig);
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script>
+        // Inizializza Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAM1cUlBm-Sgmy9nfSvB6sjwiZ49-vAeKM",
+            authDomain: "dressimify.firebaseapp.com",
+            projectId: "dressimify",
+            storageBucket: "dressimify.appspot.com",
+            messagingSenderId: "1057705002752",
+            appId: "1:1057705002752:web:dfda063a77bad0f93d95e5",
+            measurementId: "G-JV66QE2GXC"
+        };
+        firebase.initializeApp(firebaseConfig);
 
-  // Funzione per login con Facebook
-  function loginWithFacebook() {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithRedirect(provider);
-    provider.addScope('email'); 
-    firebase
-      .auth()
-      .signInWithRedirect(provider)
-      .then(() => console.log('Redirecting to Facebook login...'))
-      .catch(error => console.error("Errore:", error));
-  }
-</script>
+        // Funzione per login con Facebook
+        function loginWithFacebook() {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            firebase.auth().signInWithRedirect(provider);
+            provider.addScope('email');
+            firebase
+                .auth()
+                .signInWithRedirect(provider)
+                .then(() => console.log('Redirecting to Facebook login...'))
+                .catch(error => console.error("Errore:", error));
+        }
+    </script>
 </body>
-
 
 </html>

@@ -9,9 +9,18 @@ const io = socketIo(server);
 // Middleware per servire file statici
 app.use(express.static('public'));
 
+// Contatore visitatori
+let visitorCount = 0;
+
 // Socket.IO
 io.on('connection', (socket) => {
+    // Incrementa il contatore visitatori
+    visitorCount++;
     console.log(`User connected with ID: ${socket.id}`);
+    console.log(`Current visitors: ${visitorCount}`);
+    
+    // Invia il contatore aggiornato a tutti i client
+    io.emit('visitor count', visitorCount);
 
     // Ricezione di un messaggio
     socket.on('send message', (data) => {
@@ -23,7 +32,13 @@ io.on('connection', (socket) => {
 
     // Disconnessione
     socket.on('disconnect', () => {
+        // Decrementa il contatore visitatori
+        visitorCount--;
         console.log(`User disconnected with ID: ${socket.id}`);
+        console.log(`Current visitors: ${visitorCount}`);
+        
+        // Invia il contatore aggiornato a tutti i client
+        io.emit('visitor count', visitorCount);
     });
 });
 

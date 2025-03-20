@@ -1,100 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acquisto</title>
+    <title>Dettagli Acquisto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #16a085;
+            --accent-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --text-color: #34495e;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 10px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
         }
 
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-            color: #2c3e50;
-            font-size: 2.5rem;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
         }
 
-        .product-container {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        /* Card Styles */
-        .card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            color: #2980b9;
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            margin: 8px 0;
-            font-size: 1rem;
-            color: #7f8c8d;
-        }
-
-        /* Button Styles */
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            padding: 10px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            padding: 15px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .navbar .logo img {
-            height: 50px;
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 24px;
+            margin-left: 10px;
         }
 
         .navbar .nav-links {
             list-style: none;
             display: flex;
-            gap: 15px;
+            gap: 25px;
             margin: 0;
             padding: 0;
         }
@@ -104,61 +72,298 @@
         }
 
         .navbar .nav-links a {
-            color: #fff;
+            color: white;
             text-decoration: none;
-            font-weight: bold;
-            padding: 10px 15px;
-            border-radius: 5px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: background-color 0.3s ease;
+            gap: 8px;
         }
 
         .navbar .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
 
         .navbar .nav-links a i {
-            font-size: 1.2rem;
+            font-size: 16px;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar .nav-links {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
+        .page-title {
+            text-align: center;
+            margin: 40px 0;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 32px;
+            position: relative;
+            padding-bottom: 15px;
+        }
 
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .product-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            min-height: 60vh;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .product-category {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card h3 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .product-image {
+            width: 180px;
+            height: 180px;
+            background-color: var(--light-color);
+            border-radius: 50%;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-color);
+            font-size: 40px;
+        }
+
+        .product-details {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .price-tag {
+            margin: 20px 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .price-tag i {
+            font-size: 24px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--secondary-color), #1abc9c);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(22, 160, 133, 0.3);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #1abc9c, var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 160, 133, 0.4);
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-color: #ccc;
+        }
+
+        .condition-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .condition-badge.nuovo {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+        }
+
+        .condition-badge.usato {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
                 padding: 15px;
+            }
+
+            .navbar .nav-links {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card {
+                width: 90%;
+                max-width: 380px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="navbar">
+    <nav class="navbar">
+        <div class="logo">
+            <h1>GestPro</h1>
+        </div>
         <ul class="nav-links">
             <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             <li><a href="/noleggio"><i class="fas fa-shopping-cart"></i> Noleggio</a></li>
+            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
-    </div>
-    <h1>Dettagli Acquisto</h1>
+    </nav>
+
+    <h1 class="page-title">Dettagli Acquisto</h1>
+
     <div class="product-container">
         <div class="card">
-            <h3>{{product.category}} - {{product.brand}}</h3>
-            <p>Taglia: {{product.size}}</p>
-            <p>Colore: {{product.color}}</p>
-            <p>Condizione: {{product.condition}}</p>
-            <p>Prezzo: {{product.price}}&euro;</p>
+            <div class="product-category">{{product.category}}</div>
+            <h3>{{product.brand}}</h3>
+            
+            <div class="product-image">
+                <i class="fas fa-tshirt"></i>
+            </div>
+            
+            <div class="product-details">
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-ruler"></i> Taglia</span>
+                    <span class="detail-value">{{product.size}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-palette"></i> Colore</span>
+                    <span class="detail-value">{{product.color}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-info-circle"></i> Condizione</span>
+                    <span class="detail-value">
+                        <span class="condition-badge {{product.condition}}">{{product.condition}}</span>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="price-tag">
+                <i class="fas fa-tag"></i> {{product.price}}&euro;
+            </div>
+            
             <form action="/acquista" method="post">
                 <input type="hidden" name="id" value="{{product.id}}">
-                <button type="submit">Conferma Acquisto</button>
+                <button type="submit" class="btn">
+                    <i class="fas fa-check-circle"></i> Conferma Acquisto
+                </button>
             </form>
+            
+            <button onclick="history.back()" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Torna Indietro
+            </button>
         </div>
     </div>
 </body>

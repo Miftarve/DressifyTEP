@@ -85,7 +85,6 @@ function findUserByEmail(email) {
 
 // ===== GOOGLE AUTHENTICATION STRATEGY =====
 passport.use(new GoogleStrategy({
-    
     callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     try {
@@ -122,7 +121,7 @@ passport.use(new GoogleStrategy({
 
 // ===== FACEBOOK AUTHENTICATION STRATEGY =====
 passport.use(new FacebookStrategy({
-    
+
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'photos', 'email', 'name']
 }, (accessToken, refreshToken, profile, done) => {
@@ -291,6 +290,10 @@ app.get('/', (req, res) => {
     res.redirect('/home');
 });
 
+// Assuming you already have your Express app set up
+app.get('/recuperoDati', (req, res) => {
+    res.sendFile(path.join(__dirname, 'recuperDati.html'));
+  });
 /**
  * @swagger
  * /login:
@@ -795,10 +798,10 @@ app.get('/prodotti', (req, res) => {
  */
 // Aggiungi un prodotto (solo admin)
 app.get('/prodotti', (req, res) => {
-    if (!req.session.loggedin || req.session.role !== 'admin') {
+    if (!req.session.loggedin || !req.session.user || req.session.user.ruolo !== 'admin') {
         return res.redirect('/login');
     }
-    const products = db.getAllProducts(); // Recupera la lista aggiornata
+    const products = db.getAllProducts();
     res.render('prodotti', { products });
 });
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,18 +12,25 @@
   <style>
     /* Variabili CSS per la palette professionale */
     :root {
-      --primary-color: #3a6ea5;    /* Blu acceso professionale */
-      --secondary-color: #004e98;  /* Blu scuro */
-      --accent-color: #ff6b6b;     /* Rosso-arancio per evidenziazioni */
-      --light-bg: #f7f9fc;         /* Bianco-azzurro per sfondi */
-      --dark-bg: #293241;          /* Blu scurissimo per contrasto */
+      --primary-color: #3a6ea5;
+      /* Blu acceso professionale */
+      --secondary-color: #004e98;
+      /* Blu scuro */
+      --accent-color: #ff6b6b;
+      /* Rosso-arancio per evidenziazioni */
+      --light-bg: #f7f9fc;
+      /* Bianco-azzurro per sfondi */
+      --dark-bg: #293241;
+      /* Blu scurissimo per contrasto */
       --light-text: #ffffff;
       --dark-text: #293241;
       --light-gray: #e6e9ef;
       --medium-gray: #d1d5db;
       --text-secondary: #5d7285;
-      --success-color: #06d6a0;    /* Verde per notifiche positive */
-      --error-color: #ef476f;      /* Rosso per errori */
+      --success-color: #06d6a0;
+      /* Verde per notifiche positive */
+      --error-color: #ef476f;
+      /* Rosso per errori */
       --transition-speed: 0.3s;
       --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -40,7 +48,8 @@
       background-color: var(--light-bg);
       color: var(--dark-text);
       line-height: 1.6;
-      padding-top: 70px; /* Spazio per header fisso */
+      padding-top: 70px;
+      /* Spazio per header fisso */
     }
 
     /* Header e Navbar */
@@ -101,13 +110,14 @@
       background-color: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
     }
-    
+
     .nav-links li a i {
       font-size: 1.1em;
     }
 
     /* Titoli */
-    h1, h2 {
+    h1,
+    h2 {
       text-align: center;
       margin-bottom: 25px;
       font-weight: 600;
@@ -120,7 +130,7 @@
       position: relative;
       padding-bottom: 15px;
     }
-    
+
     h1:after {
       content: '';
       position: absolute;
@@ -149,7 +159,7 @@
       box-shadow: var(--card-shadow);
       transition: transform var(--transition-speed);
     }
-    
+
     .filter-container:hover {
       transform: translateY(-5px);
     }
@@ -183,7 +193,7 @@
       font-family: 'Poppins', sans-serif;
       transition: all var(--transition-speed);
     }
-    
+
     .filter-container input:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
@@ -200,29 +210,29 @@
       transition: all var(--transition-speed);
       font-family: 'Poppins', sans-serif;
     }
-    
+
     #filterForm button {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: var(--light-text);
       min-width: 120px;
     }
-    
+
     #filterForm button:hover {
       transform: translateY(-3px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    
+
     #showAllForm {
       margin-top: 15px;
       text-align: center;
     }
-    
+
     #showAllForm button {
       background: transparent;
       color: var(--secondary-color);
       border: 1px solid var(--secondary-color);
     }
-    
+
     #showAllForm button:hover {
       background-color: rgba(58, 110, 165, 0.1);
     }
@@ -250,7 +260,7 @@
       transform: translateY(-10px);
       box-shadow: var(--hover-shadow);
     }
-    
+
     .card:before {
       content: '';
       position: absolute;
@@ -283,14 +293,14 @@
       display: flex;
       align-items: center;
     }
-    
+
     .card p i {
       margin-right: 10px;
       color: var(--accent-color);
       width: 20px;
       text-align: center;
     }
-    
+
     .price {
       font-size: 1.4em !important;
       font-weight: 600;
@@ -311,7 +321,7 @@
       font-family: 'Poppins', sans-serif;
       transition: all var(--transition-speed);
     }
-    
+
     .card input[type="number"]:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
@@ -333,13 +343,13 @@
       gap: 10px;
       font-family: 'Poppins', sans-serif;
     }
-    
+
     .noleggio-form button {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: var(--light-text);
       margin-bottom: 10px;
     }
-    
+
     .acquisto-form button {
       background: var(--accent-color);
       color: var(--light-text);
@@ -368,7 +378,7 @@
       align-items: center;
       gap: 10px;
     }
-    
+
     .notification:before {
       font-family: 'Font Awesome 5 Free';
       font-weight: 900;
@@ -377,17 +387,19 @@
     .notification {
       background: linear-gradient(135deg, var(--success-color), #08b389);
     }
-    
+
     .notification:before {
-      content: "\f058"; /* check icon */
+      content: "\f058";
+      /* check icon */
     }
 
     .notification.error {
       background: linear-gradient(135deg, var(--error-color), #d64161);
     }
-    
+
     .notification.error:before {
-      content: "\f057"; /* x icon */
+      content: "\f057";
+      /* x icon */
     }
 
     .notification.show {
@@ -403,8 +415,9 @@
       margin: 30px auto;
       position: relative;
     }
-    
-    .loader:before, .loader:after {
+
+    .loader:before,
+    .loader:after {
       content: '';
       position: absolute;
       top: 0;
@@ -415,21 +428,26 @@
       border: 5px solid transparent;
       border-top-color: var(--accent-color);
     }
-    
+
     .loader:before {
       z-index: 10;
       animation: spin 1s infinite;
     }
-    
+
     .loader:after {
       border: 5px solid rgba(58, 110, 165, 0.1);
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
-    
+
     /* Messaggio nessun risultato */
     #no-results {
       grid-column: 1 / -1;
@@ -441,9 +459,10 @@
       font-size: 1.2em;
       color: var(--text-secondary);
     }
-    
+
     #no-results:before {
-      content: "\f57a"; /* Sad face icon */
+      content: "\f57a";
+      /* Sad face icon */
       font-family: 'Font Awesome 5 Free';
       font-weight: 900;
       display: block;
@@ -457,39 +476,39 @@
       .navbar {
         padding: 12px 15px;
       }
-      
+
       .navbar .logo {
         font-size: 1.4em;
       }
-      
+
       .nav-links {
         gap: 10px;
       }
-      
+
       .nav-links li a {
         padding: 8px 12px;
       }
-      
+
       h1 {
         font-size: 2.2em;
       }
-      
+
       h2 {
         font-size: 1.8em;
       }
-      
+
       .filter-container {
         padding: 20px 15px;
       }
-      
+
       .filter-container form {
         flex-direction: column;
       }
-      
+
       .filter-container div {
         width: 100%;
       }
-      
+
       #products {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -498,6 +517,7 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <nav class="navbar">
@@ -545,101 +565,101 @@
     </section>
 
     <h2>Risultati:</h2>
-    
+
     <div id="loaderContainer" class="loader"></div>
 
     <!-- Sezione prodotti -->
     <section id="products">
       {{#if products.length}}
-        {{#each products}}
-          <div class="card">
-            <div class="card-content">
-              <h3>{{brand}} - {{category}}</h3>
-              <div class="details">
-                <p class="price"><i class="fas fa-tag"></i> {{price}}€</p>
-                <p><i class="fas fa-info-circle"></i> Condizione: {{condition}}</p>
-                <p><i class="fas fa-palette"></i> Colore: {{color}}</p>
-              </div>
-
-              <!-- Form per il noleggio -->
-              <form class="noleggio-form" action="/noleggio" method="post">
-                <input type="hidden" name="id" value="{{id}}">
-                <label for="durata-{{id}}">Durata (giorni):</label>
-                <input type="number" id="durata-{{id}}" name="durata" min="1" required>
-                <button type="submit"><i class="fas fa-calendar-alt"></i> Noleggia</button>
-              </form>
-
-              <!-- Form per l'acquisto -->
-              <form class="acquisto-form" action="/acquista" method="post">
-                <input type="hidden" name="id" value="{{id}}">
-                <button type="submit"><i class="fas fa-shopping-cart"></i> Acquista</button>
-              </form>
-            </div>
+      {{#each products}}
+      <div class="card">
+        <div class="card-content">
+          <h3>{{brand}} - {{category}}</h3>
+          <div class="details">
+            <p class="price"><i class="fas fa-tag"></i> {{price}}€</p>
+            <p><i class="fas fa-info-circle"></i> Condizione: {{condition}}</p>
+            <p><i class="fas fa-palette"></i> Colore: {{color}}</p>
           </div>
-        {{/each}}
+
+          <!-- Form per il noleggio -->
+          <form class="noleggio-form" action="/noleggio" method="post">
+            <input type="hidden" name="id" value="{{id}}">
+            <label for="durata-{{id}}">Durata (giorni):</label>
+            <input type="number" id="durata-{{id}}" name="durata" min="1" required>
+            <button type="submit"><i class="fas fa-calendar-alt"></i> Noleggia</button>
+          </form>
+
+          <!-- Form per l'acquisto -->
+          <form class="acquisto-form" action="/acquista" method="post">
+            <input type="hidden" name="id" value="{{id}}">
+            <button type="submit"><i class="fas fa-shopping-cart"></i> Acquista</button>
+          </form>
+        </div>
+      </div>
+      {{/each}}
       {{else}}
-        <p id="no-results">Nessun prodotto trovato con i filtri applicati.</p>
+      <p id="no-results">Nessun prodotto trovato con i filtri applicati.</p>
       {{/if}}
     </section>
   </main>
 
   <!-- Contenitore per le notifiche -->
   <div id="notification" class="notification"></div>
-  
+
   <!-- Script per AJAX -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Gestione form filtro
-      document.getElementById('filterForm').addEventListener('submit', function(e) {
+      document.getElementById('filterForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        
+
         const formData = new FormData(this);
         const params = new URLSearchParams();
-        
+
         // Aggiungi solo i campi non vuoti ai parametri
         for (const [key, value] of formData.entries()) {
           if (value.trim() !== '') {
             params.append(key, value);
           }
         }
-        
+
         fetchProducts('/noleggio?' + params.toString());
       });
-      
+
       // Gestione form "Mostra tutti"
-      document.getElementById('showAllForm').addEventListener('submit', function(e) {
+      document.getElementById('showAllForm').addEventListener('submit', function (e) {
         e.preventDefault();
         fetchProducts('/noleggio');
       });
-      
+
       // Gestione noleggio prodotti
       document.querySelectorAll('.noleggio-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
           e.preventDefault();
-          
+
           const formData = new FormData(this);
           submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
         });
       });
-      
+
       // Gestione acquisto prodotti
       document.querySelectorAll('.acquisto-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
           e.preventDefault();
-          
+
           const formData = new FormData(this);
           submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
         });
       });
-      
+
       // Funzione per caricare i prodotti
       function fetchProducts(url) {
         const productsContainer = document.getElementById('products');
         const loader = document.getElementById('loaderContainer');
-        
+
         // Mostra loader
         loader.style.display = 'block';
-        
+
         fetch(url)
           .then(response => {
             if (!response.ok) {
@@ -651,24 +671,24 @@
             // Crea un elemento temporaneo per estrarre la sezione prodotti dall'HTML
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
-            
+
             // Ottieni la sezione prodotti dalla risposta
             const newProducts = tempDiv.querySelector('#products');
-            
+
             if (newProducts) {
               productsContainer.innerHTML = newProducts.innerHTML;
-              
+
               // Riattacca gli event listener ai nuovi form
               productsContainer.querySelectorAll('.noleggio-form').forEach(form => {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                   e.preventDefault();
                   const formData = new FormData(this);
                   submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
                 });
               });
-              
+
               productsContainer.querySelectorAll('.acquisto-form').forEach(form => {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                   e.preventDefault();
                   const formData = new FormData(this);
                   submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
@@ -688,14 +708,14 @@
             loader.style.display = 'none';
           });
       }
-      
+
       // Funzione per inviare form di noleggio o acquisto
       function submitProductForm(url, formData, successMessage) {
         const loader = document.getElementById('loaderContainer');
-        
+
         // Mostra loader
         loader.style.display = 'block';
-        
+
         fetch(url, {
           method: 'POST',
           body: formData
@@ -704,11 +724,18 @@
             if (!response.ok) {
               throw new Error('Errore durante l\'operazione');
             }
-            return response.json();
+            // Check the content type to determine how to parse the response
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              return response.json();
+            } else {
+              // Handle HTML or other response types
+              return { success: true, reload: true };
+            }
           })
           .then(data => {
             showNotification(successMessage);
-            
+
             // Ricarica i prodotti se necessario
             if (data.reload) {
               fetchProducts('/noleggio');
@@ -723,14 +750,46 @@
             loader.style.display = 'none';
           });
       }
-      
+      const loader = document.getElementById('loaderContainer');
+
+      // Mostra loader
+      loader.style.display = 'block';
+
+      fetch(url, {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Errore durante l\'operazione');
+          }
+          return response.json();
+        })
+        .then(data => {
+          showNotification(successMessage);
+
+          // Ricarica i prodotti se necessario
+          if (data.reload) {
+            fetchProducts('/noleggio');
+          }
+        })
+        .catch(error => {
+          showNotification(error.message, true);
+          console.error('Errore:', error);
+        })
+        .finally(() => {
+          // Nascondi loader
+          loader.style.display = 'none';
+        });
+    }
+
       // Funzione per mostrare notifiche
       function showNotification(message, isError = false) {
         const notification = document.getElementById('notification');
         notification.textContent = message;
         notification.className = 'notification' + (isError ? ' error' : '');
         notification.classList.add('show');
-        
+
         setTimeout(() => {
           notification.classList.remove('show');
         }, 3000);
@@ -738,4 +797,5 @@
     });
   </script>
 </body>
+
 </html>

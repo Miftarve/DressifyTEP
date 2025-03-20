@@ -1,123 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Modifica Utente</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-
+<head>
+  <title>Modifica Utente</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #f72585;
+      --success: #4cc9f0;
+      --background: #f8f9fa;
+      --white: #ffffff;
+      --text: #212529;
+      --text-light: #6c757d;
+      --border: #dee2e6;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--background);
+      background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      padding: 32px;
+      max-width: 550px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+      color: var(--primary-dark);
+      margin-bottom: 24px;
+      text-align: center;
+      font-weight: 600;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: var(--secondary);
+      border-radius: 2px;
+    }
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .form-group {
+      position: relative;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      color: var(--text);
+      background-color: var(--white);
+    }
+    
+    input:focus, select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+      outline: none;
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%236c757d' d='M4.646 6.646a.5.5 0 01.708 0L8 9.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+    }
+    
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    
+    button {
+      padding: 12px 24px;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(67, 97, 238, 0.2);
+    }
+    
+    .cancel-btn {
+      background: transparent;
+      color: var(--text-light);
+      box-shadow: none;
+      border: 1px solid var(--border);
+    }
+    
+    .cancel-btn:hover {
+      background: #f1f3f5;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    p {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--text-light);
+    }
+    
+    p a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    p a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 600px) {
       .container {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        max-width: 500px;
-        width: 100%;
+        padding: 24px;
       }
-
+      
       h1 {
         font-size: 1.5rem;
-        color: #333;
-        margin-bottom: 20px;
-        text-align: center;
       }
-
-      form {
-        display: flex;
+      
+      .form-row {
         flex-direction: column;
+        gap: 20px;
+      }
+      
+      button {
+        width: 100%;
+      }
+      
+      .button-group {
+        flex-direction: column-reverse;
         gap: 15px;
       }
-
-      .form-row {
-        display: flex;
-        gap: 10px;
-      }
-
-      .form-row input {
-        flex: 1;
-      }
-
-      input, select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 1rem;
-        box-sizing: border-box;
-        transition: border-color 0.3s;
-      }
-
-      input:focus, select:focus {
-        border-color: #2980b9;
-        outline: none;
-      }
-
-      button {
-        padding: 10px 20px;
-        background-color: #2980b9;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      button:hover {
-        background-color: #3498db;
-      }
-
-      p {
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      p a {
-        color: #2980b9;
-        text-decoration: none;
-        transition: color 0.3s;
-      }
-
-      p a:hover {
-        color: #1a5276;
-      }
-
-      @media (max-width: 500px) {
-        h1 {
-          font-size: 1.2rem;
-        }
-
-        .form-row {
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
+    }
+  </style>
+</head>
 <body>
-    <div class="container">
-        <h1>Modifica Utente</h1>
-        <form action="/modificaUtente/{{user.id}}" method="post">
-            <input type="text" name="nome" value="{{user.nome}}" placeholder="Nome" required>
-            <input type="text" name="cognome" value="{{user.cognome}}" placeholder="Cognome" required>
-            <input type="date" name="dataNascita" value="{{user.dataNascita}}" required>
-            <input type="text" name="luogoNascita" value="{{user.luogoNascita}}" placeholder="Luogo di Nascita" required>
-            <select name="ruolo" required>
-                <option value="admin" {{#if (eq user.ruolo "admin")}}selected{{/if}}>Admin</option>
-                <option value="user" {{#if (eq user.ruolo "user")}}selected{{/if}}>Utente</option>
-            </select>
-            <input type="email" name="email" value="{{user.email}}" placeholder="Email" required>
-            <button type="submit">Salva</button>
-        </form>
-    </div>
+  <div class="container">
+    <h1>Modifica Utente</h1>
+    <form action="/modificaUtente/{{user.id}}" method="post">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" value="{{user.nome}}" placeholder="Inserisci il nome" required>
+        </div>
+        <div class="form-group">
+          <label for="cognome">Cognome</label>
+          <input type="text" id="cognome" name="cognome" value="{{user.cognome}}" placeholder="Inserisci il cognome" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dataNascita">Data di Nascita</label>
+          <input type="date" id="dataNascita" name="dataNascita" value="{{user.dataNascita}}" required>
+        </div>
+        <div class="form-group">
+          <label for="luogoNascita">Luogo di Nascita</label>
+          <input type="text" id="luogoNascita" name="luogoNascita" value="{{user.luogoNascita}}" placeholder="Inserisci il luogo di nascita" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{user.email}}" placeholder="Inserisci l'email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="ruolo">Ruolo</label>
+        <select id="ruolo" name="ruolo" required>
+          <option value="admin" {{#if (eq user.ruolo "admin")}}selected{{/if}}>Amministratore</option>
+          <option value="user" {{#if (eq user.ruolo "user")}}selected{{/if}}>Utente</option>
+        </select>
+      </div>
+      
+      <div class="button-group">
+        <button type="button" class="cancel-btn" onclick="history.back()">Annulla</button>
+        <button type="submit">Salva Modifiche</button>
+      </div>
+    </form>
+  </div>
 </body>
 </html>
