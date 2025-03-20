@@ -103,7 +103,7 @@ npm install
 
 ### 3. Configura le chiavi OAuth
 
-**IMPORTANTE: È necessario configurare le chiavi clientID e clientSecret nel file server.**
+**IMPORTANTE: È necessario configurare le chiavi clientID e clientSecret nel file server.js**
 
 ```javascript
 const config = {
