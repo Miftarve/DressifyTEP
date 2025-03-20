@@ -86,24 +86,48 @@ Con DressifyTEP, puoi facilmente trovare nuove combinazioni e idee per i tuoi ou
 - **Scalabilità**: La piattaforma deve supportare un numero crescente di utenti e prodotti.
 - **Usabilità**: Design intuitivo e facile da usare per tutti.
 
-## 📥 Installazione
+## 📥 Installazione e Configurazione
+
+### 1. Clona il repository
 
 ```bash
-# Scarica il progetto
 git clone https://github.com/Miftarve/DressifyTEP.git
-
-# Vai nella cartella
 cd DressifyTEP
+```
 
-# Installa le componenti necessarie
+### 2. Installa le dipendenze
+
+```bash
 npm install
+```
 
-# Configura le impostazioni
-cp .env.example .env
-# Modifica le tue impostazioni nel file .env
+### 3. Configura le chiavi OAuth
 
-# Avvia l'app
-npm start
+**IMPORTANTE: È necessario configurare le chiavi clientID e clientSecret nel file server.**
+
+```javascript
+const config = {
+  clientID: 'IL_TUO_CLIENT_ID_QUI',
+  clientSecret: 'IL_TUO_CLIENT_SECRET_QUI'
+};
+```
+
+### 4. Avvia il progetto
+
+Per avviare il progetto principale:
+```bash
+node server.js
+```
+
+Per avviare la pagina di chat:
+```bash
+node chat.js
+```
+
+### 6. Verifica l'installazione
+
+```
+http://localhost:3000
 ```
 
 # Diagramma dei casi d'uso per Dressify
