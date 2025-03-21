@@ -1041,7 +1041,22 @@
       });
 
       // Funzioni per il carrello
+      // Funzione modificata per il controllo di un solo prodotto in noleggio
       function addToCart(item) {
+        // Verifica se l'articolo è di tipo "noleggio" e se esiste già nel carrello
+        if (item.type === 'rental') {
+          // Controlla se esiste già lo stesso prodotto in noleggio nel carrello
+          const existingRentalItem = cart.find(cartItem =>
+            cartItem.type === 'rental' && cartItem.id === item.id
+          );
+
+          if (existingRentalItem) {
+            showNotification('Questo prodotto è già nel tuo carrello a noleggio!', true);
+            return; // Interrompe la funzione senza aggiungere l'articolo
+          }
+        }
+
+        // Se il controllo passa o è un prodotto in acquisto, prosegui con l'aggiunta
         // Genera un ID univoco per l'elemento del carrello
         item.cartId = Date.now() + Math.random().toString(36).substring(2, 9);
         cart.push(item);
@@ -1444,6 +1459,7 @@
         }, 3000);
       }
     });
+
   </script>
 </body>
 

@@ -9,9 +9,25 @@ class DBMock {
         this.products = [
             { id: 1, category: 'Maglietta', size: 'S', color: 'Nera', brand: 'Nike', condition: 'Nuovo', price: 15 },
             { id: 2, category: 'Pantaloni', size: 'M', color: 'Blu', brand: 'Adidas', condition: 'Usato', price: 20 },
-            { id: 3, category: 'Giacca', size: 'L', color: 'Verde', brand: 'Puma', condition: 'Nuovo', price: 150 }
-        ];  // Aggiungi alcuni prodotti di esempio
-
+            { id: 3, category: 'Giacca', size: 'L', color: 'Verde', brand: 'Puma', condition: 'Nuovo', price: 150 },
+            { id: 4, category: 'Camicia', size: 'M', color: 'Bianca', brand: 'Ralph Lauren', condition: 'Nuovo', price: 85 },
+            { id: 5, category: 'Felpa', size: 'XL', color: 'Grigia', brand: 'Nike', condition: 'Usato', price: 35 },
+            { id: 6, category: 'Jeans', size: 'S', color: 'Nero', brand: 'Levi\'s', condition: 'Nuovo', price: 70 },
+            { id: 7, category: 'Abito', size: 'L', color: 'Blu scuro', brand: 'Armani', condition: 'Usato', price: 190 },
+            { id: 8, category: 'Cappotto', size: 'M', color: 'Cammello', brand: 'Burberry', condition: 'Nuovo', price: 220 },
+            { id: 9, category: 'Maglione', size: 'S', color: 'Rosso', brand: 'Tommy Hilfiger', condition: 'Usato', price: 45 },
+            { id: 10, category: 'Scarpe', size: '42', color: 'Marrone', brand: 'Nike', condition: 'Nuovo', price: 120 },
+            { id: 11, category: 'Bermuda', size: 'M', color: 'Beige', brand: 'Adidas', condition: 'Nuovo', price: 55 },
+            { id: 12, category: 'Polo', size: 'L', color: 'Azzurra', brand: 'Fred Perry', condition: 'Usato', price: 40 },
+            { id: 13, category: 'Giacca di pelle', size: 'XL', color: 'Nera', brand: 'Diesel', condition: 'Nuovo', price: 175 },
+            { id: 14, category: 'Cardigan', size: 'M', color: 'Verde scuro', brand: 'Nike', condition: 'Usato', price: 30 },
+            { id: 15, category: 'Gilet', size: 'S', color: 'Blu navy', brand: 'North Face', condition: 'Nuovo', price: 65 },
+            { id: 16, category: 'T-shirt', size: 'M', color: 'Giallo', brand: 'Adidas', condition: 'Nuovo', price: 25 },
+            { id: 17, category: 'Giacca sportiva', size: 'L', color: 'Rosso', brand: 'Puma', condition: 'Usato', price: 80 },
+            { id: 18, category: 'Pantaloni eleganti', size: 'M', color: 'Grigio', brand: 'Armani', condition: 'Nuovo', price: 110 },
+            { id: 19, category: 'Felpa con cappuccio', size: 'S', color: 'Nero', brand: 'Nike', condition: 'Nuovo', price: 60 },
+            { id: 20, category: 'Scarpe da ginnastica', size: '39', color: 'Bianco', brand: 'Adidas', condition: 'Usato', price: 45 }
+        ];
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
         this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
     }
@@ -21,7 +37,7 @@ class DBMock {
         if (!product) return null;
         return product.dailyRentalPrice * days;
     }
-    
+
     // Ottieni tutti gli utenti
     getAllUsers() {
         return this.users.map(user => ({ ...user, password: undefined })); // Escludi la password
@@ -33,7 +49,7 @@ class DBMock {
         console.log('Tutti i prodotti:', this.products); // Debug per controllare i dati
         return this.products;
     }
-    
+
 
     // Aggiungi un nuovo prodotto
     createProduct(product) {
@@ -68,7 +84,7 @@ class DBMock {
         this.products[productIndex] = { ...this.products[productIndex], ...updatedData };
         return this.products[productIndex];
     }
-    
+
 
     // Elimina un prodotto
     deleteProduct(id) {
