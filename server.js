@@ -44,6 +44,16 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(session({
+    secret: 'ssshhhhh',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        secure: false, // Set to true if using HTTPS
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week in milliseconds
+    }
+}));
+
 
 // Swagger Configuration
 const swaggerOptions = {
@@ -70,10 +80,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Serializzazione e deserializzazione utente
 passport.serializeUser((user, done) => {
-    done(null, user);
+    // Store only the essential identifier in the session
+    done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
+passport.deserializeUser((id, done) => {
+    // Retrieve the full user object when needed
+    const user = db.getUserById(id);
+    if (!user) {
+        return done(new Error('User not found'), null);
+    }
     done(null, user);
 });
 
@@ -85,6 +101,7 @@ function findUserByEmail(email) {
 
 // ===== GOOGLE AUTHENTICATION STRATEGY =====
 passport.use(new GoogleStrategy({
+
     callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     try {
@@ -121,7 +138,7 @@ passport.use(new GoogleStrategy({
 
 // ===== FACEBOOK AUTHENTICATION STRATEGY =====
 passport.use(new FacebookStrategy({
-
+    
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'photos', 'email', 'name']
 }, (accessToken, refreshToken, profile, done) => {
@@ -175,10 +192,23 @@ app.get('/auth/google/callback',
         failureRedirect: '/login'
     }),
     (req, res) => {
-        // Salva le informazioni dell'utente nella sessione
-        req.session.loggedin = true;
-        req.session.user = req.user;
-        res.redirect('/home');
+        // Make sure the user is properly saved in the session
+        if (req.user) {
+            // This sets up the session completely via passport
+            req.session.loggedin = true;
+            req.session.user = req.user;
+            req.session.role = req.user.ruolo;
+            
+            // Force session save to ensure persistence
+            req.session.save(err => {
+                if (err) {
+                    console.error('Session save error:', err);
+                }
+                res.redirect('/home');
+            });
+        } else {
+            res.redirect('/login');
+        }
     }
 );
 
@@ -192,10 +222,21 @@ app.get('/auth/facebook/callback',
         failureRedirect: '/login'
     }),
     (req, res) => {
-        // Salva le informazioni dell'utente nella sessione
-        req.session.loggedin = true;
-        req.session.user = req.user;
-        res.redirect('/home');
+        if (req.user) {
+            req.session.loggedin = true;
+            req.session.user = req.user;
+            req.session.role = req.user.ruolo;
+            
+            // Force session save to ensure persistence
+            req.session.save(err => {
+                if (err) {
+                    console.error('Session save error:', err);
+                }
+                res.redirect('/home');
+            });
+        } else {
+            res.redirect('/login');
+        }
     }
 );
 
@@ -229,10 +270,25 @@ app.post('/api/delete-user-data', async (req, res) => {
 
 // Middleware per verificare l'autenticazione
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated() || req.session.loggedin) {
+    // First check Passport's authentication
+    if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/login');
+    
+    // Then check our manual session flag as backup
+    if (req.session && req.session.loggedin && req.session.user) {
+        // If we have session data but Passport doesn't recognize it,
+        // restore the Passport session
+        req.login(req.session.user, err => {
+            if (err) {
+                console.error('Session restoration error:', err);
+                return res.redirect('/login');
+            }
+            return next();
+        });
+    } else {
+        res.redirect('/login');
+    }
 }
 
 
@@ -326,8 +382,10 @@ app.post('/login', (req, res) => {
             if (err) {
                 return res.render('error', { message: 'Errore durante il login!' });
             }
+            // Standardize session data structure across all login methods
             req.session.loggedin = true;
             req.session.user = user;
+            req.session.role = user.ruolo; // Ensure role is saved in session
             res.redirect('/home');
         });
     } else {
@@ -371,23 +429,29 @@ app.get('/logout', (req, res) => {
  *         description: Redirects to login if not authenticated
  */
 app.get('/home', ensureAuthenticated, (req, res) => {
+    // Get user from session or passport
     const user = req.user || req.session.user;
+    
+    // Additional safety check
     if (!user) {
         return res.redirect('/login');
     }
     
-    if (user.ruolo === 'admin') {
-        const users = db.getAllUsers(); // Recupera gli utenti dal DBMock
+    // Use req.session.role if available, otherwise get from user object
+    const userRole = req.session.role || user.ruolo;
+    
+    if (userRole === 'admin') {
+        const users = db.getAllUsers();
         res.render('admin/home', {
             name: user.nome,
-            role: user.ruolo,
+            role: userRole,
             message: req.session.message,
             users: users
         });
     } else {
         res.render('home', {
             name: user.nome,
-            role: user.ruolo,
+            role: userRole,
             message: `Benvenuto, ${user.nome}!`
         });
     }
