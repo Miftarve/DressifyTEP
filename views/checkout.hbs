@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout - Completa il tuo ordine</title>
+  <!-- Importa Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Importa Font Awesome per le icone -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- jQuery è richiesto per le operazioni AJAX -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* Variabili CSS per la palette professionale */
+    :root {
+      --primary-color: #3a6ea5;
+      --secondary-color: #004e98;
+      --accent-color: #ff6b6b;
+      --light-bg: #f7f9fc;
+      --dark-bg: #293241;
+      --light-text: #ffffff;
+      --dark-text: #293241;
+      --light-gray: #e6e9ef;
+      --medium-gray: #d1d5db;
+      --text-secondary: #5d7285;
+      --success-color: #06d6a0;
+      --error-color: #ef476f;
+      --transition-speed: 0.3s;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Reset globale */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--dark-text);
+      line-height: 1.6;
+      padding-top: 70px;
+    }
+
+    /* Header e Navbar */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(135deg, var(--dark-bg), var(--secondary-color));
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .navbar {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar .logo {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: var(--light-text);
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar .logo:before {
+      content: "\f115";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      margin-right: 10px;
+      color: var(--accent-color);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+    }
+
+    .nav-links li a {
+      color: var(--light-text);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 25px;
+      transition: all var(--transition-speed);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links li a:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .nav-links li a i {
+      font-size: 1.1em;
+    }
+
+    /* Stili per il carrello */
+    .cart-icon {
+      position: relative;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+      font-weight: 700;
+    }
+
+    /* Main content */
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      color: var(--primary-color);
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    h1:after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 4px;
+      background: var(--accent-color);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    /* Stili per checkout */
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkout-items, .checkout-summary {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+    }
+
+    .checkout-items h2, .checkout-summary h2 {
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .checkout-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .checkout-item-details {
+      flex: 1;
+    }
+
+    .checkout-item-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: 1.1em;
+    }
+
+    .checkout-item-info {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin: 5px 0;
+    }
+
+    .checkout-item-price {
+      font-weight: 600;
+      color: var(--secondary-color);
+      font-size: 1.1em;
+      margin-left: 15px;
+    }
+
+    .checkout-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 1em;
+      color: var(--text-secondary);
+    }
+
+    .checkout-summary-total {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: var(--dark-text);
+      padding-top: 15px;
+      margin-top: 15px;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .checkout-form {
+      margin-top: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: 'Poppins', sans-serif;
+      transition: all var(--transition-speed);
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
+      outline: none;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .checkout-btn:disabled {
+      background: var(--medium-gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Stili per notifiche */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification:before {
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+    }
+
+    .notification {
+      background: linear-gradient(135deg, var(--success-color), #08b389);
+    }
+
+    .notification:before {
+      content: "\f058";
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--error-color), #d64161);
+    }
+
+    .notification.error:before {
+      content: "\f057";
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Empty cart */
+    .empty-cart {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .empty-cart i {
+      font-size: 4em;
+      color: var(--medium-gray);
+      margin-bottom: 20px;
+    }
+
+    .empty-cart p {
+      font-size: 1.2em;
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+    }
+
+    .continue-shopping-btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all var(--transition-speed);
+    }
+
+    .continue-shopping-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">Noleggio & Vendita</div>
+      <ul class="nav-links">
+        <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="/noleggio"><i class="fas fa-tag"></i> Catalogo</a></li>
+        <li>
+          <a href="#" id="cart-button">
+            <div class="cart-icon">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-count">0</span>
+            </div>
+            Carrello
+          </a>
+        </li>
+        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Completa il tuo ordine</h1>
+
+    <div id="checkout-content">
+      <!-- Il contenuto verrà caricato dinamicamente -->
+    </div>
+  </main>
+
+  <!-- Contenitore per le notifiche -->
+  <div id="notification" class="notification"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Recupera il carrello dal localStorage
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      updateCartCount();
+
+      // Aggiorna il contatore del carrello
+      function updateCartCount() {
+        document.querySelector('.cart-count').textContent = cart.length;
+      }
+
+      // Mostra il contenuto del checkout
+      displayCheckoutContent();
+
+      function displayCheckoutContent() {
+        const checkoutContainer = document.getElementById('checkout-content');
+        
+        if (cart.length === 0) {
+          // Carrello vuoto
+          checkoutContainer.innerHTML = `
+            <div class="empty-cart">
+              <i class="fas fa-shopping-cart"></i>
+              <p>Il tuo carrello è vuoto</p>
+              <a href="/noleggio" class="continue-shopping-btn">
+                <i class="fas fa-arrow-left"></i> Torna al catalogo
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        // Calcola i totali
+        let subtotal = 0;
+        const itemsHTML = cart.map(item => {
+          const itemPrice = item.type === 'rental' 
+            ? parseFloat(item.price) * parseInt(item.duration)
+            : parseFloat(item.price);
+          
+          subtotal += itemPrice;
+          
+          return `
+            <div class="checkout-item">
+              <div class="checkout-item-details">
+                <div class="checkout-item-title">
+                  ${item.brand} - ${item.category}
+                  <span class="item-type-badge ${item.type === 'rental' ? 'rental' : 'purchase'}">
+                    ${item.type === 'rental' ? 'Noleggio' : 'Acquisto'}
+                  </span>
+                </div>
+                <div class="checkout-item-info">
+                  Colore: ${item.color} • Condizione: ${item.condition}
+                </div>
+                ${item.type === 'rental' ? `
+                  <div class="checkout-item-info">
+                    Dal ${item.startDate} al ${item.endDate} (${item.duration} ${parseInt(item.duration) === 1 ? 'giorno' : 'giorni'})
+                  </div>
+                ` : ''}
+              </div>
+              <div class="checkout-item-price">${itemPrice.toFixed(2)}€</div>
+            </div>
+          `;
+        }).join('');
+
+        const tax = subtotal * 0.22;
+        const total = subtotal + tax;
+
+        checkoutContainer.innerHTML = `
+          <div class="checkout-grid">
+            <div class="checkout-items">
+              <h2>I tuoi articoli</h2>
+              ${itemsHTML}
+            </div>
+            <div class="checkout-summary">
+              <h2>Riepilogo ordine</h2>
+              <div class="checkout-summary-row">
+                <span>Subtotale</span>
+                <span>${subtotal.toFixed(2)}€</span>
+              </div>
+              <div class="checkout-summary-row">
+                <span>IVA (22%)</span>
+                <span>${tax.toFixed(2)}€</span>
+              </div>
+              <div class="checkout-summary-row checkout-summary-total">
+                <span>Totale</span>
+                <span>${total.toFixed(2)}€</span>
+              </div>
+
+              <form class="checkout-form" id="checkout-form">
+                <div class="form-group">
+                  <label for="name">Nome e cognome</label>
+                  <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="address">Indirizzo di spedizione</label>
+                  <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                  <label for="payment">Metodo di pagamento</label>
+                  <select id="payment" required>
+                    <option value="">Seleziona un metodo</option>
+                    <option value="credit_card">Carta di credito</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="transfer">Bonifico bancario</option>
+                  </select>
+                </div>
+                <button type="submit" class="checkout-btn" id="submit-order">
+                  <i class="fas fa-check-circle"></i> Completa l'ordine
+                </button>
+              </form>
+            </div>
+          </div>
+        `;
+
+        // Gestisci l'invio del form di checkout
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Disabilita il pulsante per evitare click multipli
+          const submitButton = document.getElementById('submit-order');
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Elaborazione in corso...';
+          
+          // Invia l'ordine al server
+          fetch('/api/checkout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cartItems: cart,
+              customerInfo: {
+                name: document.getElementById('name').value,
+                address: document.getElementById('address').value,
+                paymentMethod: document.getElementById('payment').value
+              }
+            })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Errore durante il checkout');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              // Svuota il carrello
+              localStorage.setItem('cart', JSON.stringify([]));
+              
+              // Mostra un messaggio di successo
+              showNotification('Ordine completato con successo! Grazie per il tuo acquisto.');
+              
+              // Reindirizza alla home dopo un breve ritardo
+              setTimeout(() => {
+                window.location.href = '/home';
+              }, 2000);
+            } else {
+              throw new Error(data.message || 'Si è verificato un errore');
+            }
+          })
+          .catch(error => {
+            // Riabilita il pulsante in caso di errore
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Completa l\'ordine';
+            
+            // Mostra un messaggio di errore
+            showNotification(error.message || 'Si è verificato un errore durante il checkout', true);
+          });
+        });
+      }
+
+      // Funzione per mostrare notifiche
+      function showNotification(message, isError = false) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = 'notification' + (isError ? ' error' : '');
+        notification.classList.add('show');
+
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+
+</html>

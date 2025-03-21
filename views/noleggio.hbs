@@ -9,6 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Importa Font Awesome per le icone -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- DateRangePicker CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <!-- jQuery è richiesto per DateRangePicker -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Moment.js è richiesto per manipolazione date -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <!-- DateRangePicker JS -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
   <style>
     /* Variabili CSS per la palette professionale */
     :root {
@@ -113,6 +121,27 @@
 
     .nav-links li a i {
       font-size: 1.1em;
+    }
+
+    /* Stile per l'icona del carrello */
+    .cart-icon {
+      position: relative;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+      font-weight: 700;
     }
 
     /* Titoli */
@@ -471,6 +500,267 @@
       margin-bottom: 15px;
     }
 
+    /* Date Range Picker Stili Personalizzati */
+    .daterangepicker {
+      font-family: 'Poppins', sans-serif;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .daterangepicker .calendar-table {
+      border-radius: 6px;
+    }
+
+    .daterangepicker td.active,
+    .daterangepicker td.active:hover {
+      background-color: var(--primary-color);
+    }
+
+    .daterangepicker .drp-buttons .btn {
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .daterangepicker .drp-selected {
+      font-size: 0.9em;
+    }
+
+    .date-range-container {
+      width: 100%;
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .date-range-container .date-range-input {
+      width: 100%;
+      padding: 12px 15px;
+      padding-right: 40px;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: 'Poppins', sans-serif;
+      transition: all var(--transition-speed);
+      cursor: pointer;
+    }
+
+    .date-range-container .date-range-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(58, 110, 165, 0.2);
+      outline: none;
+    }
+
+    .date-range-container:after {
+      content: "\f073";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-color);
+      pointer-events: none;
+    }
+
+    .days-count {
+      font-size: 0.9em;
+      margin: 5px 0 10px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Stili per il Carrello */
+    #cart-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1100;
+      overflow-y: auto;
+    }
+
+    .cart-container {
+      background-color: var(--light-bg);
+      width: 90%;
+      max-width: 900px;
+      margin: 70px auto;
+      border-radius: 12px;
+      box-shadow: var(--hover-shadow);
+      padding: 30px;
+      position: relative;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light-gray);
+    }
+
+    .cart-title {
+      font-size: 1.8em;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .cart-close {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cart-close:hover {
+      color: var(--error-color);
+      transform: scale(1.1);
+    }
+
+    .cart-items {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 10px;
+      border-bottom: 1px solid var(--light-gray);
+      background-color: var(--light-text);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .cart-item-details {
+      flex: 1;
+      padding-right: 15px;
+    }
+
+    .cart-item-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .cart-item-info {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .cart-item-period {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    .cart-item-price {
+      font-weight: 600;
+      color: var(--secondary-color);
+      font-size: 1.1em;
+    }
+
+    .cart-item-remove {
+      background: none;
+      border: none;
+      color: var(--error-color);
+      cursor: pointer;
+      font-size: 1.1em;
+      padding: 5px;
+      transition: all 0.2s;
+    }
+
+    .cart-item-remove:hover {
+      transform: scale(1.1);
+    }
+
+    .cart-empty {
+      text-align: center;
+      padding: 30px;
+      font-size: 1.1em;
+      color: var(--text-secondary);
+    }
+
+    .cart-empty i {
+      display: block;
+      font-size: 3em;
+      color: var(--light-gray);
+      margin-bottom: 15px;
+    }
+
+    .cart-summary {
+      background-color: var(--light-text);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .cart-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 1em;
+      color: var(--text-secondary);
+    }
+
+    .cart-summary-total {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: var(--dark-text);
+      padding-top: 10px;
+      margin-top: 10px;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .cart-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .cart-continue-shopping,
+    .cart-checkout {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .cart-continue-shopping {
+      background-color: var(--light-text);
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .cart-continue-shopping:hover {
+      background-color: rgba(58, 110, 165, 0.1);
+    }
+
+    .cart-checkout {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: var(--light-text);
+    }
+
+    .cart-checkout:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
     /* Responsive design */
     @media (max-width: 768px) {
       .navbar {
@@ -514,6 +804,55 @@
         gap: 20px;
         padding: 0 10px;
       }
+
+      .cart-container {
+        width: 95%;
+        padding: 20px 15px;
+        margin: 50px auto;
+      }
+
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cart-item-details {
+        width: 100%;
+        padding-right: 0;
+        margin-bottom: 10px;
+      }
+
+      .cart-item-actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .cart-actions {
+        flex-direction: column;
+      }
+    }
+
+    /* Mini badge per indicare che è un prodotto da noleggio o acquisto */
+    .cart-item-type {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.7em;
+      font-weight: 600;
+      margin-left: 10px;
+      text-transform: uppercase;
+    }
+
+    .cart-item-type.rental {
+      background-color: rgba(58, 110, 165, 0.2);
+      color: var(--primary-color);
+    }
+
+    .cart-item-type.purchase {
+      background-color: rgba(255, 107, 107, 0.2);
+      color: var(--accent-color);
     }
   </style>
 </head>
@@ -525,6 +864,15 @@
       <ul class="nav-links">
         <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
         <li><a href="/static/index.html"><i class="fas fa-comments"></i> Chat</a></li>
+        <li>
+          <a href="#" id="cart-button">
+            <div class="cart-icon">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-count">0</span>
+            </div>
+            Carrello
+          </a>
+        </li>
         <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
       </ul>
     </nav>
@@ -581,18 +929,35 @@
             <p><i class="fas fa-palette"></i> Colore: {{color}}</p>
           </div>
 
-          <!-- Form per il noleggio -->
-          <form class="noleggio-form" action="/noleggio" method="post">
+          <!-- Form per il noleggio con date range picker -->
+          <form class="noleggio-form" action="javascript:void(0);">
             <input type="hidden" name="id" value="{{id}}">
-            <label for="durata-{{id}}">Durata (giorni):</label>
-            <input type="number" id="durata-{{id}}" name="durata" min="1" required>
-            <button type="submit"><i class="fas fa-calendar-alt"></i> Noleggia</button>
+            <input type="hidden" name="brand" value="{{brand}}">
+            <input type="hidden" name="category" value="{{category}}">
+            <input type="hidden" name="price" value="{{price}}">
+            <input type="hidden" name="color" value="{{color}}">
+            <input type="hidden" name="condition" value="{{condition}}">
+            <label for="daterange-{{id}}">Seleziona Periodo:</label>
+            <div class="date-range-container">
+              <input type="text" id="daterange-{{id}}" class="date-range-input" name="daterange" readonly required>
+              <input type="hidden" id="durata-{{id}}" name="durata" value="1">
+              <input type="hidden" name="startDate" id="startDate-{{id}}">
+              <input type="hidden" name="endDate" id="endDate-{{id}}">
+            </div>
+            <p class="days-count" id="days-count-{{id}}">Durata: 1 giorno</p>
+            <button type="submit" class="add-to-cart-rental"><i class="fas fa-cart-plus"></i> Aggiungi al
+              carrello</button>
           </form>
 
           <!-- Form per l'acquisto -->
-          <form class="acquisto-form" action="/acquista" method="post">
+          <form class="acquisto-form" action="javascript:void(0);">
             <input type="hidden" name="id" value="{{id}}">
-            <button type="submit"><i class="fas fa-shopping-cart"></i> Acquista</button>
+            <input type="hidden" name="brand" value="{{brand}}">
+            <input type="hidden" name="category" value="{{category}}">
+            <input type="hidden" name="price" value="{{price}}">
+            <input type="hidden" name="color" value="{{color}}">
+            <input type="hidden" name="condition" value="{{condition}}">
+            <button type="submit" class="add-to-cart-purchase"><i class="fas fa-shopping-cart"></i> Acquista</button>
           </form>
         </div>
       </div>
@@ -603,12 +968,256 @@
     </section>
   </main>
 
+  <!-- Modale Carrello -->
+  <div id="cart-modal">
+    <div class="cart-container">
+      <div class="cart-header">
+        <h2 class="cart-title"><i class="fas fa-shopping-cart"></i> Il tuo carrello</h2>
+        <button class="cart-close"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="cart-items">
+        <!-- Gli elementi del carrello verranno inseriti qui dinamicamente -->
+      </div>
+
+      <div class="cart-summary">
+        <div class="cart-summary-row">
+          <span>Subtotale</span>
+          <span id="cart-subtotal">0.00€</span>
+        </div>
+        <div class="cart-summary-row">
+          <span>IVA (22%)</span>
+          <span id="cart-tax">0.00€</span>
+        </div>
+        <div class="cart-summary-row cart-summary-total">
+          <span>Totale</span>
+          <span id="cart-total">0.00€</span>
+        </div>
+      </div>
+
+      <div class="cart-actions">
+        <button class="cart-continue-shopping">
+          <i class="fas fa-arrow-left"></i> Continua lo shopping
+        </button>
+        <button class="cart-checkout">
+          <i class="fas fa-check"></i> Procedi al checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Contenitore per le notifiche -->
   <div id="notification" class="notification"></div>
 
-  <!-- Script per AJAX -->
+  <!-- Script per AJAX, DateRangePicker e Carrello -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Inizializza il carrello dal localStorage
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      updateCartCount();
+
+      // Gestione del carrello
+      document.getElementById('cart-button').addEventListener('click', function (e) {
+        e.preventDefault();
+        openCart();
+      });
+
+      document.querySelector('.cart-close').addEventListener('click', function () {
+        closeCart();
+      });
+
+      document.querySelector('.cart-continue-shopping').addEventListener('click', function () {
+        closeCart();
+      });
+
+      document.querySelector('.cart-checkout').addEventListener('click', function () {
+        if (cart.length === 0) {
+          showNotification('Il carrello è vuoto!', true);
+          return;
+        }
+
+        // Redirect alla pagina di checkout
+        window.location.href = '/checkout';
+      });
+
+      // Funzioni per il carrello
+      function addToCart(item) {
+        // Genera un ID univoco per l'elemento del carrello
+        item.cartId = Date.now() + Math.random().toString(36).substring(2, 9);
+        cart.push(item);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification(item.type === 'rental' ? 'Noleggio aggiunto al carrello!' : 'Prodotto aggiunto al carrello!');
+      }
+
+      function removeFromCart(cartId) {
+        cart = cart.filter(item => item.cartId !== cartId);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartUI();
+        updateCartCount();
+      }
+
+      function updateCartCount() {
+        document.querySelector('.cart-count').textContent = cart.length;
+      }
+
+      function openCart() {
+        updateCartUI();
+        document.getElementById('cart-modal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Disabilita lo scroll della pagina
+      }
+
+      function closeCart() {
+        document.getElementById('cart-modal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Riabilita lo scroll della pagina
+      }
+
+      function updateCartUI() {
+        const cartItemsContainer = document.querySelector('.cart-items');
+        cartItemsContainer.innerHTML = '';
+
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = `
+            <div class="cart-empty">
+              <i class="fas fa-shopping-cart"></i>
+              Il tuo carrello è vuoto
+            </div>
+          `;
+          updateCartTotals(0);
+          return;
+        }
+
+        let subtotal = 0;
+
+        cart.forEach(item => {
+          const itemPrice = item.type === 'rental'
+            ? parseFloat(item.price) * parseInt(item.duration)
+            : parseFloat(item.price);
+
+          subtotal += itemPrice;
+
+          const cartItemHTML = `
+            <div class="cart-item">
+              <div class="cart-item-details">
+                <div class="cart-item-title">
+                  ${item.brand} - ${item.category}
+                  <span class="cart-item-type ${item.type === 'rental' ? 'rental' : 'purchase'}">
+                    ${item.type === 'rental' ? 'Noleggio' : 'Acquisto'}
+                  </span>
+                </div>
+                <div class="cart-item-info">
+                  <span>Colore: ${item.color}</span> • 
+                  <span>Condizione: ${item.condition}</span>
+                </div>
+                ${item.type === 'rental' ? `
+                  <div class="cart-item-period">
+                    Dal ${item.startDate} al ${item.endDate} (${item.duration} ${parseInt(item.duration) === 1 ? 'giorno' : 'giorni'})
+                  </div>
+                ` : ''}
+              </div>
+              <div class="cart-item-actions">
+                <div class="cart-item-price">${itemPrice.toFixed(2)}€</div>
+                <button class="cart-item-remove" data-cart-id="${item.cartId}">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          `;
+
+          cartItemsContainer.innerHTML += cartItemHTML;
+        });
+
+        // Aggiorna i totali
+        updateCartTotals(subtotal);
+
+        // Aggiungi event listener ai pulsanti di rimozione
+        document.querySelectorAll('.cart-item-remove').forEach(button => {
+          button.addEventListener('click', function () {
+            const cartId = this.getAttribute('data-cart-id');
+            removeFromCart(cartId);
+          });
+        });
+      }
+
+      function updateCartTotals(subtotal) {
+        const tax = subtotal * 0.22;
+        const total = subtotal + tax;
+
+        document.getElementById('cart-subtotal').textContent = subtotal.toFixed(2) + '€';
+        document.getElementById('cart-tax').textContent = tax.toFixed(2) + '€';
+        document.getElementById('cart-total').textContent = total.toFixed(2) + '€';
+      }
+
+      // Inizializza i date range picker per tutti i prodotti
+      document.querySelectorAll('.date-range-input').forEach(input => {
+        const productId = input.id.split('-')[1];
+        const durataInput = document.getElementById('durata-' + productId);
+        const daysCountElement = document.getElementById('days-count-' + productId);
+        const startDateInput = document.getElementById('startDate-' + productId);
+        const endDateInput = document.getElementById('endDate-' + productId);
+
+        // Imposta la data di oggi come minima selezionabile
+        const today = new Date();
+
+        // Ottenere domani come data predefinita di fine
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Imposta i valori iniziali degli input nascosti per le date
+        startDateInput.value = formatDate(today);
+        endDateInput.value = formatDate(tomorrow);
+
+        $(input).daterangepicker({
+          opens: 'center',
+          minDate: today,
+          startDate: today,
+          endDate: tomorrow,
+          locale: {
+            format: 'DD/MM/YYYY',
+            separator: ' - ',
+            applyLabel: 'Applica',
+            cancelLabel: 'Annulla',
+            fromLabel: 'Da',
+            toLabel: 'A',
+            weekLabel: 'W',
+            customRangeLabel: 'Intervallo personalizzato',
+            daysOfWeek: ['Do', 'Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa'],
+            monthNames: [
+              'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+              'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+            ],
+            firstDay: 1
+          }
+        }, function (start, end, label) {
+          // Calcola il numero di giorni
+          const startDate = start.toDate();
+          const endDate = end.toDate();
+          const diffTime = Math.abs(endDate - startDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          // Aggiorna il campo nascosto con il numero di giorni
+          durataInput.value = diffDays;
+
+          // Aggiorna i campi nascosti per le date
+          startDateInput.value = formatDate(startDate);
+          endDateInput.value = formatDate(endDate);
+
+          // Aggiorna il testo che mostra il numero di giorni
+          daysCountElement.textContent = `Durata: ${diffDays} ${diffDays === 1 ? 'giorno' : 'giorni'}`;
+        });
+
+        // Imposta i valori iniziali
+        const initialDiffDays = 1;
+        durataInput.value = initialDiffDays;
+        daysCountElement.textContent = `Durata: ${initialDiffDays} giorno`;
+      });
+
+      // Helper per formattare la data
+      function formatDate(date) {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Intl.DateTimeFormat('it-IT', options).format(date);
+      }
+
       // Gestione form filtro
       document.getElementById('filterForm').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -632,23 +1241,47 @@
         fetchProducts('/noleggio');
       });
 
-      // Gestione noleggio prodotti
+      // Gestione noleggio prodotti (aggiunta al carrello)
       document.querySelectorAll('.noleggio-form').forEach(form => {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
 
           const formData = new FormData(this);
-          submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
+          const rentalItem = {
+            type: 'rental',
+            id: formData.get('id'),
+            brand: formData.get('brand'),
+            category: formData.get('category'),
+            price: formData.get('price'),
+            color: formData.get('color'),
+            condition: formData.get('condition'),
+            duration: formData.get('durata'),
+            startDate: formData.get('startDate'),
+            endDate: formData.get('endDate'),
+            dateRange: formData.get('daterange')
+          };
+
+          addToCart(rentalItem);
         });
       });
 
-      // Gestione acquisto prodotti
+      // Gestione acquisto prodotti (aggiunta al carrello)
       document.querySelectorAll('.acquisto-form').forEach(form => {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
 
           const formData = new FormData(this);
-          submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
+          const purchaseItem = {
+            type: 'purchase',
+            id: formData.get('id'),
+            brand: formData.get('brand'),
+            category: formData.get('category'),
+            price: formData.get('price'),
+            color: formData.get('color'),
+            condition: formData.get('condition')
+          };
+
+          addToCart(purchaseItem);
         });
       });
 
@@ -682,17 +1315,107 @@
               productsContainer.querySelectorAll('.noleggio-form').forEach(form => {
                 form.addEventListener('submit', function (e) {
                   e.preventDefault();
+
                   const formData = new FormData(this);
-                  submitProductForm('/noleggio', formData, 'Prodotto noleggiato con successo!');
+                  const rentalItem = {
+                    type: 'rental',
+                    id: formData.get('id'),
+                    brand: formData.get('brand'),
+                    category: formData.get('category'),
+                    price: formData.get('price'),
+                    color: formData.get('color'),
+                    condition: formData.get('condition'),
+                    duration: formData.get('durata'),
+                    startDate: formData.get('startDate'),
+                    endDate: formData.get('endDate'),
+                    dateRange: formData.get('daterange')
+                  };
+
+                  addToCart(rentalItem);
                 });
               });
 
               productsContainer.querySelectorAll('.acquisto-form').forEach(form => {
                 form.addEventListener('submit', function (e) {
                   e.preventDefault();
+
                   const formData = new FormData(this);
-                  submitProductForm('/acquista', formData, 'Prodotto acquistato con successo!');
+                  const purchaseItem = {
+                    type: 'purchase',
+                    id: formData.get('id'),
+                    brand: formData.get('brand'),
+                    category: formData.get('category'),
+                    price: formData.get('price'),
+                    color: formData.get('color'),
+                    condition: formData.get('condition')
+                  };
+
+                  addToCart(purchaseItem);
                 });
+              });
+
+              // Reinizializza i date range picker per i nuovi prodotti
+              productsContainer.querySelectorAll('.date-range-input').forEach(input => {
+                const productId = input.id.split('-')[1];
+                const durataInput = document.getElementById('durata-' + productId);
+                const daysCountElement = document.getElementById('days-count-' + productId);
+                const startDateInput = document.getElementById('startDate-' + productId);
+                const endDateInput = document.getElementById('endDate-' + productId);
+
+                // Imposta la data di oggi come minima selezionabile
+                const today = new Date();
+
+                // Ottenere domani come data predefinita di fine
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+
+                // Imposta i valori iniziali degli input nascosti per le date
+                startDateInput.value = formatDate(today);
+                endDateInput.value = formatDate(tomorrow);
+
+                $(input).daterangepicker({
+                  opens: 'center',
+                  minDate: today,
+                  startDate: today,
+                  endDate: tomorrow,
+                  locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Applica',
+                    cancelLabel: 'Annulla',
+                    fromLabel: 'Da',
+                    toLabel: 'A',
+                    weekLabel: 'W',
+                    customRangeLabel: 'Intervallo personalizzato',
+                    daysOfWeek: ['Do', 'Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa'],
+                    monthNames: [
+                      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+                      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+                    ],
+                    firstDay: 1
+                  }
+                }, function (start, end, label) {
+                  // Calcola il numero di giorni
+                  const startDate = start.toDate();
+                  const endDate = end.toDate();
+                  const diffTime = Math.abs(endDate - startDate);
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                  // Aggiorna il campo nascosto con il numero di giorni
+                  durataInput.value = diffDays;
+
+                  // Aggiorna i campi nascosti per le date
+                  startDateInput.value = formatDate(startDate);
+                  endDateInput.value = formatDate(endDate);
+
+                  // Aggiorna il testo che mostra il numero di giorni
+                  daysCountElement.textContent = `Durata: ${diffDays} ${diffDays === 1 ? 'giorno' : 'giorni'}`;
+                });
+
+                // Imposta i valori iniziali
+                const initialDiffDays = 1;
+                durataInput.value = initialDiffDays;
+                daysCountElement.textContent = `Durata: ${initialDiffDays} giorno`;
               });
             } else {
               // Fallback se non riesce a trovare la sezione prodotti
@@ -708,80 +1431,6 @@
             loader.style.display = 'none';
           });
       }
-
-      // Funzione per inviare form di noleggio o acquisto
-      function submitProductForm(url, formData, successMessage) {
-        const loader = document.getElementById('loaderContainer');
-
-        // Mostra loader
-        loader.style.display = 'block';
-
-        fetch(url, {
-          method: 'POST',
-          body: formData
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Errore durante l\'operazione');
-            }
-            // Check the content type to determine how to parse the response
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              return response.json();
-            } else {
-              // Handle HTML or other response types
-              return { success: true, reload: true };
-            }
-          })
-          .then(data => {
-            showNotification(successMessage);
-
-            // Ricarica i prodotti se necessario
-            if (data.reload) {
-              fetchProducts('/noleggio');
-            }
-          })
-          .catch(error => {
-            showNotification(error.message, true);
-            console.error('Errore:', error);
-          })
-          .finally(() => {
-            // Nascondi loader
-            loader.style.display = 'none';
-          });
-      }
-      const loader = document.getElementById('loaderContainer');
-
-      // Mostra loader
-      loader.style.display = 'block';
-
-      fetch(url, {
-        method: 'POST',
-        body: formData
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Errore durante l\'operazione');
-          }
-          return response.json();
-        })
-        .then(data => {
-          showNotification(successMessage);
-
-          // Ricarica i prodotti se necessario
-          if (data.reload) {
-            fetchProducts('/noleggio');
-          }
-        })
-        .catch(error => {
-          showNotification(error.message, true);
-          console.error('Errore:', error);
-        })
-        .finally(() => {
-          // Nascondi loader
-          loader.style.display = 'none';
-        });
-    }
 
       // Funzione per mostrare notifiche
       function showNotification(message, isError = false) {

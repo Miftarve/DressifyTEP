@@ -1286,6 +1286,42 @@ app.post('/acquista', (req, res) => {
     res.render('acquista', { product }); // Mostra i dettagli del prodotto acquistato
 });
 
+
+// API per il carrello
+app.post('/api/cart/add', (req, res) => {
+    // Endpoint per aggiungere un prodotto al carrello
+    // Il carrello viene gestito lato client con localStorage
+    res.json({ success: true });
+});
+
+app.post('/api/cart/remove', (req, res) => {
+    // Endpoint per rimuovere un prodotto dal carrello
+    // Il carrello viene gestito lato client con localStorage
+    res.json({ success: true });
+});
+
+// Pagina di checkout
+app.get('/checkout', ensureAuthenticated, (req, res) => {
+    res.render('checkout', {
+        title: 'Completa il tuo ordine',
+        user: req.user || req.session.user
+    });
+});
+
+// API per completare l'ordine
+app.post('/api/checkout', ensureAuthenticated, (req, res) => {
+    const { cartItems } = req.body;
+    
+    // Qui potresti implementare la logica per salvare l'ordine nel database
+    // Per ora restituiamo una risposta di successo
+    
+    res.json({
+        success: true,
+        orderId: Date.now(), // Simuliamo un ID ordine
+        message: 'Ordine completato con successo!'
+    });
+});
+
 // Start server
 const port = 3000;
 app.listen(port, () => console.log(`Server started on port ${port}. 
