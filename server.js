@@ -7,6 +7,9 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
+// Carica le variabili d'ambiente dal file .env
+require('dotenv').config();
+
 //const cors = require('cors');
 
 //const sqlite3 = require('sqlite3').verbose();
@@ -22,7 +25,11 @@ const DBMock = require('./DBMock.js');
 
 // Create express app using session
 const app = express();
-app.use(session({ secret: 'ssshhhhh' }));
+app.use(session({ 
+    secret: process.env.SESSION_SECRET || 'ssshhhhh',
+    resave: false,
+    saveUninitialized: true
+}));
 
 // Configurazione del motore di template
 app.set('view engine', 'hbs');
@@ -45,7 +52,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(session({
-    secret: 'ssshhhhh',
+    secret: process.env.SESSION_SECRET || 'ssshhhhh',
     resave: false,
     saveUninitialized: true,
     cookie: { 
@@ -101,7 +108,8 @@ function findUserByEmail(email) {
 
 // ===== GOOGLE AUTHENTICATION STRATEGY =====
 passport.use(new GoogleStrategy({
-
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     try {
@@ -138,7 +146,8 @@ passport.use(new GoogleStrategy({
 
 // ===== FACEBOOK AUTHENTICATION STRATEGY =====
 passport.use(new FacebookStrategy({
-    
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'photos', 'email', 'name']
 }, (accessToken, refreshToken, profile, done) => {
