@@ -32,6 +32,8 @@ class DBMock {
         this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
     }
 
+
+    
     calculateRentalPrice(productId, days) {
         const product = this.getProductById(productId);
         if (!product) return null;
