@@ -28,10 +28,13 @@ class DBMock {
             { id: 19, category: 'Felpa con cappuccio', size: 'S', color: 'Nero', brand: 'Nike', condition: 'Nuovo', price: 60 },
             { id: 20, category: 'Scarpe da ginnastica', size: '39', color: 'Bianco', brand: 'Adidas', condition: 'Usato', price: 45 }
         ];
+        
+        // Inizializza le conversazioni (nuovo)
+        this.conversations = {};
+        
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
         this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
     }
-
 
     
     calculateRentalPrice(productId, days) {
@@ -46,7 +49,6 @@ class DBMock {
     }
 
     // Ottieni tutti i prodotti
-
     getAllProducts() {
         console.log('Tutti i prodotti:', this.products); // Debug per controllare i dati
         return this.products;
@@ -152,6 +154,44 @@ class DBMock {
         }
         this.users.splice(userIndex, 1);
         return true;
+    }
+
+    // NUOVI METODI PER LE CONVERSAZIONI
+
+    // Ottieni messaggi tra due utenti
+    getConversation(user1Id, user2Id) {
+        // Crea un ID di conversazione consistente: ordina gli ID e li unisce con un trattino
+        const conversationId = [parseInt(user1Id), parseInt(user2Id)].sort().join('-');
+        return this.conversations[conversationId] || [];
+    }
+
+    // Salva un messaggio nella conversazione
+    saveMessage(senderId, recipientId, text) {
+        // Crea un ID di conversazione consistente
+        const conversationId = [parseInt(senderId), parseInt(recipientId)].sort().join('-');
+        
+        // Crea l'oggetto messaggio
+        const message = {
+            senderId: parseInt(senderId),
+            recipientId: parseInt(recipientId),
+            text,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Assicurati che la conversazione esista
+        if (!this.conversations[conversationId]) {
+            this.conversations[conversationId] = [];
+        }
+        
+        // Aggiungi il messaggio
+        this.conversations[conversationId].push(message);
+        
+        return message;
+    }
+
+    // Ottieni tutte le conversazioni
+    getAllConversations() {
+        return this.conversations;
     }
 }
 

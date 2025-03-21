@@ -6,6 +6,8 @@ const swaggerUi = require('swagger-ui-express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const http = require('http');
+const socketIo = require('socket.io');
 
 // Carica le variabili d'ambiente dal file .env
 require('dotenv').config();
@@ -25,7 +27,16 @@ const DBMock = require('./DBMock.js');
 
 // Create express app using session
 const app = express();
-app.use(session({ 
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// Struttura per memorizzare le conversazioni
+//const conversations = {};
+
+// Tracciare gli utenti connessi
+const connectedUsers = new Map();
+
+app.use(session({
     secret: process.env.SESSION_SECRET || 'ssshhhhh',
     resave: false,
     saveUninitialized: true
@@ -55,7 +66,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'ssshhhhh',
     resave: false,
     saveUninitialized: true,
-    cookie: { 
+    cookie: {
         secure: false, // Set to true if using HTTPS
         maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week in milliseconds
     }
@@ -118,7 +129,7 @@ passport.use(new GoogleStrategy({
         if (profile.emails && profile.emails.length > 0) {
             user = findUserByEmail(profile.emails[0].value);
         }
-        
+
         // Se l'utente non esiste, lo creiamo
         if (!user) {
             user = db.createUser({
@@ -137,7 +148,7 @@ passport.use(new GoogleStrategy({
             // Aggiorniamo il googleId se l'utente esiste
             db.updateUser(user.id, { ...user, googleId: profile.id });
         }
-        
+
         return done(null, user);
     } catch (error) {
         return done(error, null);
@@ -154,18 +165,18 @@ passport.use(new FacebookStrategy({
     try {
         // Verifica se l'utente esiste già nel DB
         let user = null;
-        
+
         // Se il profilo contiene l'email, cerca l'utente per email
         if (profile.emails && profile.emails.length > 0) {
             user = findUserByEmail(profile.emails[0].value);
         }
-        
+
         // Se non trovato per email, cerca per facebookId
         if (!user) {
             const allUsers = db.getAllUsers();
             user = allUsers.find(u => u.facebookId === profile.id);
         }
-        
+
         // Se l'utente non esiste, lo creiamo
         if (!user) {
             user = db.createUser({
@@ -184,7 +195,7 @@ passport.use(new FacebookStrategy({
             // Aggiorniamo il facebookId se l'utente esiste
             db.updateUser(user.id, { ...user, facebookId: profile.id });
         }
-        
+
         return done(null, user);
     } catch (error) {
         return done(error, null);
@@ -192,11 +203,11 @@ passport.use(new FacebookStrategy({
 }));
 
 // ===== GOOGLE AUTHENTICATION ROUTES =====
-app.get('/auth/google', passport.authenticate('google', { 
+app.get('/auth/google', passport.authenticate('google', {
     scope: ['profile', 'email']
 }));
 
-app.get('/auth/google/callback', 
+app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/login'
     }),
@@ -207,7 +218,7 @@ app.get('/auth/google/callback',
             req.session.loggedin = true;
             req.session.user = req.user;
             req.session.role = req.user.ruolo;
-            
+
             // Force session save to ensure persistence
             req.session.save(err => {
                 if (err) {
@@ -222,7 +233,7 @@ app.get('/auth/google/callback',
 );
 
 // ===== FACEBOOK AUTHENTICATION ROUTES =====
-app.get('/auth/facebook', passport.authenticate('facebook', { 
+app.get('/auth/facebook', passport.authenticate('facebook', {
     scope: ['email', 'public_profile']
 }));
 
@@ -235,7 +246,7 @@ app.get('/auth/facebook/callback',
             req.session.loggedin = true;
             req.session.user = req.user;
             req.session.role = req.user.ruolo;
-            
+
             // Force session save to ensure persistence
             req.session.save(err => {
                 if (err) {
@@ -260,7 +271,7 @@ app.post('/api/delete-user-data', async (req, res) => {
         // Cerca l'utente per facebookId
         const allUsers = db.getAllUsers();
         const user = allUsers.find(u => u.facebookId === userId);
-        
+
         if (user) {
             // Elimina l'utente dal database
             const isDeleted = db.deleteUser(user.id);
@@ -283,7 +294,7 @@ function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    
+
     // Then check our manual session flag as backup
     if (req.session && req.session.loggedin && req.session.user) {
         // If we have session data but Passport doesn't recognize it,
@@ -358,7 +369,7 @@ app.get('/', (req, res) => {
 // Assuming you already have your Express app set up
 app.get('/recuperoDati', (req, res) => {
     res.sendFile(path.join(__dirname, 'recuperDati.html'));
-  });
+});
 /**
  * @swagger
  * /login:
@@ -440,15 +451,15 @@ app.get('/logout', (req, res) => {
 app.get('/home', ensureAuthenticated, (req, res) => {
     // Get user from session or passport
     const user = req.user || req.session.user;
-    
+
     // Additional safety check
     if (!user) {
         return res.redirect('/login');
     }
-    
+
     // Use req.session.role if available, otherwise get from user object
     const userRole = req.session.role || user.ruolo;
-    
+
     if (userRole === 'admin') {
         const users = db.getAllUsers();
         res.render('admin/home', {
@@ -1311,10 +1322,10 @@ app.get('/checkout', ensureAuthenticated, (req, res) => {
 // API per completare l'ordine
 app.post('/api/checkout', ensureAuthenticated, (req, res) => {
     const { cartItems } = req.body;
-    
+
     // Qui potresti implementare la logica per salvare l'ordine nel database
     // Per ora restituiamo una risposta di successo
-    
+
     res.json({
         success: true,
         orderId: Date.now(), // Simuliamo un ID ordine
@@ -1322,8 +1333,258 @@ app.post('/api/checkout', ensureAuthenticated, (req, res) => {
     });
 });
 
+// ---------- NUOVE ROUTE PER LA CHAT ----------
+
+// Rotta per la pagina della chat (accessibile solo agli utenti autenticati)
+app.get('/chat', ensureAuthenticated, (req, res) => {
+    // Ottieni l'utente corrente
+    const currentUser = req.user || req.session.user;
+
+    // Ottieni tutti gli utenti (per mostrare la lista)
+    const allUsers = db.getAllUsers().filter(user => user.id !== currentUser.id);
+
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Rotta per ottenere la lista degli utenti (per l'API)
+app.get('/api/users', ensureAuthenticated, (req, res) => {
+    const currentUser = req.user || req.session.user;
+    const users = db.getAllUsers().filter(user => user.id !== currentUser.id);
+
+    // Invia solo le informazioni necessarie
+    const safeUsers = users.map(user => ({
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username
+    }));
+
+    res.json(safeUsers);
+});
+
+// Rotta per ottenere i messaggi tra due utenti
+app.get('/api/messages/:userId', ensureAuthenticated, (req, res) => {
+    const currentUser = req.user || req.session.user;
+    const otherUserId = parseInt(req.params.userId);
+
+    // Usa il metodo di DBMock
+    const messages = db.getConversation(currentUser.id, otherUserId);
+
+    res.json(messages);
+});
+
+// Socket.IO
+io.use((socket, next) => {
+    const sessionID = socket.handshake.auth.sessionID;
+    const username = socket.handshake.auth.username;
+    const userId = socket.handshake.auth.userId;
+
+    if (!userId) {
+        return next(new Error("Autenticazione richiesta"));
+    }
+
+    // Salva le informazioni utente nel socket
+    socket.userId = userId;
+    socket.username = username;
+
+    next();
+});
+
+io.on('connection', (socket) => {
+    // Associa l'utente al socket
+    const userId = socket.userId;
+    connectedUsers.set(userId, socket.id);
+
+    // Invia la lista degli utenti connessi a tutti
+    const users = [];
+    connectedUsers.forEach((_, userId) => {
+        const user = db.getUserById(parseInt(userId));
+        if (user) {
+            users.push({
+                id: user.id,
+                username: user.username,
+                nome: user.nome + ' ' + user.cognome,
+                connected: true
+            });
+        }
+    });
+    socket.emit('users', users);
+
+    // Gestione dei messaggi
+    socket.on('private message', ({ recipientId, text }) => {
+        const senderId = socket.userId;
+
+        // Usa il metodo di DBMock per salvare il messaggio
+        const message = db.saveMessage(senderId, recipientId, text);
+
+        // Invia il messaggio al destinatario se è online
+        const recipientSocketId = connectedUsers.get(recipientId.toString());
+        if (recipientSocketId) {
+            socket.to(recipientSocketId).emit('private message', message);
+        }
+    });
+
+    // Disconnessione
+    socket.on('disconnect', () => {
+        connectedUsers.delete(socket.userId);
+    });
+});
+
+// Rotta per servire la pagina della chat
+app.get('/chat', ensureAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Rotta per ottenere l'utente corrente (per l'API)
+app.get('/api/currentUser', ensureAuthenticated, (req, res) => {
+    const user = req.user || req.session.user;
+
+    // Invia solo le informazioni necessarie
+    const safeUser = {
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username
+    };
+
+    res.json(safeUser);
+});
+
+// Rotta per ottenere l'utente corrente
+app.get('/api/currentUser', ensureAuthenticated, (req, res) => {
+    const user = req.user || req.session.user;
+
+    // Invia informazioni sicure dell'utente
+    const safeUser = {
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username,
+        email: user.email
+    };
+
+    res.json(safeUser);
+});
+
+// Rotta per ottenere la lista degli utenti (escluso l'utente corrente)
+app.get('/api/users', ensureAuthenticated, (req, res) => {
+    const currentUser = req.user || req.session.user;
+    const allUsers = db.getAllUsers();
+
+    // Filtra l'utente corrente dalla lista
+    const otherUsers = allUsers.filter(user => user.id !== currentUser.id);
+
+    // Invia solo le informazioni necessarie
+    const safeUsers = otherUsers.map(user => ({
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username
+    }));
+
+    res.json(safeUsers);
+});
+
+// Rotta per ottenere i messaggi tra due utenti
+app.get('/api/messages/:userId', ensureAuthenticated, (req, res) => {
+    const currentUser = req.user || req.session.user;
+    const otherUserId = parseInt(req.params.userId);
+
+    // Identifica la conversazione
+    const conversationId = [currentUser.id, otherUserId].sort().join('-');
+
+    // Ottieni i messaggi
+    const messages = conversations[conversationId] || [];
+
+    res.json(messages);
+});
+
+// Socket.IO
+io.use((socket, next) => {
+    const userId = socket.handshake.auth.userId;
+    const username = socket.handshake.auth.username;
+
+    if (!userId) {
+        return next(new Error("Autenticazione richiesta"));
+    }
+
+    // Salva le informazioni utente nel socket
+    socket.userId = userId;
+    socket.username = username;
+
+    next();
+});
+
+io.on('connection', (socket) => {
+    // Associa l'utente al socket
+    const userId = socket.userId;
+    connectedUsers.set(userId.toString(), socket.id);
+
+    // Invia la lista degli utenti connessi a tutti
+    const users = [];
+    const allUsers = db.getAllUsers();
+
+    allUsers.forEach(user => {
+        users.push({
+            id: user.id,
+            username: user.username,
+            nome: user.nome + ' ' + user.cognome,
+            connected: connectedUsers.has(user.id.toString())
+        });
+    });
+
+    socket.emit('users', users);
+
+    // Gestione dei messaggi
+    socket.on('private message', ({ recipientId, text }) => {
+        const senderId = socket.userId;
+
+        // Crea ID conversazione (sempre nello stesso ordine per consistenza)
+        const conversationId = [parseInt(senderId), parseInt(recipientId)].sort().join('-');
+
+        // Crea oggetto messaggio
+        const message = {
+            senderId,
+            recipientId,
+            text,
+            timestamp: new Date().toISOString()
+        };
+
+        // Salva il messaggio nella conversazione
+        if (!conversations[conversationId]) {
+            conversations[conversationId] = [];
+        }
+        conversations[conversationId].push(message);
+
+        // Invia il messaggio al destinatario se è online
+        const recipientSocketId = connectedUsers.get(recipientId.toString());
+        if (recipientSocketId) {
+            socket.to(recipientSocketId).emit('private message', message);
+        }
+    });
+
+    // Disconnessione
+    socket.on('disconnect', () => {
+        connectedUsers.delete(socket.userId.toString());
+
+        // Notifica gli altri utenti della disconnessione
+        const users = [];
+        const allUsers = db.getAllUsers();
+
+        allUsers.forEach(user => {
+            users.push({
+                id: user.id,
+                username: user.username,
+                nome: user.nome + ' ' + user.cognome,
+                connected: connectedUsers.has(user.id.toString())
+            });
+        });
+
+        socket.broadcast.emit('users', users);
+    });
+});
 // Start server
 const port = 3000;
-app.listen(port, () => console.log(`Server started on port ${port}. 
+server.listen(port, () => console.log(`Server started on port ${port}. 
 Vai su http://localhost:${port}.
 Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));

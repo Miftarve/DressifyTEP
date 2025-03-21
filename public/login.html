@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
     <title>Login - DRESSIMIFY</title>
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Font Import */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap');
 
         /* General Reset */
         * {
@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Raleway', sans-serif;
             background-image: url('public/assets/1.jpeg');
             background-size: cover;
             background-position: center;
@@ -39,60 +39,87 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background-color: rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 173, 173, 0.7), rgba(251, 191, 36, 0.5));
             z-index: 1;
         }
 
         h1 {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 24px;
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
         p {
-            font-size: 0.9rem;
-            color: #5d6778;
-            margin: 16px 0;
+            font-size: 0.95rem;
+            color: #4a5568;
+            margin: 10px 0;
         }
 
         a {
-            color: #0056b3;
+            color: #e53e3e;
             text-decoration: none;
             transition: color 0.3s ease;
             font-weight: 500;
         }
 
         a:hover {
-            color: #003d82;
+            color: #c53030;
+            text-decoration: underline;
         }
 
         /* Form Container */
         .form-container {
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            max-width: 420px;
-            width: 100%;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.97);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            max-width: 800px;
+            width: 95%;
             position: relative;
             z-index: 2;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-wrap: wrap;
         }
 
-        /* Logo and Title */
-        .logo-container {
-            margin-bottom: 20px;
+        /* Logo Section */
+        .brand-section {
+            flex: 1;
+            min-width: 260px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #e53e3e;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
         }
 
         .brand-logo {
             font-size: 2.4rem;
             font-weight: 700;
-            color: #0056b3;
             letter-spacing: 1px;
             margin-bottom: 6px;
-            background: linear-gradient(135deg, #0056b3, #0078d7);
+            background: linear-gradient(135deg, #e53e3e, #ed8936);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -100,10 +127,52 @@
 
         .brand-tagline {
             font-size: 0.95rem;
-            color: #5d6778;
+            color: #4a5568;
             font-weight: 400;
             letter-spacing: 0.5px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .brand-tagline::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 2px;
+            bottom: -10px;
+            left: 35%;
+            background: linear-gradient(90deg, transparent, #e53e3e, transparent);
+        }
+
+        .security-info {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .security-icons {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .security-icons i {
+            margin: 0 10px;
+            font-size: 1.2rem;
+            color: #e53e3e;
+        }
+
+        /* Form Section */
+        .form-section {
+            flex: 1.5;
+            min-width: 300px;
+            padding: 20px 30px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
         /* Input Fields */
@@ -117,30 +186,38 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #9dabc0;
+            color: #e53e3e;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within i {
+            color: #c53030;
         }
 
         input,
         button {
             width: 100%;
             padding: 14px 15px 14px 45px;
-            border-radius: 8px;
-            border: 1px solid #e1e5eb;
+            border-radius: 50px;
+            border: 1.5px solid #e2e8f0;
             font-size: 1rem;
             transition: all 0.3s ease;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Raleway', sans-serif;
         }
 
         input[type="text"],
         input[type="password"] {
-            background-color: #f9fafc;
-            color: #495057;
+            background-color: #f8fafc;
+            color: #4a5568;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         input:focus {
-            border-color: #0078d7;
-            box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.1);
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.15);
             outline: none;
+            padding-left: 50px;
         }
 
         /* Buttons */
@@ -151,27 +228,114 @@
             border: none;
             display: inline-block;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 50px;
             transition: all 0.3s ease;
         }
 
         .btn-primary {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #e53e3e, #ed8936);
             color: white;
-            margin-top: 10px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
         }
 
         .btn-primary:hover {
-            background-color: #003d82;
+            background: linear-gradient(135deg, #c53030, #dd6b20);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 86, 179, 0.2);
+            box-shadow: 0 8px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Social Login */
+        .social-login {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .social-btn {
+            flex: 0.48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .social-btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .social-btn:hover::before {
+            left: 100%;
+        }
+
+        .google-btn {
+            background-color: #ffffff;
+            color: #3c4043;
+            border: 1.5px solid #e2e8f0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .google-btn:hover {
+            background-color: #f9fafb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .facebook-btn {
+            background-color: #1877f2;
+            color: white;
+            box-shadow: 0 2px 5px rgba(24, 119, 242, 0.2);
+        }
+
+        .facebook-btn:hover {
+            background-color: #0d6efd;
+            box-shadow: 0 4px 10px rgba(24, 119, 242, 0.3);
+            transform: translateY(-2px);
         }
 
         .social-login-divider {
             display: flex;
             align-items: center;
-            margin: 25px 0;
-            color: #9dabc0;
+            margin: 25px 0 20px;
+            color: #8896aa;
         }
 
         .social-login-divider::before,
@@ -179,7 +343,7 @@
             content: "";
             flex: 1;
             height: 1px;
-            background-color: #e1e5eb;
+            background: linear-gradient(90deg, transparent, #e2e8f0, #e2e8f0, transparent);
         }
 
         .social-login-divider span {
@@ -187,66 +351,61 @@
             font-size: 0.9rem;
         }
 
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            padding: 12px;
-            font-weight: 500;
-        }
-
-        .social-btn i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-
-        .google-btn {
-            background-color: #ffffff;
-            color: #5f6368;
-            border: 1px solid #e1e5eb;
-        }
-
-        .google-btn:hover {
-            background-color: #f8f9fa;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .facebook-btn {
-            background-color: #1877f2;
-            color: white;
-        }
-
-        .facebook-btn:hover {
-            background-color: #0e65d9;
-            box-shadow: 0 2px 10px rgba(24, 119, 242, 0.2);
+        /* Forgot Password Link */
+        .forgot-password {
+            display: block;
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
         }
 
         .footer-links {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5eb;
-            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            body {
-                padding: 20px;
+            .form-container {
+                flex-direction: column;
+                max-width: 95%;
+                padding: 25px;
             }
 
-            .form-container {
-                padding: 30px;
+            .brand-section {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+
+            .security-info {
+                margin-top: 15px;
             }
         }
 
         @media (max-width: 480px) {
             .form-container {
-                padding: 25px 20px;
+                padding: 20px 15px;
+            }
+
+            .form-section {
+                padding: 10px;
             }
 
             .brand-logo {
                 font-size: 2rem;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+
+            .social-btn {
+                flex: 1;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -254,45 +413,65 @@
 
 <body>
     <div class="form-container">
-        <div class="logo-container">
+        <!-- Brand Section - Left Side -->
+        <div class="brand-section">
+            <div class="logo-icon"><i class="fas fa-tshirt"></i></div>
             <div class="brand-logo">DRESSIMIFY</div>
             <div class="brand-tagline">Fashion simplified, style amplified</div>
+            <div class="security-info">
+                <p>Secure login protected with encryption</p>
+                <div class="security-icons">
+                    <i class="fas fa-shield-alt"></i>
+                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
         </div>
 
-        <h1>Welcome Back</h1>
-        <form action="/login" method="post">
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" name="username" id="username" placeholder="Username or Email" required>
+        <!-- Form Section - Right Side -->
+        <div class="form-section">
+            <div class="welcome-text">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your DRESSIMIFY account</p>
             </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" name="password" id="password" placeholder="Password" required>
+
+            <form action="/login" method="post">
+                <div class="input-group">
+                    <i class="fas fa-user-circle"></i>
+                    <input type="text" name="username" id="username" placeholder="Username or Email" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                </div>
+                <a href="/forgot-password" class="forgot-password"><i class="fas fa-question-circle"></i> Forgot password?</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+            </form>
+
+            <div class="social-login-divider">
+                <span><i class="fas fa-link"></i> or continue with</span>
             </div>
-            <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>
 
-        <div class="social-login-divider">
-            <span>or continue with</span>
-        </div>
+            <div class="social-login">
+                <button onclick="loginWithFacebook()" class="social-btn facebook-btn">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
 
-        <button onclick="loginWithFacebook()" class="btn social-btn facebook-btn">
-            <i class="fab fa-facebook-f"></i> Facebook
-        </button>
+                <a href="/auth/google" class="social-btn google-btn">
+                    <i class="fab fa-google"></i> Google
+                </a>
+            </div>
 
-        <a href="/auth/google" class="btn social-btn google-btn">
-            <i class="fab fa-google"></i> Google
-        </a>
-
-        <div class="footer-links">
-            <p>Don't have an account? <a href="/register">Sign Up</a></p>
+            <div class="footer-links">
+                <p>Don't have an account? <a href="/register"><i class="fas fa-user-plus"></i> Sign Up</a></p>
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script>
-        // Inizializza Firebase
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAM1cUlBm-Sgmy9nfSvB6sjwiZ49-vAeKM",
             authDomain: "dressimify.firebaseapp.com",
@@ -304,7 +483,7 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        // Funzione per login con Facebook
+        // Facebook login function
         function loginWithFacebook() {
             const provider = new firebase.auth.FacebookAuthProvider();
             firebase.auth().signInWithRedirect(provider);
@@ -313,7 +492,7 @@
                 .auth()
                 .signInWithRedirect(provider)
                 .then(() => console.log('Redirecting to Facebook login...'))
-                .catch(error => console.error("Errore:", error));
+                .catch(error => console.error("Error:", error));
         }
     </script>
 </body>
