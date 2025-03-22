@@ -4,6 +4,11 @@ class DBMock {
         this.users = [
             { id: 1, username: 'miftar', email: 'miftar@gmail.com', nome: 'Miftar ', cognome: 'Veliqi', dataNascita: '31/07/2005', luogoNascita: 'Kosovo', ruolo: 'admin', password: '123456' },
             { id: 2, username: 'roccia', email: 'roccia@gmail.com', nome: 'Fabrizio ', cognome: 'Quarti', dataNascita: '02/04/2006', luogoNascita: 'Italia', ruolo: 'user', password: 'abcdef' },
+            { id: 3, username: 'lucia83', email: 'lucia.bianchi@gmail.com', nome: 'Lucia', cognome: 'Bianchi', dataNascita: '15/03/1983', luogoNascita: 'Italia', ruolo: 'user', password: 'lucia2023' },
+            { id: 4, username: 'marco_rossi', email: 'marco.rossi@gmail.com', nome: 'Marco', cognome: 'Rossi', dataNascita: '22/09/1990', luogoNascita: 'Italia', ruolo: 'user', password: 'rossi1234' },
+            { id: 5, username: 'sofia_k', email: 'sofia.k@gmail.com', nome: 'Sofia', cognome: 'Kowalski', dataNascita: '07/12/1995', luogoNascita: 'Polonia', ruolo: 'moderator', password: 'sk2022!' },
+            { id: 6, username: 'alex_tech', email: 'alessandro.t@gmail.com', nome: 'Alessandro', cognome: 'Tecchi', dataNascita: '18/06/1988', luogoNascita: 'Italia', ruolo: 'user', password: 'tech4ever' },
+            { id: 7, username: 'carmen87', email: 'carmen.lopez@gmail.com', nome: 'Carmen', cognome: 'Lopez', dataNascita: '03/05/1987', luogoNascita: 'Spagna', ruolo: 'user', password: 'carmen123' }
         ];
 
         this.products = [
