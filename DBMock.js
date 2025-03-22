@@ -1,3 +1,4 @@
+const { dbConnection } = require('./database.js');
 class DBMock {
     constructor() {
         // Inizializza gli utenti
@@ -33,15 +34,15 @@ class DBMock {
             { id: 19, category: 'Felpa con cappuccio', size: 'S', color: 'Nero', brand: 'Nike', condition: 'Nuovo', price: 60 },
             { id: 20, category: 'Scarpe da ginnastica', size: '39', color: 'Bianco', brand: 'Adidas', condition: 'Usato', price: 45 }
         ];
-        
+
         // Inizializza le conversazioni (nuovo)
         this.conversations = {};
-        
+
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
         this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
     }
 
-    
+
     calculateRentalPrice(productId, days) {
         const product = this.getProductById(productId);
         if (!product) return null;
@@ -165,39 +166,85 @@ class DBMock {
 
     // Ottieni messaggi tra due utenti
     getConversation(user1Id, user2Id) {
-        // Crea un ID di conversazione consistente: ordina gli ID e li unisce con un trattino
-        const conversationId = [parseInt(user1Id), parseInt(user2Id)].sort().join('-');
-        return this.conversations[conversationId] || [];
+        return new Promise((resolve, reject) => {
+            // Query che ottiene i messaggi tra i due utenti
+            const query = `
+            SELECT * FROM messages 
+            WHERE (sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?)
+            ORDER BY timestamp ASC
+        `;
+
+            dbConnection.all(query, [user1Id, user2Id, user2Id, user1Id], (err, rows) => {
+                if (err) {
+                    console.error('Errore nel recupero conversazione:', err);
+                    return resolve([]); // In caso di errore, restituisci array vuoto
+                }
+
+                // Converte le righe del DB nel formato atteso dall'app
+                const messages = rows.map(row => ({
+                    senderId: row.sender_id,
+                    recipientId: row.recipient_id,
+                    text: row.text,
+                    timestamp: row.timestamp,
+                    isRead: row.is_read === 1
+                }));
+
+                resolve(messages);
+            });
+        });
+    }
+
+    // Per compatibilità con il codice esistente (funzione sincrona)
+    getConversationSync(user1Id, user2Id) {
+        // La versione sincrona restituisce un array vuoto, 
+        // i dati verranno caricati asincronamente
+        return [];
     }
 
     // Salva un messaggio nella conversazione
     saveMessage(senderId, recipientId, text) {
-        // Crea un ID di conversazione consistente
-        const conversationId = [parseInt(senderId), parseInt(recipientId)].sort().join('-');
-        
-        // Crea l'oggetto messaggio
+        const timestamp = new Date().toISOString();
         const message = {
             senderId: parseInt(senderId),
             recipientId: parseInt(recipientId),
             text,
-            timestamp: new Date().toISOString()
+            timestamp
         };
-        
-        // Assicurati che la conversazione esista
-        if (!this.conversations[conversationId]) {
-            this.conversations[conversationId] = [];
-        }
-        
-        // Aggiungi il messaggio
-        this.conversations[conversationId].push(message);
-        
-        return message;
+
+        // Inserisce il messaggio nel database
+        dbConnection.run(
+            `INSERT INTO messages (sender_id, recipient_id, text, timestamp) VALUES (?, ?, ?, ?)`,
+            [senderId, recipientId, text, timestamp],
+            (err) => {
+                if (err) {
+                    console.error('Errore nel salvataggio messaggio:', err);
+                }
+            }
+        );
+
+        return message; // Ritorna il messaggio per compatibilità
     }
 
-    // Ottieni tutte le conversazioni
-    getAllConversations() {
-        return this.conversations;
+    // Segna i messaggi come letti
+    // Modifica solo alla funzione markMessagesAsRead
+    // Versione con Promise
+    markMessagesAsRead(senderId, recipientId) {
+        return new Promise((resolve, reject) => {
+            dbConnection.run(
+                `UPDATE messages SET is_read = 1 WHERE sender_id = ? AND recipient_id = ? AND is_read = 0`,
+                [senderId, recipientId],
+                function (err) {
+                    if (err) {
+                        console.error('Errore nell\'aggiornamento dei messaggi letti:', err);
+                        reject(err);
+                    } else {
+                        resolve({ updated: this.changes });
+                    }
+                }
+            );
+        });
     }
 }
+
 
 module.exports = DBMock;

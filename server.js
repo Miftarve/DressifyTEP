@@ -25,6 +25,9 @@ const hbs = require('hbs');
 const session = require('express-session');
 const DBMock = require('./DBMock.js');
 
+// Importa il modulo database e inizializza le tabelle
+const { initDatabase } = require('./database.js');
+initDatabase();
 // Create express app using session
 const app = express();
 const server = http.createServer(app);
@@ -1362,16 +1365,24 @@ app.get('/api/users', ensureAuthenticated, (req, res) => {
     res.json(safeUsers);
 });
 
-// Rotta per ottenere i messaggi tra due utenti
-app.get('/api/messages/:userId', ensureAuthenticated, (req, res) => {
+app.get('/api/messages/:userId', ensureAuthenticated, async (req, res) => {
     const currentUser = req.user || req.session.user;
     const otherUserId = parseInt(req.params.userId);
 
-    // Usa il metodo di DBMock
-    const messages = db.getConversation(currentUser.id, otherUserId);
-
-    res.json(messages);
+    try {
+        // Recupera i messaggi dal database
+        const messages = await db.getConversation(currentUser.id, otherUserId);
+        
+        // Segna i messaggi ricevuti come letti
+        db.markMessagesAsRead(otherUserId, currentUser.id);
+        
+        res.json(messages);
+    } catch (error) {
+        console.error('Errore nel recupero messaggi:', error);
+        res.json([]);  // In caso di errore, restituisci un array vuoto
+    }
 });
+
 
 // Socket.IO
 io.use((socket, next) => {
@@ -1410,11 +1421,11 @@ io.on('connection', (socket) => {
     });
     socket.emit('users', users);
 
-    // Gestione dei messaggi
+    // Gestione dei messaggi modificata
     socket.on('private message', ({ recipientId, text }) => {
         const senderId = socket.userId;
 
-        // Usa il metodo di DBMock per salvare il messaggio
+        // Salva il messaggio nel database
         const message = db.saveMessage(senderId, recipientId, text);
 
         // Invia il messaggio al destinatario se è online
@@ -1485,18 +1496,23 @@ app.get('/api/users', ensureAuthenticated, (req, res) => {
     res.json(safeUsers);
 });
 
-// Rotta per ottenere i messaggi tra due utenti
-app.get('/api/messages/:userId', ensureAuthenticated, (req, res) => {
+// Nel codice della route /api/messages/:userId
+app.get('/api/messages/:userId', ensureAuthenticated, async (req, res) => {
     const currentUser = req.user || req.session.user;
     const otherUserId = parseInt(req.params.userId);
 
-    // Identifica la conversazione
-    const conversationId = [currentUser.id, otherUserId].sort().join('-');
+    try {
+        // Recupera i messaggi dal database
+        const messages = await db.getConversation(currentUser.id, otherUserId);
 
-    // Ottieni i messaggi
-    const messages = conversations[conversationId] || [];
+        // Segna i messaggi ricevuti come letti (con await)
+        await db.markMessagesAsRead(otherUserId, currentUser.id);
 
-    res.json(messages);
+        res.json(messages);
+    } catch (error) {
+        console.error('Errore nel recupero messaggi:', error);
+        res.status(500).json({ error: 'Errore nel caricamento dei messaggi' });
+    }
 });
 
 // Socket.IO
@@ -1535,34 +1551,18 @@ io.on('connection', (socket) => {
 
     socket.emit('users', users);
 
-    // Gestione dei messaggi
     socket.on('private message', ({ recipientId, text }) => {
         const senderId = socket.userId;
-
-        // Crea ID conversazione (sempre nello stesso ordine per consistenza)
-        const conversationId = [parseInt(senderId), parseInt(recipientId)].sort().join('-');
-
-        // Crea oggetto messaggio
-        const message = {
-            senderId,
-            recipientId,
-            text,
-            timestamp: new Date().toISOString()
-        };
-
-        // Salva il messaggio nella conversazione
-        if (!conversations[conversationId]) {
-            conversations[conversationId] = [];
-        }
-        conversations[conversationId].push(message);
-
+    
+        // Salva il messaggio nel database
+        const message = db.saveMessage(senderId, recipientId, text);
+    
         // Invia il messaggio al destinatario se è online
         const recipientSocketId = connectedUsers.get(recipientId.toString());
         if (recipientSocketId) {
             socket.to(recipientSocketId).emit('private message', message);
         }
     });
-
     // Disconnessione
     socket.on('disconnect', () => {
         connectedUsers.delete(socket.userId.toString());
@@ -1587,4 +1587,4 @@ io.on('connection', (socket) => {
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 
 Vai su http://localhost:${port}.
-Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`));
+Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`)); 
