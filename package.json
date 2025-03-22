@@ -19,6 +19,7 @@
     "firebase": "^11.2.0",
     "hbs": "^4.2.0",
     "http": "^0.0.1-security",
+    "mongoose": "^8.12.2",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
