@@ -201,33 +201,45 @@ class DBMock {
         return [];
     }
 
-    // Salva un messaggio nella conversazione
+    // Aggiorna il metodo saveMessage nel file DBMock.js per gestire correttamente i tipi di ID
+
+    // Aggiorna il metodo saveMessage nel file DBMock.js per gestire Promise in modo appropriato
     saveMessage(senderId, recipientId, text) {
-        const timestamp = new Date().toISOString();
-        const message = {
-            senderId: parseInt(senderId),
-            recipientId: parseInt(recipientId),
-            text,
-            timestamp
-        };
+        return new Promise((resolve, reject) => {
+            const timestamp = new Date().toISOString();
 
-        // Inserisce il messaggio nel database
-        dbConnection.run(
-            `INSERT INTO messages (sender_id, recipient_id, text, timestamp) VALUES (?, ?, ?, ?)`,
-            [senderId, recipientId, text, timestamp],
-            (err) => {
-                if (err) {
-                    console.error('Errore nel salvataggio messaggio:', err);
+            // Assicurati che gli ID siano sempre numeri interi
+            const senderIdInt = parseInt(senderId, 10);
+            const recipientIdInt = parseInt(recipientId, 10);
+
+            console.log(`DBMock: Salvando messaggio da ${senderIdInt} a ${recipientIdInt}`);
+
+            const message = {
+                senderId: senderIdInt,
+                recipientId: recipientIdInt,
+                text,
+                timestamp,
+                isRead: false
+            };
+
+            // Inserisce il messaggio nel database
+            dbConnection.run(
+                `INSERT INTO messages (sender_id, recipient_id, text, timestamp) VALUES (?, ?, ?, ?)`,
+                [senderIdInt, recipientIdInt, text, timestamp],
+                function (err) {
+                    if (err) {
+                        console.error('Errore nel salvataggio messaggio:', err);
+                        reject(err);
+                    } else {
+                        console.log(`Messaggio salvato con successo: ID=${this.lastID}, Da ${senderIdInt} a ${recipientIdInt}`);
+                        message.id = this.lastID;
+                        resolve(message);
+                    }
                 }
-            }
-        );
-
-        return message; // Ritorna il messaggio per compatibilità
+            );
+        });
     }
 
-    // Segna i messaggi come letti
-    // Modifica solo alla funzione markMessagesAsRead
-    // Versione con Promise
     markMessagesAsRead(senderId, recipientId) {
         return new Promise((resolve, reject) => {
             dbConnection.run(

@@ -1515,7 +1515,7 @@ app.get('/api/messages/:userId', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Socket.IO
+
 io.use((socket, next) => {
     const userId = socket.handshake.auth.userId;
     const username = socket.handshake.auth.username;
@@ -1524,19 +1524,26 @@ io.use((socket, next) => {
         return next(new Error("Autenticazione richiesta"));
     }
 
-    // Salva le informazioni utente nel socket
-    socket.userId = userId;
+    // Converte l'ID utente in numero per garantire consistenza
+    socket.userId = parseInt(userId, 10);
     socket.username = username;
 
+    console.log(`Utente connesso: ID=${socket.userId}, Username=${socket.username}`);
     next();
 });
 
 io.on('connection', (socket) => {
-    // Associa l'utente al socket
+    // Associa l'utente al socket usando l'ID convertito in stringa
     const userId = socket.userId;
+    console.log(`Connessione stabilita per l'utente ID=${userId}`);
+    
+    // Usa sempre toString() per le chiavi della mappa
     connectedUsers.set(userId.toString(), socket.id);
 
-    // Invia la lista degli utenti connessi a tutti
+    // Log degli utenti connessi per debug
+    console.log("Utenti connessi:", Array.from(connectedUsers.keys()));
+
+    // Invia la lista degli utenti connessi
     const users = [];
     const allUsers = db.getAllUsers();
 
@@ -1551,38 +1558,47 @@ io.on('connection', (socket) => {
 
     socket.emit('users', users);
 
-    socket.on('private message', ({ recipientId, text }) => {
+    // Gestione messaggi privati migliorata
+    socket.on('private message', async ({ recipientId, text }) => {
         const senderId = socket.userId;
-    
-        // Salva il messaggio nel database
-        const message = db.saveMessage(senderId, recipientId, text);
-    
-        // Invia il messaggio al destinatario se è online
-        const recipientSocketId = connectedUsers.get(recipientId.toString());
-        if (recipientSocketId) {
-            socket.to(recipientSocketId).emit('private message', message);
+        
+        // Converti sempre recipientId in numero
+        const recipientIdInt = parseInt(recipientId, 10);
+        
+        console.log(`Messaggio da ${senderId} a ${recipientIdInt}: ${text}`);
+
+        try {
+            // Salva il messaggio nel database
+            const message = await db.saveMessage(senderId, recipientIdInt, text);
+            
+            // Conferma al mittente che il messaggio è stato salvato
+            socket.emit('message_saved', message);
+            
+            // Invia il messaggio al destinatario se è online
+            const recipientSocketId = connectedUsers.get(recipientIdInt.toString());
+            if (recipientSocketId) {
+                console.log(`Destinatario ${recipientIdInt} è online, invio messaggio`);
+                socket.to(recipientSocketId).emit('private message', message);
+            } else {
+                console.log(`Destinatario ${recipientIdInt} non è online`);
+            }
+        } catch (error) {
+            console.error('Errore nell\'invio/salvataggio del messaggio:', error);
+            socket.emit('message_error', { error: 'Errore nell\'invio del messaggio' });
         }
     });
-    // Disconnessione
+
+    // Disconnessione con log migliorato
     socket.on('disconnect', () => {
+        console.log(`Utente disconnesso: ID=${socket.userId}`);
         connectedUsers.delete(socket.userId.toString());
 
         // Notifica gli altri utenti della disconnessione
-        const users = [];
-        const allUsers = db.getAllUsers();
-
-        allUsers.forEach(user => {
-            users.push({
-                id: user.id,
-                username: user.username,
-                nome: user.nome + ' ' + user.cognome,
-                connected: connectedUsers.has(user.id.toString())
-            });
-        });
-
-        socket.broadcast.emit('users', users);
+        socket.broadcast.emit('user_disconnected', socket.userId);
     });
 });
+
+
 // Start server
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 

@@ -4,96 +4,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Dressimify Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #5e60ce;
-            --primary-light: #6930c3;
-            --primary-dark: #5390d9;
-            --secondary: #48bfe3;
-            --message-sent: #c8b6ff;
-            --message-received: #f0f0f5;
-            --background: #f8f9fa;
-            --white: #ffffff;
-            --dark: #212529;
-            --gray: #6c757d;
-            --border: #e9ecef;
-            --sidebar-width: 250px;
+            /* Palette professionale e moderna */
+            --primary: #3366FF;
+            --primary-light: #5B83FF;
+            --primary-dark: #264FDB;
+            --secondary: #00D5D5;
+            --accent: #FF6B6B;
+            --message-sent: #E9F2FF;
+            --message-received: #F4F7FC;
+            --background: #F8FAFD;
+            --white: #FFFFFF;
+            --dark: #1E293B;
+            --gray: #64748B;
+            --light-gray: #CBD5E1;
+            --border: #E2E8F0;
+            --shadow: rgba(30, 41, 59, 0.1);
+            --sidebar-width: 280px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #a2d2ff, #bde0fe);
+            background: var(--background);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 0;
-            margin: 0;
+            color: var(--dark);
         }
 
         .navbar {
-            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 15px 20px;
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.08);
+            position: relative;
+            z-index: 10;
         }
 
         .navbar-brand {
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 700;
             text-decoration: none;
             color: white;
-        }
-
-        .navbar-user {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .navbar-user .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .navbar-user:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-user .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--white);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-user .user-name {
             font-weight: 500;
         }
 
+        .navbar-links {
+            display: flex;
+            gap: 8px;
+        }
+
         .navbar-links a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            padding: 10px 16px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .navbar-links a i {
+            font-size: 1.1rem;
         }
 
         .navbar-links a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 64px);
-            /* Altezza totale meno navbar */
+            height: calc(100vh - 70px);
+            overflow: hidden;
+            position: relative;
         }
 
         .users-sidebar {
@@ -103,55 +139,100 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            box-shadow: 2px 0 8px rgba(30, 41, 59, 0.05);
+            z-index: 5;
         }
 
         .users-search {
-            padding: 15px;
+            padding: 20px;
             border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 2;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
         }
 
         .users-search input {
             width: 100%;
-            padding: 10px;
+            padding: 12px 12px 12px 40px;
             border: 1px solid var(--border);
-            border-radius: 50px;
+            border-radius: 12px;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background-color: var(--background);
+        }
+
+        .users-search input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.12);
+            background-color: var(--white);
         }
 
         .users-list {
             flex: 1;
             overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .users-list-header {
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .user-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            border-radius: 0;
+            position: relative;
         }
 
         .user-item:hover {
-            background-color: rgba(94, 96, 206, 0.05);
+            background-color: rgba(51, 102, 255, 0.04);
         }
 
         .user-item.active {
-            background-color: rgba(94, 96, 206, 0.1);
+            background-color: rgba(51, 102, 255, 0.08);
+            border-left: 3px solid var(--primary);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 8px rgba(51, 102, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .user-item:hover .user-avatar {
+            transform: scale(1.05);
         }
 
         .user-info {
@@ -159,13 +240,29 @@
         }
 
         .user-name {
-            font-weight: 500;
+            font-weight: 600;
             color: var(--dark);
+            margin-bottom: 3px;
+            font-size: 0.95rem;
         }
 
         .user-status {
             font-size: 0.8rem;
             color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #CCC;
+        }
+
+        .status-indicator.online {
+            background-color: #22C55E;
         }
 
         .chat-area {
@@ -173,31 +270,77 @@
             display: flex;
             flex-direction: column;
             background-color: var(--background);
+            position: relative;
+            overflow: hidden; /* Importante per i componenti fissi */
         }
 
         .chat-header {
-            padding: 15px 20px;
+            padding: 16px 24px;
             background-color: var(--white);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 15px;
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.05);
+            z-index: 5;
+            position: sticky;
+            top: 0;
         }
 
         .chat-recipient {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .chat-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--background);
+            color: var(--gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .chat-action-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chat-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative; /* Per posizionare elementi interni */
         }
 
         #messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            background-color: #f8fafc;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+            gap: 16px;
+            background-color: var(--background);
+            background-image: 
+                radial-gradient(rgba(51, 102, 255, 0.02) 2px, transparent 2px),
+                radial-gradient(rgba(51, 102, 255, 0.02) 2px, transparent 2px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            /* Aggiunti padding-top e padding-bottom per evitare che i messaggi vengano coperti da header e footer */
+            padding-top: 24px;
+            padding-bottom: 100px;
         }
 
         #messages::-webkit-scrollbar {
@@ -205,54 +348,95 @@
         }
 
         #messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+            background: transparent;
         }
 
         #messages::-webkit-scrollbar-thumb {
-            background: #d6d6d6;
+            background: var(--light-gray);
             border-radius: 10px;
         }
 
         #messages::-webkit-scrollbar-thumb:hover {
-            background: #c0c0c0;
+            background: var(--gray);
         }
 
         #input-container {
             display: flex;
-            padding: 16px;
+            padding: 20px;
             border-top: 1px solid var(--border);
             background-color: var(--white);
-            position: relative;
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            box-shadow: 0 -2px 10px rgba(30, 41, 59, 0.05);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: var(--background);
+            border-radius: 24px;
+            padding: 0 20px;
+            box-shadow: inset 0 2px 5px rgba(30, 41, 59, 0.05);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.12), inset 0 2px 5px rgba(30, 41, 59, 0.02);
         }
 
         #input-container input {
             flex: 1;
-            padding: 14px 20px;
-            border: 1px solid #dbe0e5;
-            border-radius: 50px;
+            padding: 14px 0;
+            border: none;
             font-size: 1rem;
             box-sizing: border-box;
-            transition: all 0.3s;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            background-color: #f9fafb;
+            background-color: transparent;
         }
 
         #input-container input:focus {
-            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(94, 96, 206, 0.2);
-            background-color: var(--white);
         }
 
-        #input-container button {
-            padding: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
+        .message-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-left: 12px;
+        }
+
+        .message-action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-action-btn:hover {
+            color: var(--primary);
+            background-color: rgba(51, 102, 255, 0.08);
+        }
+
+        #send-button {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 16px;
             margin-left: 12px;
             cursor: pointer;
             font-size: 1.2rem;
@@ -260,29 +444,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(94, 96, 206, 0.3);
+            box-shadow: 0 4px 12px rgba(51, 102, 255, 0.3);
         }
 
-        #input-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(94, 96, 206, 0.4);
+        #send-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(51, 102, 255, 0.4);
         }
 
-        #input-container button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(94, 96, 206, 0.3);
+        #send-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(51, 102, 255, 0.3);
         }
 
         .message {
             max-width: 75%;
-            padding: 14px 18px;
+            padding: 16px 20px;
             border-radius: 18px;
-            margin: 4px 0;
             word-wrap: break-word;
             font-size: 1rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.08);
             position: relative;
             animation: fadeIn 0.3s ease-in-out;
+            line-height: 1.5;
         }
 
         @keyframes fadeIn {
@@ -298,14 +482,14 @@
         }
 
         .message.self {
-            background: linear-gradient(to bottom right, var(--message-sent), #d8c2fc);
-            color: var(--dark);
+            background: linear-gradient(to bottom right, var(--primary-light), var(--primary));
+            color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
 
         .message.other {
-            background-color: var(--message-received);
+            background-color: var(--white);
             color: var(--dark);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
@@ -313,9 +497,17 @@
 
         .message-timestamp {
             font-size: 0.7rem;
-            color: rgba(0, 0, 0, 0.4);
-            margin-top: 5px;
+            margin-top: 6px;
             text-align: right;
+            opacity: 0.7;
+        }
+
+        .message.self .message-timestamp {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .message.other .message-timestamp {
+            color: var(--gray);
         }
 
         .no-conversation {
@@ -327,18 +519,46 @@
             color: var(--gray);
             text-align: center;
             padding: 20px;
+            background-color: var(--background);
         }
 
         .no-conversation i {
-            font-size: 3rem;
+            font-size: 4rem;
             margin-bottom: 20px;
             color: var(--primary-light);
-            opacity: 0.5;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .no-conversation h2 {
+            margin-bottom: 12px;
+            color: var(--dark);
+            font-weight: 600;
         }
 
         .no-conversation p {
-            max-width: 300px;
-            line-height: 1.5;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+
+        .start-chat-btn {
+            margin-top: 24px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(51, 102, 255, 0.2);
+        }
+
+        .start-chat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(51, 102, 255, 0.3);
         }
 
         /* Responsive Design */
@@ -363,6 +583,7 @@
             .users-list {
                 display: flex;
                 overflow-x: auto;
+                padding: 10px;
             }
 
             .user-item {
@@ -380,11 +601,23 @@
             .user-status {
                 display: none;
             }
+
+            .chat-header {
+                padding: 12px 15px;
+            }
+
+            #messages {
+                padding: 15px;
+            }
+
+            #input-container {
+                padding: 15px;
+            }
         }
 
         @media (max-width: 576px) {
             .navbar {
-                padding: 10px 15px;
+                padding: 12px 15px;
             }
 
             .navbar-brand {
@@ -392,26 +625,22 @@
             }
 
             .navbar-links a {
-                margin-left: 10px;
-                padding: 5px 8px;
+                padding: 8px 12px;
             }
 
-            #input-container {
-                padding: 10px;
+            .chat-action-btn {
+                width: 36px;
+                height: 36px;
             }
 
-            #input-container input {
-                padding: 10px 15px;
-            }
-
-            #input-container button {
-                width: 40px;
-                height: 40px;
+            #send-button {
+                width: 48px;
+                height: 48px;
             }
 
             .message {
                 max-width: 85%;
-                padding: 12px 14px;
+                padding: 14px 16px;
             }
         }
 
@@ -422,29 +651,127 @@
         .has-new-message::after {
             content: '';
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background-color: #FF4757;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
             border-radius: 50%;
-            top: 10px;
-            right: 10px;
+            top: 12px;
+            right: 12px;
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0% {
                 transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
             }
 
             70% {
                 transform: scale(1);
-                box-shadow: 0 0 0 10px rgba(255, 71, 87, 0);
+                box-shadow: 0 0 0 8px rgba(255, 107, 107, 0);
             }
 
             100% {
                 transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+            }
+        }
+
+        .message-date-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .message-date-divider span {
+            background-color: var(--background);
+            padding: 0 15px;
+            color: var(--gray);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message-date-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--border);
+            z-index: 0;
+        }
+
+        /* Stile per il contatore visitatori */
+        .visitors-counter {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            margin-left: 20px;
+            transition: all 0.3s;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .visitors-counter:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .visitors-counter i {
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .visitors-count {
+            color: white;
+        }
+
+        /* Pulsante per scorrere verso il basso */
+        .scroll-to-bottom {
+            position: absolute;
+            bottom: 100px; /* Posizionato sopra l'area di input */
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(51, 102, 255, 0.3);
+            z-index: 4;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-bottom.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-to-bottom:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(51, 102, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .visitors-counter {
+                margin-left: 10px;
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .visitors-counter {
+                padding: 4px 8px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -453,7 +780,14 @@
 <body>
     <!-- Navbar -->
     <div class="navbar">
-        <a href="/home" class="navbar-brand">Dressimify Chat</a>
+        <a href="/home" class="navbar-brand">
+            <i class="fas fa-comments"></i> Dressimify Chat
+        </a>
+        <!-- Contatore visitatori -->
+        <div class="visitors-counter">
+            <i class="fas fa-user-group"></i>
+            <span class="visitors-count" id="visitors-count">0</span> online
+        </div>
         <div class="navbar-user">
             <div class="user-avatar" id="current-user-avatar"></div>
             <span class="user-name" id="current-user-name">Caricamento...</span>
@@ -469,7 +803,13 @@
         <!-- Users Sidebar -->
         <div class="users-sidebar">
             <div class="users-search">
-                <input type="text" placeholder="Cerca utenti..." id="user-search">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cerca utenti..." id="user-search">
+                </div>
+            </div>
+            <div class="users-list-header">
+                Conversazioni
             </div>
             <div class="users-list" id="users-list">
                 <!-- Gli utenti verranno aggiunti dinamicamente -->
@@ -481,21 +821,41 @@
             <div class="no-conversation" id="no-conversation">
                 <i class="fas fa-comments"></i>
                 <h2>Nessuna conversazione selezionata</h2>
-                <p>Seleziona un utente dalla lista per iniziare a chattare.</p>
+                <p>Seleziona un utente dalla lista per iniziare a chattare o cerca nuovi contatti.</p>
+                <button class="start-chat-btn"><i class="fas fa-user-plus"></i> Trova contatti</button>
             </div>
 
             <div class="chat-content" id="chat-content" style="display: none;">
                 <div class="chat-header">
                     <div class="user-avatar" id="recipient-avatar"></div>
-                    <div class="chat-recipient" id="chat-recipient">...</div>
+                    <div>
+                        <div class="chat-recipient" id="chat-recipient">...</div>
+                        <div class="user-status"><span class="status-indicator" id="recipient-status"></span> <span id="status-text">Offline</span></div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="chat-action-btn"><i class="fas fa-phone"></i></button>
+                        <button class="chat-action-btn"><i class="fas fa-video"></i></button>
+                        <button class="chat-action-btn"><i class="fas fa-info-circle"></i></button>
+                    </div>
                 </div>
 
                 <div id="messages">
                     <!-- I messaggi verranno aggiunti dinamicamente -->
                 </div>
+                
+                <!-- Pulsante per scorrere verso il basso -->
+                <div class="scroll-to-bottom" id="scroll-to-bottom">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
 
                 <div id="input-container">
-                    <input id="message-input" type="text" placeholder="Scrivi un messaggio...">
+                    <div class="input-wrapper">
+                        <input id="message-input" type="text" placeholder="Scrivi un messaggio...">
+                        <div class="message-actions">
+                            <button class="message-action-btn"><i class="far fa-smile"></i></button>
+                            <button class="message-action-btn"><i class="fas fa-paperclip"></i></button>
+                        </div>
+                    </div>
                     <button id="send-button"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -510,6 +870,7 @@
         let users = [];
         let messages = {};
         const socket = io();
+        let isScrolledToBottom = true;
 
         // Funzione principale di inizializzazione
         async function init() {
@@ -523,6 +884,11 @@
 
                 currentUser = await userResponse.json();
 
+                // Assicurati che l'ID sia un numero
+                currentUser.id = parseInt(currentUser.id, 10);
+
+                console.log("Utente corrente:", currentUser);
+
                 // Aggiorna UI con le informazioni dell'utente
                 document.getElementById('current-user-name').textContent =
                     currentUser.nome + ' ' + currentUser.cognome;
@@ -533,12 +899,17 @@
                 const usersResponse = await fetch('/api/users');
                 if (usersResponse.ok) {
                     users = await usersResponse.json();
+                    // Assicurati che tutti gli ID siano numeri
+                    users = users.map(user => ({
+                        ...user,
+                        id: parseInt(user.id, 10)
+                    }));
                     renderUsersList();
                 }
 
-                // Connetti socket con autenticazione
+                // Connetti socket con autenticazione - IMPORTANTE: Invia l'ID come numero
                 socket.auth = {
-                    userId: currentUser.id,
+                    userId: parseInt(currentUser.id, 10),
                     username: currentUser.username
                 };
 
@@ -546,20 +917,59 @@
 
                 // Gestione eventi socket
                 setupSocketListeners();
+                
+                // Setup scroll event per mostrare/nascondere il pulsante di scroll
+                setupScrollButton();
 
             } catch (error) {
                 console.error('Errore durante l\'inizializzazione:', error);
             }
         }
+        
+        // Setup del pulsante di scroll
+        function setupScrollButton() {
+            const messagesContainer = document.getElementById('messages');
+            const scrollButton = document.getElementById('scroll-to-bottom');
+            
+            // Controlla lo scroll e mostra/nascondi il pulsante
+            messagesContainer.addEventListener('scroll', () => {
+                const isAtBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+                isScrolledToBottom = isAtBottom;
+                
+                if (isAtBottom) {
+                    scrollButton.classList.remove('visible');
+                } else {
+                    scrollButton.classList.add('visible');
+                }
+            });
+            
+            // Evento click per scorrere verso il basso
+            scrollButton.addEventListener('click', () => {
+                scrollToBottom();
+            });
+        }
+        
+        // Scorri verso il basso
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            isScrolledToBottom = true;
+        }
 
         // Configurazione dei listener per Socket.IO
         function setupSocketListeners() {
             socket.on('connect', () => {
-                console.log('Connesso al server Socket.IO');
+                console.log('Connesso al server Socket.IO con ID:', currentUser.id);
             });
 
             socket.on('users', (usersList) => {
                 console.log('Utenti online ricevuti:', usersList);
+
+                // Assicurati che tutti gli ID siano numeri
+                usersList = usersList.map(user => ({
+                    ...user,
+                    id: parseInt(user.id, 10)
+                }));
 
                 // Aggiorna lo stato di connessione degli utenti
                 usersList.forEach(user => {
@@ -570,10 +980,22 @@
                 });
 
                 renderUsersList();
+                
+                // Aggiorna il contatore visitatori
+                updateVisitorsCount(usersList.filter(user => user.connected).length);
+            });
+
+            // Ascolta l'evento visitor_count per il contatore visitatori in tempo reale
+            socket.on('visitor_count', (count) => {
+                updateVisitorsCount(count);
             });
 
             socket.on('private message', (message) => {
                 console.log('Messaggio privato ricevuto:', message);
+
+                // Assicurati che gli ID siano numeri
+                message.senderId = parseInt(message.senderId, 10);
+                message.recipientId = parseInt(message.recipientId, 10);
 
                 // Aggiungi il messaggio alla lista appropriata
                 const userId = message.senderId;
@@ -584,13 +1006,36 @@
                 messages[userId].push(message);
 
                 // Se la conversazione è quella selezionata, aggiorna la visualizzazione
-                if (selectedUser && selectedUser.id === parseInt(userId)) {
+                if (selectedUser && selectedUser.id === userId) {
                     renderMessages(userId);
+                    // Scroll automatico solo se l'utente è già in fondo
+                    if (isScrolledToBottom) {
+                        scrollToBottom();
+                    } else {
+                        // Mostra il pulsante di scroll se l'utente non è in fondo
+                        document.getElementById('scroll-to-bottom').classList.add('visible');
+                    }
                 } else {
                     // Altrimenti, notifica l'utente
                     notifyNewMessage(userId);
                 }
             });
+
+            // Aggiungi listener per conferma salvataggio messaggio
+            socket.on('message_saved', (message) => {
+                console.log('Messaggio salvato con successo:', message);
+            });
+
+            // Aggiungi listener per errori
+            socket.on('message_error', (error) => {
+                console.error('Errore con il messaggio:', error);
+                alert('Errore nell\'invio del messaggio. Riprova.');
+            });
+        }
+
+        // Funzione per aggiornare il contatore visitatori
+        function updateVisitorsCount(count) {
+            document.getElementById('visitors-count').textContent = count;
         }
 
         // Renderizza la lista degli utenti
@@ -619,12 +1064,15 @@
                     : user.username;
 
                 userItem.innerHTML = `
-                    <div class="user-avatar">${getInitials(user.nome || user.username)}</div>
-                    <div class="user-info">
-                        <div class="user-name">${displayName}</div>
-                        <div class="user-status">${user.connected ? 'Online' : 'Offline'}</div>
-                    </div>
-                `;
+            <div class="user-avatar">${getInitials(user.nome || user.username)}</div>
+            <div class="user-info">
+                <div class="user-name">${displayName}</div>
+                <div class="user-status">
+                    <span class="status-indicator ${user.connected ? 'online' : ''}"></span>
+                    ${user.connected ? 'Online' : 'Offline'}
+                </div>
+            </div>
+        `;
 
                 userItem.addEventListener('click', () => {
                     selectUser(user);
@@ -636,13 +1084,21 @@
 
         // Seleziona un utente per la chat
         function selectUser(user) {
-            selectedUser = user;
+            selectedUser = {
+                ...user,
+                id: parseInt(user.id, 10) // Assicurati che l'ID sia un numero
+            };
+
+            console.log("Utente selezionato:", selectedUser);
 
             // Aggiorna UI
             document.querySelectorAll('.user-item').forEach(item => {
                 item.classList.remove('active');
-                if (parseInt(item.dataset.userId) === user.id) {
+                if (parseInt(item.dataset.userId) === selectedUser.id) {
                     item.classList.add('active');
+                    item.classList.remove('has-new-message');
+                    item.style.backgroundColor = '';
+                    item.style.fontWeight = '';
                 }
             });
 
@@ -655,18 +1111,43 @@
             document.getElementById('chat-recipient').textContent = user.nome && user.cognome
                 ? `${user.nome} ${user.cognome}`
                 : user.username;
+            
+            // Aggiorna lo stato online/offline nella chat
+            const statusIndicator = document.getElementById('recipient-status');
+            const statusText = document.getElementById('status-text');
+            if (user.connected) {
+                statusIndicator.className = 'status-indicator online';
+                statusText.textContent = 'Online';
+            } else {
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = 'Offline';
+            }
 
             // Carica messaggi
-            getMessages(user.id);
+            getMessages(selectedUser.id);
         }
 
         // Ottieni i messaggi con un utente
         async function getMessages(userId) {
             try {
+                userId = parseInt(userId, 10); // Assicurati che l'ID sia un numero
+                console.log("Caricamento messaggi per l'utente ID:", userId);
+
                 const response = await fetch(`/api/messages/${userId}`);
                 if (response.ok) {
-                    messages[userId] = await response.json();
+                    const msgs = await response.json();
+
+                    // Assicurati che gli ID nei messaggi siano numeri
+                    messages[userId] = msgs.map(msg => ({
+                        ...msg,
+                        senderId: parseInt(msg.senderId, 10),
+                        recipientId: parseInt(msg.recipientId, 10)
+                    }));
+
                     renderMessages(userId);
+                    
+                    // Dopo aver caricato i messaggi, scorri verso il basso
+                    setTimeout(scrollToBottom, 100);
                 }
             } catch (error) {
                 console.error('Errore nel recupero dei messaggi:', error);
@@ -677,6 +1158,7 @@
 
         // Renderizza i messaggi
         function renderMessages(userId) {
+            userId = parseInt(userId, 10); // Assicurati che l'ID sia un numero
             const messagesContainer = document.getElementById('messages');
             messagesContainer.innerHTML = '';
 
@@ -688,22 +1170,24 @@
             messages[userId].forEach(msg => {
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message';
-                messageElement.classList.add(msg.senderId == currentUser.id ? 'self' : 'other');
+
+                // Converti sempre gli ID in numeri per il confronto
+                const senderId = parseInt(msg.senderId, 10);
+                const currentUserId = parseInt(currentUser.id, 10);
+
+                messageElement.classList.add(senderId === currentUserId ? 'self' : 'other');
 
                 // Formatta la data
                 const timestamp = new Date(msg.timestamp);
                 const formattedTime = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 messageElement.innerHTML = `
-                    <div class="message-content">${msg.text}</div>
-                    <div class="message-timestamp">${formattedTime}</div>
-                `;
+            <div class="message-content">${msg.text}</div>
+            <div class="message-timestamp">${formattedTime}</div>
+        `;
 
                 messagesContainer.appendChild(messageElement);
             });
-
-            // Scorri alla fine della chat
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
         // Funzione per inviare un messaggio
@@ -712,11 +1196,14 @@
             const text = input.value.trim();
 
             if (text && selectedUser) {
-                console.log('Invio messaggio a:', selectedUser.id, text);
+                console.log('Invio messaggio a ID:', selectedUser.id, text);
+
+                // Assicurati che recipientId sia un numero
+                const recipientId = parseInt(selectedUser.id, 10);
 
                 // Crea oggetto messaggio
                 const message = {
-                    recipientId: selectedUser.id,
+                    recipientId: recipientId,
                     text: text
                 };
 
@@ -724,19 +1211,25 @@
                 socket.emit('private message', message);
 
                 // Aggiungi alla lista locale
-                if (!messages[selectedUser.id]) {
-                    messages[selectedUser.id] = [];
+                if (!messages[recipientId]) {
+                    messages[recipientId] = [];
                 }
 
-                messages[selectedUser.id].push({
-                    senderId: currentUser.id,
-                    recipientId: selectedUser.id,
+                // Aggiungi il messaggio localmente
+                const newMsg = {
+                    senderId: parseInt(currentUser.id, 10),
+                    recipientId: recipientId,
                     text: text,
                     timestamp: new Date().toISOString()
-                });
+                };
+
+                messages[recipientId].push(newMsg);
 
                 // Aggiorna UI
-                renderMessages(selectedUser.id);
+                renderMessages(recipientId);
+                
+                // Scorri verso il basso quando invii un messaggio
+                scrollToBottom();
 
                 // Pulisci input
                 input.value = '';
@@ -752,6 +1245,7 @@
         // Funzione per mostrare notifiche
         function notifyNewMessage(userId) {
             // Implementare notifiche (potrebbe essere un badge sul nome utente)
+            userId = parseInt(userId, 10); // Assicurati che l'ID sia un numero
             const userItem = document.querySelector(`.user-item[data-user-id="${userId}"]`);
             if (userItem) {
                 userItem.classList.add('has-new-message');
