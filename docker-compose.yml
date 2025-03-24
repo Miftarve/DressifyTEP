@@ -1,11 +1,9 @@
-version: '3'
-
 services:
-  dressifytep:
-    build: .
-    image: dressifytep
-    container_name: dressifytep-container
+  backend:
+    build:
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     env_file:
       - .env
+
