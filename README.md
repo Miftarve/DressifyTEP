@@ -102,6 +102,19 @@ Prima di iniziare, assicurati di avere quanto segue:
 
 ## 📥Installazione di Docker
 
+# Guida all'Installazione di DressifyTEP con Docker
+
+Questa guida spiega come configurare e avviare l'applicazione DressifyTEP utilizzando Docker su vari sistemi operativi.
+
+## Prerequisiti
+
+Prima di iniziare, assicurati di avere quanto segue:
+
+- Un computer con sistema operativo Windows, Linux o macOS
+- Docker e Docker Compose installati (vedi le istruzioni di installazione più avanti)
+
+## 📥 Installazione di Docker
+
 ### Windows
 1. Scarica Docker Desktop:
    - Visita la [pagina di Docker Desktop per Windows](https://www.docker.com/products/docker-desktop)
@@ -160,28 +173,50 @@ Docker Compose è incluso in Docker Desktop. Non è necessaria un'installazione 
 
 ## Configurazione e Avvio di DressifyTEP
 
-### Passaggio 1: Scarica il Progetto
+Ci sono due metodi per configurare e avviare DressifyTEP: **manuale** e **automatico**.
+
+### Metodo 1: Configurazione Automatica (Solo Windows)
+
+Per un'installazione rapida e guidata, puoi utilizzare il file batch incluso nel progetto:
+
+1. Scarica il file ZIP del progetto
+2. Estrai la cartella ZIP nella posizione desiderata
+3. Naviga nella cartella del progetto
+4. Fai doppio clic sul file `setup-dressify.bat`
+5. Segui le istruzioni visualizzate nella finestra del prompt dei comandi
+
+Il file batch eseguirà automaticamente:
+- Controllo dell'installazione di Docker
+- Verifica che Docker sia in esecuzione
+- Creazione del file `.env` (o chiederà se sovrascrivere un file esistente)
+- Ti aiuterà a inserire le credenziali OAuth
+- Avvio dell'applicazione con Docker
+- Offerta di aprire l'applicazione nel browser
+
+### Metodo 2: Configurazione Manuale
+
+#### Passaggio 1: Scarica il Progetto
 1. Scarica il file ZIP del progetto
 2. Estrai la cartella ZIP nella posizione desiderata
 
-### Passaggio 2: Configura il File .env
+#### Passaggio 2: Configura il File .env
 1. Vai alla cartella del progetto estratto
 2. Fai clic con il tasto destro sulla cartella e seleziona "Apri nel terminale"
 3. Nel terminale, crea il file `.env` con il seguente comando:
 
-#### Windows (PowerShell):
+##### Windows (PowerShell):
 ```
 Set-Content -Path ".env" -Value "# Google OAuth credentials`nGOOGLE_CLIENT_ID=idcliente`nGOOGLE_CLIENT_SECRET=appsecret`n`n# Facebook OAuth credentials`nFACEBOOK_APP_ID=idcliente`nFACEBOOK_APP_SECRET=appsecret"
 ```
 
-#### macOS/Linux:
+##### macOS/Linux:
 ```
 echo -e "# Google OAuth credentials\nGOOGLE_CLIENT_ID=idcliente\nGOOGLE_CLIENT_SECRET=appsecret\n\n# Facebook OAuth credentials\nFACEBOOK_APP_ID=idcliente\nFACEBOOK_APP_SECRET=appsecret" > .env
 ```
 
 4. **Importante**: Modifica il file `.env` appena creato e sostituisci `idcliente` e `appsecret` con le tue credenziali OAuth reali di Google e Facebook
 
-### Passaggio 3: Avvia l'Applicazione
+#### Passaggio 3: Avvia l'Applicazione
 1. Nella stessa finestra del terminale, esegui il seguente comando per costruire e avviare i container Docker:
    ```
    docker-compose up -d --build
@@ -210,4 +245,3 @@ Per arrestare l'applicazione, esegui il seguente comando nella cartella del prog
 ```
 docker-compose down
 ```
-
