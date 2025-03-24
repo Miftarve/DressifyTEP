@@ -87,7 +87,7 @@ Con DressifyTEP, puoi facilmente trovare nuove combinazioni e idee per i tuoi ou
 - **Usabilità**: Design intuitivo e facile da usare per tutti.
   
 # Diagramma dei casi d'uso per Dressify
-- Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](https://yuml.me/mify/e4c6a5df.svg)
+ - Visualizza il diagramma dei casi d'uso: ![Casi d'Uso Dressify](https://yuml.me/mify/e4c6a5df.svg)
 
 # Guida all'Installazione di DressifyTEP con Docker
 
