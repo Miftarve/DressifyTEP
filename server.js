@@ -8,73 +8,47 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const http = require('http');
 const socketIo = require('socket.io');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 // Carica le variabili d'ambiente dal file .env
 require('dotenv').config();
 
-//const cors = require('cors');
-
-//const sqlite3 = require('sqlite3').verbose();
-//const db = new sqlite3.Database('database.db');
 const mock = require('./DBMock.js');
 const db = new mock();
 
 const hbs = require('hbs');
 
-//use sessions for tracking logins
-const session = require('express-session');
-const DBMock = require('./DBMock.js');
+// Definizione della SECRET_KEY per i JWT
+const SECRET_KEY = process.env.SECRET_KEY || 'dressify_secret_key';
 
 // Importa il modulo database e inizializza le tabelle
 const { initDatabase } = require('./database.js');
 initDatabase();
-// Create express app using session
+
+// Create express app
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Struttura per memorizzare le conversazioni
-//const conversations = {};
-
 // Tracciare gli utenti connessi
 const connectedUsers = new Map();
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'ssshhhhh',
-    resave: false,
-    saveUninitialized: true
-}));
+// Middleware
+app.use(cors());
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // Configurazione del motore di template
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-
 hbs.registerHelper('json', context => JSON.stringify(context, null, 2));
 
-// Body parser middleware
-app.use(bodyParser.json());       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
-
-app.set('view engine', 'hbs')
-
-// Set public folder
-app.use('/static', express.static(path.join(__dirname, 'public')));
-// Inizializza Passport e sessioni
+// Inizializza Passport.js (solo per OAuth)
 app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'ssshhhhh',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week in milliseconds
-    }
-}));
-
 
 /**
  * @swagger
@@ -184,11 +158,11 @@ app.use(session({
  *           type: boolean
  *           description: Stato di lettura del messaggio
  *   securitySchemes:
- *     sessionAuth:
- *       type: apiKey
- *       in: cookie
- *       name: connect.sid
- *       description: Autenticazione basata su sessione
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: Autenticazione basata su JWT
  *     googleOAuth:
  *       type: oauth2
  *       flows:
@@ -269,16 +243,16 @@ const swaggerOptions = {
         ],
         components: {
             securitySchemes: {
-                sessionAuth: {
-                    type: 'apiKey',
-                    in: 'cookie',
-                    name: 'connect.sid'
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
                 }
             }
         },
         security: [
             {
-                sessionAuth: []
+                bearerAuth: []
             }
         ]
     },
@@ -288,15 +262,12 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-
-// Serializzazione e deserializzazione utente
+// Funzioni di utilità per Passport.js
 passport.serializeUser((user, done) => {
-    // Store only the essential identifier in the session
     done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-    // Retrieve the full user object when needed
     const user = db.getUserById(id);
     if (!user) {
         return done(new Error('User not found'), null);
@@ -432,20 +403,24 @@ app.get('/auth/google/callback',
         failureRedirect: '/login'
     }),
     (req, res) => {
-        // Make sure the user is properly saved in the session
+        // Una volta autenticato con Google, genera un JWT
         if (req.user) {
-            // This sets up the session completely via passport
-            req.session.loggedin = true;
-            req.session.user = req.user;
-            req.session.role = req.user.ruolo;
-
-            // Force session save to ensure persistence
-            req.session.save(err => {
-                if (err) {
-                    console.error('Session save error:', err);
-                }
-                res.redirect('/home');
+            const token = jwt.sign({
+                id: req.user.id,
+                name: req.user.nome,
+                email: req.user.email,
+                ruolo: req.user.ruolo
+            }, SECRET_KEY, {
+                expiresIn: '24h' // Token valido per 24 ore
             });
+
+            // Salva token nei cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000 // 24 ore
+            });
+
+            res.redirect('/home');
         } else {
             res.redirect('/login');
         }
@@ -490,17 +465,22 @@ app.get('/auth/facebook/callback',
     }),
     (req, res) => {
         if (req.user) {
-            req.session.loggedin = true;
-            req.session.user = req.user;
-            req.session.role = req.user.ruolo;
-
-            // Force session save to ensure persistence
-            req.session.save(err => {
-                if (err) {
-                    console.error('Session save error:', err);
-                }
-                res.redirect('/home');
+            const token = jwt.sign({
+                id: req.user.id,
+                name: req.user.nome,
+                email: req.user.email,
+                ruolo: req.user.ruolo
+            }, SECRET_KEY, {
+                expiresIn: '24h' // Token valido per 24 ore
             });
+
+            // Salva token nei cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000 // 24 ore
+            });
+
+            res.redirect('/home');
         } else {
             res.redirect('/login');
         }
@@ -598,29 +578,38 @@ app.post('/api/delete-user-data', async (req, res) => {
     }
 });
 
-// Middleware per verificare l'autenticazione
+// Middleware per verificare l'autenticazione con JWT
 function ensureAuthenticated(req, res, next) {
-    // First check Passport's authentication
-    if (req.isAuthenticated()) {
-        return next();
+    // Ottieni il token da cookie o header Authorization
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+        return res.redirect('/login');
     }
 
-    // Then check our manual session flag as backup
-    if (req.session && req.session.loggedin && req.session.user) {
-        // If we have session data but Passport doesn't recognize it,
-        // restore the Passport session
-        req.login(req.session.user, err => {
-            if (err) {
-                console.error('Session restoration error:', err);
-                return res.redirect('/login');
-            }
-            return next();
-        });
-    } else {
-        res.redirect('/login');
+    try {
+        // Verifica il token
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded;
+        
+        // Funzioni per mantenere retrocompatibilità con il codice esistente
+        req.isAuthenticated = () => true;
+        
+        next();
+    } catch (error) {
+        // Se il token non è valido, reindirizza al login
+        res.clearCookie('token');
+        return res.redirect('/login');
     }
 }
 
+// Middleware per controllare se l'utente è un amministratore
+function ensureAdmin(req, res, next) {
+    if (req.isAuthenticated && req.isAuthenticated() && req.user.ruolo === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ error: 'Accesso non autorizzato' });
+}
 
 /**
  * @swagger
@@ -634,36 +623,20 @@ function ensureAuthenticated(req, res, next) {
  *         description: Pagina di login
  *       302:
  *         description: Reindirizza alla home se l'utente è già autenticato
- *   post:
- *     summary: Elabora il login dell'utente
- *     tags: [Auth]
- *     description: Autentica l'utente con username e password
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: Username o email dell'utente
- *               password:
- *                 type: string
- *                 description: Password dell'utente
- *             required:
- *               - username
- *               - password
- *     responses:
- *       302:
- *         description: Reindirizza alla home in caso di successo o alla pagina di errore in caso di fallimento
  */
 app.get('/login', (req, res) => {
-    if (req.session.loggedin) {
-        res.redirect('/home'); // Se già autenticato, reindirizza alla home
-    } else {
-        res.sendFile(path.join(__dirname, 'public', 'login.html')); // Mostra il login
+    // Verifica se c'è un token valido
+    const token = req.cookies.token;
+    if (token) {
+        try {
+            jwt.verify(token, SECRET_KEY);
+            return res.redirect('/home'); // Token valido, reindirizza alla home
+        } catch (error) {
+            // Token non valido, elimina il cookie
+            res.clearCookie('token');
+        }
     }
+    res.sendFile(path.join(__dirname, 'public', 'login.html')); // Mostra il login
 });
 
 /**
@@ -692,7 +665,6 @@ app.get('/', (req, res) => {
  *       200:
  *         description: Pagina di recupero dati
  */
-// Assuming you already have your Express app set up
 app.get('/recuperoDati', (req, res) => {
     res.sendFile(path.join(__dirname, 'recuperDati.html'));
 });
@@ -703,7 +675,7 @@ app.get('/recuperoDati', (req, res) => {
  *   post:
  *     summary: Elabora il login dell'utente
  *     tags: [Auth]
- *     description: Verifica le credenziali dell'utente e crea una sessione
+ *     description: Verifica le credenziali dell'utente e genera un token JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -731,19 +703,35 @@ app.post('/login', (req, res) => {
     const user = db.getUserByUsername(username);
 
     if (user && user.password === password) {
-        // Serializza l'utente per Passport
-        req.login(user, err => {
-            if (err) {
-                return res.render('error', { message: 'Errore durante il login!' });
+        // Genera token JWT
+        const token = jwt.sign({
+            id: user.id,
+            name: user.nome,
+            email: user.email,
+            ruolo: user.ruolo
+        }, SECRET_KEY, {
+            expiresIn: '24h' // Token valido per 24 ore
+        });
+        
+        // Salva token nei cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 // 24 ore
+        });
+        
+        // Invia token e dati utente come JSON
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                nome: user.nome,
+                cognome: user.cognome,
+                email: user.email,
+                ruolo: user.ruolo
             }
-            // Standardize session data structure across all login methods
-            req.session.loggedin = true;
-            req.session.user = user;
-            req.session.role = user.ruolo; // Ensure role is saved in session
-            res.redirect('/home');
         });
     } else {
-        res.render('error', { message: 'Username o password errati!' });
+        res.status(401).json({ message: 'Username o password errati!' });
     }
 });
 
@@ -759,14 +747,9 @@ app.post('/login', (req, res) => {
  *         description: Reindirizza alla home page dopo il logout
  */
 app.get('/logout', (req, res) => {
-    req.logout(err => {
-        if (err) {
-            return res.render('error', { message: 'Errore durante il logout!' });
-        }
-        req.session.destroy(() => {
-            res.redirect('/');
-        });
-    });
+    // Elimina il cookie del token
+    res.clearCookie('token');
+    res.redirect('/');
 });
 
 /**
@@ -777,7 +760,7 @@ app.get('/logout', (req, res) => {
  *     tags: [Users]
  *     description: Mostra la home page con informazioni personalizzate in base al ruolo dell'utente
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Home page con informazioni dell'utente
@@ -785,30 +768,21 @@ app.get('/logout', (req, res) => {
  *         description: Reindirizza al login se l'utente non è autenticato
  */
 app.get('/home', ensureAuthenticated, (req, res) => {
-    // Get user from session or passport
-    const user = req.user || req.session.user;
+    // Get user from JWT
+    const user = req.user;
 
-    // Additional safety check
-    if (!user) {
-        return res.redirect('/login');
-    }
-
-    // Use req.session.role if available, otherwise get from user object
-    const userRole = req.session.role || user.ruolo;
-
-    if (userRole === 'admin') {
+    if (user.ruolo === 'admin') {
         const users = db.getAllUsers();
         res.render('admin/home', {
-            name: user.nome,
-            role: userRole,
-            message: req.session.message,
+            name: user.name,
+            role: user.ruolo,
             users: users
         });
     } else {
         res.render('home', {
-            name: user.nome,
-            role: userRole,
-            message: `Benvenuto, ${user.nome}!`
+            name: user.name,
+            role: user.ruolo,
+            message: `Benvenuto, ${user.name}!`
         });
     }
 });
@@ -821,7 +795,7 @@ app.get('/home', ensureAuthenticated, (req, res) => {
  *     tags: [Users]
  *     description: Permette a un amministratore di creare un nuovo utente nel sistema
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -865,7 +839,7 @@ app.get('/home', ensureAuthenticated, (req, res) => {
  *       302:
  *         description: Reindirizza alla home page con messaggio di successo o alla pagina di errore in caso di fallimento
  */
-app.post('/registraUtente', (req, res) => {
+app.post('/registraUtente', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { nome, cognome, dataNascita, luogoNascita, ruolo, email, password } = req.body;
 
     if (!nome || !cognome || !dataNascita || !luogoNascita || !ruolo || !email || !password) {
@@ -874,7 +848,6 @@ app.post('/registraUtente', (req, res) => {
     }
 
     const user = db.createUser({ nome, cognome, dataNascita, luogoNascita, ruolo, email, password });
-    req.session.message = `Utente con id: (${user.id}) creato con successo`;
     res.redirect('/home');
 });
 
@@ -890,6 +863,25 @@ app.post('/registraUtente', (req, res) => {
  *         description: Pagina di registrazione
  *       302:
  *         description: Reindirizza alla home se l'utente è già autenticato
+ */
+app.get('/register', (req, res) => {
+    // Verifica se c'è un token valido
+    const token = req.cookies.token;
+    if (token) {
+        try {
+            jwt.verify(token, SECRET_KEY);
+            return res.redirect('/home'); // Token valido, reindirizza alla home
+        } catch (error) {
+            // Token non valido, elimina il cookie
+            res.clearCookie('token');
+        }
+    }
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+/**
+ * @swagger
+ * /register:
  *   post:
  *     summary: Elabora la registrazione di un nuovo utente
  *     tags: [Auth]
@@ -934,15 +926,6 @@ app.post('/registraUtente', (req, res) => {
  *       302:
  *         description: Reindirizza al login in caso di successo o alla pagina di errore in caso di fallimento
  */
-// Pagina di registrazione
-app.get('/register', (req, res) => {
-    if (req.session.loggedin) {
-        return res.redirect('/home'); // Se l'utente è loggato, reindirizzalo alla home
-    }
-    res.sendFile(path.join(__dirname, 'public', 'register.html')); // Serve la pagina di registrazione
-});
-
-// Gestione della registrazione
 app.post('/register', (req, res) => {
     const { nome, cognome, dataNascita, luogoNascita, email, username, password } = req.body;
 
@@ -964,7 +947,6 @@ app.post('/register', (req, res) => {
         password,
     });
 
-    req.session.message = `Registrazione completata con successo! Benvenuto ${newUser.nome}.`;
     res.redirect('/login');
 });
 
@@ -976,7 +958,7 @@ app.post('/register', (req, res) => {
  *     tags: [Users]
  *     description: Mostra un form precompilato con i dati dell'utente da modificare
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -989,12 +971,29 @@ app.post('/register', (req, res) => {
  *         description: Form di modifica con i dati dell'utente
  *       302:
  *         description: Reindirizza alla pagina di errore se l'utente non è trovato
+ */
+app.get('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const userId = parseInt(req.params.id);
+    const user = db.getUserById(userId);
+
+    if (!user) {
+        return res.render('error', { message: 'Utente non trovato!' });
+    }
+
+    res.render('admin/modificaUtente', {
+        user: user
+    });
+});
+
+/**
+ * @swagger
+ * /modificaUtente/{id}:
  *   post:
  *     summary: Aggiorna i dati di un utente
  *     tags: [Users]
  *     description: Elabora i dati del form e aggiorna le informazioni dell'utente
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1041,22 +1040,7 @@ app.post('/register', (req, res) => {
  *       302:
  *         description: Reindirizza alla home page in caso di successo o alla pagina di errore in caso di fallimento
  */
-// Modifica un utente
-app.get('/modificaUtente/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = db.getUserById(userId);
-
-    if (!user) {
-        return res.render('error', { message: 'Utente non trovato!' });
-    }
-
-    res.render('admin/modificaUtente', {
-        user: user
-    });
-});
-
-// Modifica i dati dell'utente
-app.post('/modificaUtente/:id', (req, res) => {
+app.post('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
     const { nome, cognome, dataNascita, ruolo, email, password } = req.body;
 
@@ -1077,7 +1061,7 @@ app.post('/modificaUtente/:id', (req, res) => {
  *     tags: [Users]
  *     description: Rimuove un utente dal sistema
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1089,8 +1073,7 @@ app.post('/modificaUtente/:id', (req, res) => {
  *       302:
  *         description: Reindirizza alla home page in caso di successo o alla pagina di errore in caso di fallimento
  */
-// Elimina un utente
-app.get('/eliminaUtente/:id', (req, res) => {
+app.get('/eliminaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
     const success = db.deleteUser(userId);
 
@@ -1113,7 +1096,7 @@ hbs.registerHelper('eq', function (a, b) {
  *     tags: [Products]
  *     description: Visualizza tutti i prodotti nel sistema, accessibile solo agli amministratori
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista dei prodotti
@@ -1125,12 +1108,21 @@ hbs.registerHelper('eq', function (a, b) {
  *                 $ref: '#/components/schemas/Product'
  *       302:
  *         description: Reindirizza al login se non autenticato o non admin
+ */
+app.get('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const products = db.getAllProducts();
+    res.render('prodotti', { products });
+});
+
+/**
+ * @swagger
+ * /prodotti:
  *   post:
  *     summary: Aggiunge un nuovo prodotto (solo admin)
  *     tags: [Products]
  *     description: Crea un nuovo prodotto nel sistema
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1165,22 +1157,10 @@ hbs.registerHelper('eq', function (a, b) {
  *       401:
  *         description: Non autorizzato, richiede autenticazione
  */
-// Visualizza tutti i prodotti (solo admin)
-app.get('/prodotti', (req, res) => {
-    if (!req.session.loggedin || req.session.role !== 'admin') {
-        return res.redirect('/login'); // Se non è loggato o non è admin, redirigi al login
-    }
-    const products = db.getAllProducts();
-    res.render('prodotti', { products });
-});
-
-// Aggiungi un prodotto (solo admin)
-app.get('/prodotti', (req, res) => {
-    if (!req.session.loggedin || !req.session.user || req.session.user.ruolo !== 'admin') {
-        return res.redirect('/login');
-    }
-    const products = db.getAllProducts();
-    res.render('prodotti', { products });
+app.post('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const { category, size, color, brand, condition, price } = req.body;
+    const product = db.createProduct({ category, size, color, brand, condition, price });
+    res.redirect('/prodotti');
 });
 
 /**
@@ -1191,7 +1171,7 @@ app.get('/prodotti', (req, res) => {
  *     tags: [Products]
  *     description: Mostra un form precompilato con i dati del prodotto da modificare
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1204,12 +1184,27 @@ app.get('/prodotti', (req, res) => {
  *         description: Form di modifica con i dati del prodotto
  *       302:
  *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
+ */
+app.get('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const { id } = req.params;
+    const product = db.getProductById(Number(id));
+
+    if (!product) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
+    }
+
+    res.render('modificaProdotti', { product });
+});
+
+/**
+ * @swagger
+ * /modificaProdotto/{id}:
  *   post:
  *     summary: Aggiorna i dati di un prodotto
  *     tags: [Products]
  *     description: Elabora i dati del form e aggiorna le informazioni del prodotto
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1249,18 +1244,7 @@ app.get('/prodotti', (req, res) => {
  *       302:
  *         description: Reindirizza alla pagina dei prodotti in caso di successo o alla pagina di errore in caso di fallimento
  */
-app.get('/modificaProdotto/:id', (req, res) => {
-    const { id } = req.params;
-    const product = db.getProductById(Number(id)); // Trova il prodotto dal database
-
-    if (!product) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.render('modificaProdotti', { product }); // Renderizza la vista di modifica
-});
-
-app.post('/modificaProdotto/:id', (req, res) => {
+app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { id } = req.params;
     const { category, size, color, brand, condition, price } = req.body;
 
@@ -1270,7 +1254,7 @@ app.post('/modificaProdotto/:id', (req, res) => {
         return res.render('error', { message: 'Prodotto non trovato!' });
     }
 
-    res.redirect('/prodotti'); // Reindirizza alla pagina prodotti
+    res.redirect('/prodotti');
 });
 
 /**
@@ -1281,7 +1265,7 @@ app.post('/modificaProdotto/:id', (req, res) => {
  *     tags: [Products]
  *     description: Mostra una pagina di conferma prima di eliminare il prodotto
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1294,12 +1278,27 @@ app.post('/modificaProdotto/:id', (req, res) => {
  *         description: Pagina di conferma eliminazione
  *       302:
  *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
+ */
+app.get('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const { id } = req.params;
+    const product = db.getProductById(Number(id));
+
+    if (!product) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
+    }
+
+    res.render('cancellaProdotto', { product });
+});
+
+/**
+ * @swagger
+ * /eliminaProdotto/{id}:
  *   post:
  *     summary: Elimina un prodotto
  *     tags: [Products]
  *     description: Rimuove definitivamente un prodotto dal sistema
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1311,76 +1310,16 @@ app.post('/modificaProdotto/:id', (req, res) => {
  *       302:
  *         description: Reindirizza alla pagina dei prodotti in caso di successo o alla pagina di errore in caso di fallimento
  */
-// Elimina un prodotto (solo admin)
-app.get('/eliminaProdotto/:id', (req, res) => {
-    if (!req.session.loggedin || req.session.role !== 'admin') {
-        return res.redirect('/login');
-    }
+app.post('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { id } = req.params;
     const isDeleted = db.deleteProduct(Number(id));
-    if (isDeleted) {
-        res.redirect('/prodotti');
-    } else {
-        res.send('Prodotto non trovato');
-    }
-});
-
-app.get('/modificaProdotto/:id', isAuthenticated, (req, res) => {
-    const { id } = req.params;
-    const product = db.getProductById(Number(id));
-
-    if (!product) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.render('modificaProdotti', { product });
-});
-
-// Aggiorna un prodotto
-app.post('/modificaProdotto/:id', (req, res) => {
-    const { id } = req.params;
-    const { category, size, color, brand, condition, price } = req.body;
-
-    const updatedProduct = db.updateProduct(Number(id), { category, size, color, brand, condition, price });
-
-    if (!updatedProduct) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.redirect('/prodotti');  // Reindirizza alla lista dei prodotti dopo la modifica
-});
-
-// Conferma eliminazione prodotto
-app.get('/eliminaProdotto/:id', (req, res) => {
-    const { id } = req.params;
-    const product = db.getProductById(Number(id));  // Trova il prodotto dal mock DB
-
-    if (!product) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.render('cancellaProdotto', { product });  // Passa il prodotto alla vista per la conferma
-});
-
-// Elimina un prodotto
-app.post('/eliminaProdotto/:id', (req, res) => {
-    const { id } = req.params;
-    const isDeleted = db.deleteProduct(Number(id));  // Elimina il prodotto dal mock DB
 
     if (!isDeleted) {
         return res.render('error', { message: 'Prodotto non trovato!' });
     }
 
-    res.redirect('/prodotti');  // Reindirizza alla lista dei prodotti dopo la cancellazione
+    res.redirect('/prodotti');
 });
-
-// Middleware per verificare se l'utente è autenticato
-function isAuthenticated(req, res, next) {
-    if (req.session.user) {
-        return next();  // Se l'utente è autenticato, continua con la rotta
-    }
-    return res.redirect('/modificaProdotti');  // Altrimenti, reindirizza alla pagina di login
-}
 
 /**
  * @swagger
@@ -1389,6 +1328,8 @@ function isAuthenticated(req, res, next) {
  *     summary: Visualizza il form per noleggiare un prodotto specifico
  *     tags: [Rentals]
  *     description: Mostra una pagina con i dettagli del prodotto e un form per il noleggio
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1401,10 +1342,27 @@ function isAuthenticated(req, res, next) {
  *         description: Form di noleggio
  *       302:
  *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
+ */
+app.get('/noleggio/:id', ensureAuthenticated, (req, res) => {
+    const productId = parseInt(req.params.id);
+    const product = db.getProductById(productId);
+
+    if (!product) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
+    }
+
+    res.render('noleggio', { product });
+});
+
+/**
+ * @swagger
+ * /noleggio/{id}:
  *   post:
  *     summary: Calcola il prezzo del noleggio per un prodotto specifico
  *     tags: [Rentals]
  *     description: Elabora i dati del form e calcola il prezzo del noleggio in base alla durata
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1430,20 +1388,7 @@ function isAuthenticated(req, res, next) {
  *       302:
  *         description: Reindirizza alla pagina di errore se la validazione fallisce
  */
-// Visualizza la pagina per noleggiare un prodotto
-app.get('/noleggio/:id', (req, res) => {
-    const productId = parseInt(req.params.id);
-    const product = db.getProductById(productId);
-
-    if (!product) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.render('noleggio', { product });
-});
-
-// Calcola il prezzo del noleggio
-app.post('/noleggio/:id', (req, res) => {
+app.post('/noleggio/:id', ensureAuthenticated, (req, res) => {
     const productId = parseInt(req.params.id);
     const { days } = req.body;
 
@@ -1456,7 +1401,8 @@ app.post('/noleggio/:id', (req, res) => {
         return res.render('error', { message: 'Prodotto non trovato!' });
     }
 
-    req.session.rental = { productId, days, price };
+    // Memorizza i dati del noleggio nell'oggetto req.rental invece che in session
+    req.rental = { productId, days, price };
     res.render('confermaNoleggio', { productId, days, price });
 });
 
@@ -1467,6 +1413,8 @@ app.post('/noleggio/:id', (req, res) => {
  *     summary: Completa il processo di noleggio o acquisto
  *     tags: [Rentals, Products]
  *     description: Finalizza il noleggio o l'acquisto di un prodotto
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1478,18 +1426,27 @@ app.post('/noleggio/:id', (req, res) => {
  *                 type: string
  *                 enum: [rental, purchase]
  *                 description: Azione da completare (noleggio o acquisto)
+ *               productId:
+ *                 type: integer
+ *                 description: ID del prodotto
+ *               days:
+ *                 type: integer
+ *                 description: Durata del noleggio in giorni
+ *               price:
+ *                 type: number
+ *                 description: Prezzo calcolato
  *             required:
  *               - action
+ *               - productId
+ *               - price
  *     responses:
  *       200:
  *         description: Pagina di successo con conferma dell'operazione
  *       302:
  *         description: Reindirizza alla pagina di errore se l'azione non è valida
  */
-// Conferma noleggio o acquisto
-app.post('/completa', (req, res) => {
-    const { action } = req.body; // 'rental' o 'purchase'
-    const { productId, days, price } = req.session.rental || {};
+app.post('/completa', ensureAuthenticated, (req, res) => {
+    const { action, productId, days, price } = req.body;
 
     if (action === 'purchase') {
         res.render('success', { message: 'Acquisto completato con successo!', price });
@@ -1507,6 +1464,8 @@ app.post('/completa', (req, res) => {
  *     summary: Calcola il prezzo del noleggio
  *     tags: [Rentals]
  *     description: Calcola il prezzo del noleggio in base alla durata specificata
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1523,7 +1482,7 @@ app.post('/completa', (req, res) => {
  *       200:
  *         description: Pagina di noleggio con il prezzo calcolato
  */
-app.post('/calcolaPrezzo', (req, res) => {
+app.post('/calcolaPrezzo', ensureAuthenticated, (req, res) => {
     const durata = parseInt(req.body.durata);
     const prezzoPerGiorno = 10; // Esempio di prezzo giornaliero
     const totale = durata * prezzoPerGiorno;
@@ -1533,9 +1492,6 @@ app.post('/calcolaPrezzo', (req, res) => {
     });
 });
 
-
-app.use(express.urlencoded({ extended: true }));
-
 /**
  * @swagger
  * /noleggio:
@@ -1543,6 +1499,8 @@ app.use(express.urlencoded({ extended: true }));
  *     summary: Visualizza i prodotti disponibili per il noleggio con opzioni di filtro
  *     tags: [Rentals]
  *     description: Mostra una lista di prodotti che possono essere noleggiati, con possibilità di filtrare per vari criteri
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: brand
@@ -1572,10 +1530,67 @@ app.use(express.urlencoded({ extended: true }));
  *     responses:
  *       200:
  *         description: Lista filtrata di prodotti
+ */
+app.get('/noleggio', ensureAuthenticated, (req, res) => {
+    let filteredProducts = db.getAllProducts();
+
+    // Parametri di query
+    const { brand, colore, condizione, prezzoMin, prezzoMax } = req.query;
+    // Filtro per brand
+    if (brand) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.brand.toLowerCase().includes(brand.toLowerCase())
+        );
+    }
+
+    // Filtro per colore
+    if (colore) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.color.toLowerCase() === colore.toLowerCase()
+        );
+    }
+
+    // Filtro per condizione
+    if (condizione) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.condition.toLowerCase() === condizione.toLowerCase()
+        );
+    }
+
+    // Filtro per prezzo minimo
+    if (prezzoMin) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.price >= parseFloat(prezzoMin)
+        );
+    }
+
+    // Filtro per prezzo massimo
+    if (prezzoMax) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.price <= parseFloat(prezzoMax)
+        );
+    }
+
+    // Rendiamo il template passando i prodotti filtrati
+    res.render('noleggio', {
+        products: filteredProducts,
+        brand,
+        colore,
+        condizione,
+        prezzoMin,
+        prezzoMax
+    });
+});
+
+/**
+ * @swagger
+ * /noleggio:
  *   post:
  *     summary: Calcola il prezzo del noleggio in base alla durata
  *     tags: [Rentals]
  *     description: Calcola il prezzo totale del noleggio per un prodotto specifico basato sulla durata richiesta
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1596,63 +1611,10 @@ app.use(express.urlencoded({ extended: true }));
  *       200:
  *         description: Pagina di noleggio con il prezzo calcolato
  */
-// Rotta per la pagina del catalogo
-app.get('/noleggio', (req, res) => {
-    let filteredProducts = db.getAllProducts(); // Prendi tutti i prodotti dal DBMock
-
-    // Parametri di query
-    const { brand, colore, condizione, prezzoMin, prezzoMax } = req.query;
-    // Filtro per brand
-    if (brand) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.brand.toLowerCase().includes(brand.toLowerCase()) // Confronto case-insensitive
-        );
-    }
-
-    // Filtro per colore
-    if (colore) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.color.toLowerCase() === colore.toLowerCase() // Confronto esatto per colore
-        );
-    }
-
-    // Filtro per condizione
-    if (condizione) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.condition.toLowerCase() === condizione.toLowerCase() // Confronto esatto per condizione
-        );
-    }
-
-    // Filtro per prezzo minimo
-    if (prezzoMin) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.price >= parseFloat(prezzoMin) // Confronto per prezzo minimo
-        );
-    }
-
-    // Filtro per prezzo massimo
-    if (prezzoMax) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.price <= parseFloat(prezzoMax) // Confronto per prezzo massimo
-        );
-    }
-
-    // Rendiamo il template passando i prodotti filtrati
-    res.render('noleggio', {
-        products: filteredProducts,
-        brand,
-        colore,
-        condizione,
-        prezzoMin,
-        prezzoMax
-    });
-});
-
-// Route per calcolare il prezzo del noleggio
-app.post('/noleggio', (req, res) => {
-    const { id, durata } = req.body; // Ottieni l'ID prodotto e la durata dal form
+app.post('/noleggio', ensureAuthenticated, (req, res) => {
+    const { id, durata } = req.body;
     const product = db.getProductById(Number(id));
-    const prezzo = product ? product.price * durata : null; // Prezzo = prezzo prodotto x giorni
+    const prezzo = product ? product.price * durata : null;
     res.render('noleggio', { prezzo, products: db.getAllProducts() });
 });
 
@@ -1663,6 +1625,8 @@ app.post('/noleggio', (req, res) => {
  *     summary: Elabora l'acquisto di un prodotto
  *     tags: [Products]
  *     description: Gestisce il processo di acquisto di un prodotto selezionato
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1681,11 +1645,10 @@ app.post('/noleggio', (req, res) => {
  *       404:
  *         description: Prodotto non trovato
  */
-// Route per la pagina di acquisto
-app.post('/acquista', (req, res) => {
-    const { id } = req.body; // Ottieni l'ID prodotto dal form
+app.post('/acquista', ensureAuthenticated, (req, res) => {
+    const { id } = req.body;
     const product = db.getProductById(Number(id));
-    res.render('acquista', { product }); // Mostra i dettagli del prodotto acquistato
+    res.render('acquista', { product });
 });
 
 /**
@@ -1695,6 +1658,8 @@ app.post('/acquista', (req, res) => {
  *     summary: Aggiunge un prodotto al carrello
  *     tags: [Cart]
  *     description: Aggiunge un prodotto al carrello dell'utente (gestito lato client con localStorage)
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1723,9 +1688,7 @@ app.post('/acquista', (req, res) => {
  *                   type: boolean
  *                   example: true
  */
-app.post('/api/cart/add', (req, res) => {
-    // Endpoint per aggiungere un prodotto al carrello
-    // Il carrello viene gestito lato client con localStorage
+app.post('/api/cart/add', ensureAuthenticated, (req, res) => {
     res.json({ success: true });
 });
 
@@ -1736,6 +1699,8 @@ app.post('/api/cart/add', (req, res) => {
  *     summary: Rimuove un prodotto dal carrello
  *     tags: [Cart]
  *     description: Rimuove un prodotto dal carrello dell'utente (gestito lato client con localStorage)
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1760,9 +1725,7 @@ app.post('/api/cart/add', (req, res) => {
  *                   type: boolean
  *                   example: true
  */
-app.post('/api/cart/remove', (req, res) => {
-    // Endpoint per rimuovere un prodotto dal carrello
-    // Il carrello viene gestito lato client con localStorage
+app.post('/api/cart/remove', ensureAuthenticated, (req, res) => {
     res.json({ success: true });
 });
 
@@ -1774,18 +1737,17 @@ app.post('/api/cart/remove', (req, res) => {
  *     tags: [Cart]
  *     description: Mostra la pagina per completare l'ordine
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Pagina di checkout
  *       302:
  *         description: Reindirizza al login se l'utente non è autenticato
  */
-// Pagina di checkout
 app.get('/checkout', ensureAuthenticated, (req, res) => {
     res.render('checkout', {
         title: 'Completa il tuo ordine',
-        user: req.user || req.session.user
+        user: req.user
     });
 });
 

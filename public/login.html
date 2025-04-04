@@ -435,7 +435,8 @@
                 <p>Sign in to your DRESSIMIFY account</p>
             </div>
 
-            <form action="/login" method="post">
+            <!-- Modificato: rimosso action e method, aggiunto id per il form -->
+            <form id="loginForm">
                 <div class="input-group">
                     <i class="fas fa-user-circle"></i>
                     <input type="text" name="username" id="username" placeholder="Username or Email" required>
@@ -445,8 +446,12 @@
                     <input type="password" name="password" id="password" placeholder="Password" required>
                 </div>
                 <a href="/forgot-password" class="forgot-password"><i class="fas fa-question-circle"></i> Forgot password?</a>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                <!-- Modificato: cambiato il tipo di bottone e rimosso type="submit" -->
+                <button type="button" onclick="login()" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
             </form>
+            
+            <!-- Aggiunto div per mostrare messaggi di errore -->
+            <div id="risultato" style="margin-top: 10px; color: red;"></div>
 
             <div class="social-login-divider">
                 <span><i class="fas fa-link"></i> or continue with</span>
@@ -494,6 +499,58 @@
                 .then(() => console.log('Redirecting to Facebook login...'))
                 .catch(error => console.error("Error:", error));
         }
+
+        // Nuova funzione di login che usa fetch API e salva i dati in localStorage
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const risultatoDiv = document.getElementById('risultato');
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                // Se la risposta non è ok, lancia un errore
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Username o password errati');
+                }
+                
+                // Estrai il token dalla risposta
+                const data = await response.json();
+                
+                // Salva il token JWT in localStorage
+                localStorage.setItem('jwtToken', data.token);
+                
+                // Salva i dati dell'utente in localStorage
+                localStorage.setItem('user', JSON.stringify({
+                    id: data.user.id,
+                    nome: data.user.nome,
+                    cognome: data.user.cognome,
+                    email: data.user.email,
+                    ruolo: data.user.ruolo
+                }));
+                
+                // Reindirizza alla home
+                window.location.href = '/home';
+                
+            } catch (error) {
+                // Mostra il messaggio di errore
+                risultatoDiv.textContent = `Errore: ${error.message}`;
+                console.error('Errore durante il login:', error);
+            }
+        }
+
+        // Event listener per inviare il form con il tasto Enter
+        document.getElementById('loginForm').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                login();
+            }
+        });
     </script>
 </body>
 
