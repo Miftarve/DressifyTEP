@@ -6,7 +6,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Reset e variabili */
@@ -25,19 +27,19 @@
       --gray-light: #e5e7eb;
       --white: #ffffff;
       --body-bg: #f9fafb;
-      
+
       /* Ombreggiature */
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      
+
       /* Border Radius */
       --radius-sm: 0.375rem;
       --radius: 0.5rem;
       --radius-md: 0.75rem;
       --radius-lg: 1rem;
-      
+
       /* Spaziatura */
       --spacing-xs: 0.5rem;
       --spacing-sm: 0.75rem;
@@ -45,12 +47,12 @@
       --spacing-md: 1.5rem;
       --spacing-lg: 2rem;
       --spacing-xl: 3rem;
-      
+
       /* Layout */
       --sidebar-width: 280px;
       --header-height: 70px;
       --container-width: 1400px;
-      
+
       /* Transizioni */
       --transition-fast: 0.15s ease;
       --transition: 0.3s ease;
@@ -617,7 +619,9 @@
       color: var(--gray);
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: var(--spacing);
       border: 1px solid var(--gray-light);
@@ -628,11 +632,14 @@
       background-color: var(--white);
     }
 
-    input.with-icon, select.with-icon {
+    input.with-icon,
+    select.with-icon {
       padding-left: 2.5rem;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
@@ -1084,7 +1091,7 @@
 <body>
   <!-- Overlay for mobile -->
   <div class="overlay" id="overlay"></div>
-  
+
   <!-- Dashboard Layout -->
   <div class="dashboard-layout">
     <!-- Sidebar -->
@@ -1096,7 +1103,7 @@
         </div>
         <div class="sidebar-logo-text">DRESSIMIFY</div>
       </div>
-      
+
       <!-- User Info -->
       <div class="sidebar-user">
         <div class="sidebar-user-avatar">M</div>
@@ -1105,7 +1112,7 @@
           <div class="sidebar-user-role">Amministratore</div>
         </div>
       </div>
-      
+
       <!-- Menu -->
       <div class="sidebar-menu">
         <div class="menu-category">Principale</div>
@@ -1121,6 +1128,10 @@
           <i class="fas fa-shopping-bag"></i>
           <span>Noleggi</span>
         </a>
+        <a href="/vendite" class="menu-item">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Vendite</span>
+        </a>
         <div class="menu-category">Comunicazione</div>
         <a href="/static/index.html" class="menu-item">
           <i class="fas fa-comments"></i>
@@ -1133,13 +1144,13 @@
           <span>Logout</span>
         </a>
       </div>
-      
+
       <!-- Footer -->
       <div class="sidebar-footer">
         Dressimify &copy; 2025 - Tutti i diritti riservati
       </div>
     </aside>
-    
+
     <!-- Main Content -->
     <main class="main-content">
       <!-- Header -->
@@ -1153,23 +1164,12 @@
             <i class="far fa-calendar-alt"></i>
             <span>02/05/2025 - 11:28</span>
           </div>
-          <button class="action-button notification-button">
-            <i class="far fa-bell"></i>
-            <div class="notification-badge">3</div>
-          </button>
+
           <div class="dropdown">
             <button class="action-button" id="user-dropdown">
               <i class="fas fa-user"></i>
             </button>
             <div class="dropdown-menu" id="user-menu">
-              <a href="#" class="dropdown-item">
-                <i class="fas fa-user"></i>
-                Profilo
-              </a>
-              <a href="#" class="dropdown-item">
-                <i class="fas fa-cog"></i>
-                Impostazioni
-              </a>
               <div class="dropdown-divider"></div>
               <a href="/logout" class="dropdown-item">
                 <i class="fas fa-sign-out-alt"></i>
@@ -1179,7 +1179,7 @@
           </div>
         </div>
       </header>
-      
+
       <!-- Main Container -->
       <div class="main-container">
         <!-- Page Title -->
@@ -1189,7 +1189,7 @@
             <p class="page-subtitle">Visualizza e gestisci tutti gli utenti del sistema</p>
           </div>
         </div>
-        
+
         <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card">
@@ -1205,7 +1205,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon blue">
               <i class="fas fa-tshirt"></i>
@@ -1219,7 +1219,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon green">
               <i class="fas fa-shopping-bag"></i>
@@ -1233,7 +1233,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon orange">
               <i class="fas fa-euro-sign"></i>
@@ -1248,7 +1248,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Graph Section -->
         <div class="graph-section">
           <div class="graph-card">
@@ -1264,7 +1264,7 @@
               <canvas id="noleggiChart"></canvas>
             </div>
           </div>
-          
+
           <div class="graph-card">
             <div class="graph-card-header">
               <h2 class="graph-card-title">Distribuzione Utenti</h2>
@@ -1274,7 +1274,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Two Columns Layout -->
         <div class="main-layout">
           <!-- Registra Utente Form -->
@@ -1295,14 +1295,16 @@
                       <label for="nome">Nome</label>
                       <div class="input-group">
                         <i class="fas fa-user input-icon"></i>
-                        <input type="text" id="nome" name="nome" class="with-icon" placeholder="Inserisci il nome" required>
+                        <input type="text" id="nome" name="nome" class="with-icon" placeholder="Inserisci il nome"
+                          required>
                       </div>
                     </div>
                     <div class="form-col">
                       <label for="cognome">Cognome</label>
                       <div class="input-group">
                         <i class="fas fa-user input-icon"></i>
-                        <input type="text" id="cognome" name="cognome" class="with-icon" placeholder="Inserisci il cognome" required>
+                        <input type="text" id="cognome" name="cognome" class="with-icon"
+                          placeholder="Inserisci il cognome" required>
                       </div>
                     </div>
                   </div>
@@ -1323,7 +1325,8 @@
                       <label for="luogoNascita">Luogo di Nascita</label>
                       <div class="input-group">
                         <i class="fas fa-map-marker-alt input-icon"></i>
-                        <input type="text" id="luogoNascita" name="luogoNascita" class="with-icon" placeholder="Città di nascita" required>
+                        <input type="text" id="luogoNascita" name="luogoNascita" class="with-icon"
+                          placeholder="Città di nascita" required>
                       </div>
                     </div>
                   </div>
@@ -1333,7 +1336,8 @@
                   <label for="email">Email</label>
                   <div class="input-group">
                     <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="email" name="email" class="with-icon" placeholder="nome@esempio.com" required>
+                    <input type="email" id="email" name="email" class="with-icon" placeholder="nome@esempio.com"
+                      required>
                   </div>
                   <div class="input-hint">L'email verrà utilizzata per il login e le comunicazioni</div>
                 </div>
@@ -1344,7 +1348,8 @@
                       <label for="password">Password</label>
                       <div class="input-group">
                         <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="password" name="password" class="with-icon" placeholder="Crea una password" required>
+                        <input type="password" id="password" name="password" class="with-icon"
+                          placeholder="Crea una password" required>
                       </div>
                     </div>
                   </div>
@@ -1526,7 +1531,7 @@
                   </tbody>
                 </table>
               </div>
-              
+
               <!-- Paginazione -->
               <div class="pagination">
                 <div class="pagination-info">
@@ -1548,7 +1553,7 @@
       </div>
     </main>
   </div>
-  
+
   <!-- Notifica Toast -->
   <div class="toast" id="toast">
     <div class="toast-icon success">
@@ -1564,47 +1569,47 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Variabili per dati utente
       const currentUser = {
         name: 'Miftarve',
         role: 'Amministratore',
         loginTime: '2025-05-02 11:28:53'
       };
-      
+
       // Setup Menu Mobile
       const hamburger = document.getElementById('hamburger-menu');
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
-      
-      hamburger.addEventListener('click', function() {
+
+      hamburger.addEventListener('click', function () {
         sidebar.classList.toggle('show');
         overlay.classList.toggle('show');
       });
-      
-      overlay.addEventListener('click', function() {
+
+      overlay.addEventListener('click', function () {
         sidebar.classList.remove('show');
         overlay.classList.remove('show');
       });
-      
+
       // User Dropdown
       const userDropdown = document.getElementById('user-dropdown');
       const userMenu = document.getElementById('user-menu');
-      
-      userDropdown.addEventListener('click', function() {
+
+      userDropdown.addEventListener('click', function () {
         userMenu.classList.toggle('show');
       });
-      
-      document.addEventListener('click', function(e) {
+
+      document.addEventListener('click', function (e) {
         if (!userDropdown.contains(e.target) && !userMenu.contains(e.target)) {
           userMenu.classList.remove('show');
         }
       });
-      
+
       // Toast Notifications
       const toast = document.getElementById('toast');
       const toastClose = document.getElementById('toast-close');
-      
+
       // Esempio di visualizzazione toast
       setTimeout(() => {
         toast.classList.add('show');
@@ -1612,37 +1617,37 @@
           toast.classList.remove('show');
         }, 5000);
       }, 2000);
-      
-      toastClose.addEventListener('click', function() {
+
+      toastClose.addEventListener('click', function () {
         toast.classList.remove('show');
       });
-      
+
       // Invio Form con Prevenzione Default + Toast
       const registraUtenteForm = document.getElementById('registraUtenteForm');
-      
-      registraUtenteForm.addEventListener('submit', function(e) {
+
+      registraUtenteForm.addEventListener('submit', function (e) {
         // Solo per demo - rimuovere in produzione
         if (document.location.href.includes('github.io')) {
           e.preventDefault();
-          
+
           // Simula invio form e mostra notifica
           toast.querySelector('.toast-title').textContent = 'Utente Registrato!';
           toast.querySelector('.toast-message').textContent = 'Il nuovo utente è stato registrato con successo.';
           toast.classList.add('show');
-          
+
           setTimeout(() => {
             toast.classList.remove('show');
           }, 5000);
-          
+
           // Reset form
           this.reset();
         }
       });
-      
+
       // Grafici
       setupCharts();
     });
-    
+
     function setupCharts() {
       // Chart.js - Noleggi
       const noleggiCtx = document.getElementById('noleggiChart').getContext('2d');
@@ -1694,7 +1699,7 @@
           }
         }
       });
-      
+
       // Chart.js - Utenti
       const utentiCtx = document.getElementById('utentiChart').getContext('2d');
       const utentiChart = new Chart(utentiCtx, {

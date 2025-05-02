@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dressimify | Gestione Vendite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- STILI COMPLETI INCORPORATI -->
+    <style>
+        /* ===== VARIABILI CSS E TEMA ===== */
+        :root {
+            /* Colori primari */
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #eef2ff;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --secondary-light: #ede9fe;
+            
+            /* Colori di stato */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            
+            /* Colori neutri */
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --black: #000000;
+            
+            /* Dimensioni e Spaziatura */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Layout */
+            --header-height: 4rem;
+            --sidebar-width: 18rem;
+            --sidebar-collapsed: 5rem;
+            --border-radius-sm: 0.25rem;
+            --border-radius: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* Animazioni */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Ombre */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Z-index */
+            --z-dropdown: 1000;
+            --z-sticky: 1020;
+            --z-fixed: 1030;
+            --z-modal-backdrop: 1040;
+            --z-modal: 1050;
+            --z-popover: 1060;
+            --z-tooltip: 1070;
+        }
+
+        /* ===== RESET E STILI GENERALI ===== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+            color: var(--gray-800);
+            background-color: var(--gray-50);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.25;
+            margin-top: 0;
+            color: var(--gray-900);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        img, svg {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        button, select {
+            text-transform: none;
+        }
+
+        button, [type="button"], [type="reset"], [type="submit"] {
+            -webkit-appearance: button;
+            cursor: pointer;
+        }
+
+        button:disabled, [type="button"]:disabled, [type="reset"]:disabled, [type="submit"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        /* ===== LAYOUT PRINCIPALE ===== */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--white);
+            border-right: 1px solid var(--gray-200);
+            transition: width var(--transition);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: var(--z-fixed);
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg) var(--spacing-md);
+            border-bottom: 1px solid var(--gray-200);
+            height: var(--header-height);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            overflow: hidden;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gray-900);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-toggle {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-100);
+            border-radius: var(--border-radius-full);
+            color: var(--gray-600);
+            border: none;
+            margin-left: auto;
+            transition: background-color var(--transition-fast), color var(--transition-fast);
+        }
+
+        .sidebar-toggle:hover {
+            background-color: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--border-radius-full);
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            margin-left: var(--spacing-md);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 0.875rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-menu {
+            padding: var(--spacing-md) 0;
+        }
+
+        .menu-category {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--gray-500);
+            letter-spacing: 0.05em;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: background-color var(--transition-fast), color var(--transition-fast);
+            position: relative;
+            margin: 0.125rem 0;
+        }
+
+        .menu-item-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            color: var(--gray-500);
+            flex-shrink: 0;
+        }
+
+        .menu-item-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .menu-item:hover {
+            background-color: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .menu-item:hover .menu-item-icon {
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .menu-item.active .menu-item-icon {
+            color: var(--primary);
+        }
+
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: var(--primary);
+        }
+
+        .menu-badge {
+            background-color: var(--danger);
+            color: var(--white);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 0.125rem 0.375rem;
+            border-radius: var(--border-radius-full);
+            margin-left: auto;
+        }
+
+        .sidebar.collapsed .brand-name,
+        .sidebar.collapsed .menu-category,
+        .sidebar.collapsed .menu-item-text,
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+            padding: var(--spacing-sm);
+        }
+
+        .sidebar.collapsed .menu-item-icon {
+            margin-right: 0;
+            font-size: 1.25rem;
+        }
+
+        .sidebar.collapsed .menu-badge {
+            position: absolute;
+            top: 0.125rem;
+            right: 0.125rem;
+        }
+
+        /* ===== CONTENUTO PRINCIPALE ===== */
+        .main-content {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            height: var(--header-height);
+            background-color: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: 1.25rem;
+            cursor: pointer;
+            margin-right: var(--spacing-md);
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .header-tools {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            gap: var(--spacing-md);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            gap: var(--spacing-sm);
+        }
+
+        .header-info i {
+            font-size: 0.875rem;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--gray-500);
+            transition: color var(--transition-fast);
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumb-item i {
+            margin-right: var(--spacing-xs);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 var(--spacing-sm);
+            color: var(--gray-400);
+            font-size: 0.75rem;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
+        /* ===== CONTENUTO DELLA PAGINA ===== */
+        .page-content {
+            flex: 1;
+            padding: var(--spacing-lg);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .page-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            max-width: 40rem;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* Stili aggiuntivi per la pagina vendite */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--border-radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+            gap: var(--spacing-xs);
+        }
+        
+        .status-badge.completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-badge.processing {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-badge.refunded {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .sale-details {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .sale-date {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .sale-user {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.8125rem;
+        }
+        
+        .user-avatar-sm {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: var(--border-radius-full);
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.6875rem;
+            flex-shrink: 0;
+        }
+
+        /* Tabella prodotti */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .product-table {
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+
+        .product-table th {
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: var(--spacing-md);
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .product-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.875rem;
+            color: var(--gray-800);
+        }
+
+        .product-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-table tr:hover td {
+            background-color: var(--gray-50);
+        }
+
+        .product-price {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .product-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            gap: var(--spacing-xs);
+            border: none;
+        }
+
+        .action-btn.edit {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .action-btn.edit:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .action-btn.refund {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .action-btn.refund:hover {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+        
+        .action-btn.ship {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .action-btn.ship:hover {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .action-btn.view-sale {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .action-btn.view-sale:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* Empty state per tabella vuota */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            color: var(--gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .empty-state-text {
+            font-size: 0.875rem;
+            margin: 0 auto;
+            max-width: 20rem;
+        }
+
+        /* Filtri */
+        .filter-form {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .filter-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            color: var(--gray-800);
+        }
+        
+        .filter-btn {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* Modal e Toast */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: var(--z-modal-backdrop);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all var(--transition);
+        }
+        
+        .modal-backdrop.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .modal {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 90%;
+            max-width: 36rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: transform var(--transition);
+        }
+        
+        .modal-backdrop.show .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+        
+        .modal-close:hover {
+            color: var(--gray-700);
+        }
+        
+        .modal-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .modal-footer {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+        
+        .sale-detail-row {
+            display: flex;
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.875rem;
+        }
+        
+        .sale-detail-label {
+            width: 40%;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .sale-detail-value {
+            width: 60%;
+            color: var(--gray-900);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 10rem;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .user-info-card {
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .user-info-name {
+            font-weight: 600;
+            margin-left: var(--spacing-sm);
+        }
+        
+        .payment-info-card {
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            width: 350px;
+            max-width: calc(100vw - var(--spacing-lg) * 2);
+            transform: translateY(calc(100% + var(--spacing-lg)));
+            transition: transform var(--transition);
+            z-index: var(--z-tooltip);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast-icon.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .toast-icon.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: var(--gray-600);
+        }
+
+        /* Paginazione */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .pagination-button {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            background-color: var(--white);
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            transition: all var(--transition-fast);
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background-color: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        .pagination-button.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Statistiche vendite */
+        .sale-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-change {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                box-shadow: var(--shadow-lg);
+                z-index: var(--z-fixed);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .sale-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="brand-name">Dressimify</div>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-avatar">M</div>
+                <div class="user-info">
+                    <div class="user-name">Miftarve</div>
+                    <div class="user-role">Amministratore</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-category">Principale</div>
+                <a href="/home" class="menu-item">
+                    <div class="menu-item-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="menu-item-text">Dashboard</div>
+                </a>
+                <a href="/prodotti" class="menu-item">
+                    <div class="menu-item-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="menu-item-text">Prodotti</div>
+                </a>
+                <a href="/noleggi" class="menu-item">
+                    <div class="menu-item-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="menu-item-text">Noleggi</div>
+                    <span class="menu-badge">3</span>
+                </a>
+                <a href="/vendite" class="menu-item active">
+                    <div class="menu-item-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="menu-item-text">Vendite</div>
+                </a>
+                
+                <div class="menu-category">Altro</div>
+
+                <a href="/logout" class="menu-item">
+                    <div class="menu-item-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="menu-item-text">Logout</div>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <button class="mobile-toggle" id="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h1 class="header-title">Gestione Vendite</h1>
+                
+                <div class="header-tools">
+                    <div class="header-info">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>02/05/2025 19:12</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <div class="breadcrumb-item">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </div>
+                <div class="breadcrumb-separator">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="breadcrumb-item active">
+                    <i class="fas fa-euro-sign"></i> Gestione Vendite
+                </div>
+            </div>
+            
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Ordini di Vendita</h1>
+                    <p class="page-description">Monitora e gestisci gli ordini di vendita, verifica i dettagli di acquisto e lo stato delle spedizioni.</p>
+                </div>
+                
+                <!-- Statistiche vendite -->
+                <div class="sale-stats">
+                    <div class="stat-card">
+                        <div class="stat-title">Vendite Totali</div>
+                        <div class="stat-value">€4,850.75</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +15.2% rispetto alla settimana scorsa
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Numero Ordini</div>
+                        <div class="stat-value">32</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +8.5% rispetto alla settimana scorsa
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Valore Medio Ordine</div>
+                        <div class="stat-value">€151.58</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +6.2% rispetto alla settimana scorsa
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabella vendite -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-shopping-cart"></i> Ordini di Vendita
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="product-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID Ordine</th>
+                                        <th>Prodotto</th>
+                                        <th>Cliente</th>
+                                        <th>Data Acquisto</th>
+                                        <th>Importo</th>
+                                        <th>Stato</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-2025-001</td>
+                                        <td>
+                                            <div class="sale-details">
+                                                <strong>Giacca Elegante</strong>
+                                                <small>Armani, Taglia M, Nero</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-user">
+                                                <div class="user-avatar-sm">A</div>
+                                                <span>Alessandro Bianchi</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-date">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <span>01/05/2025</span>
+                                            </div>
+                                        </td>
+                                        <td class="product-price">€249.99</td>
+                                        <td>
+                                            <span class="status-badge processing">
+                                                <i class="fas fa-clock"></i> In elaborazione
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="action-btn edit view-sale" data-id="1">
+                                                    <i class="fas fa-eye"></i> Dettagli
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-2025-002</td>
+                                        <td>
+                                            <div class="sale-details">
+                                                <strong>Abito da Sera</strong>
+                                                <small>Valentino, Taglia S, Rosso</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-user">
+                                                <div class="user-avatar-sm">C</div>
+                                                <span>Chiara Verdi</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-date">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <span>30/04/2025</span>
+                                            </div>
+                                        </td>
+                                        <td class="product-price">€399.99</td>
+                                        <td>
+                                            <span class="status-badge completed">
+                                                <i class="fas fa-check-circle"></i> Completato
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="action-btn edit view-sale" data-id="2">
+                                                    <i class="fas fa-eye"></i> Dettagli
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-2025-003</td>
+                                        <td>
+                                            <div class="sale-details">
+                                                <strong>Camicia Casual</strong>
+                                                <small>Zara, Taglia L, Blu</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-user">
+                                                <div class="user-avatar-sm">M</div>
+                                                <span>Marco Rossi</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-date">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <span>29/04/2025</span>
+                                            </div>
+                                        </td>
+                                        <td class="product-price">€89.99</td>
+                                        <td>
+                                            <span class="status-badge completed">
+                                                <i class="fas fa-check-circle"></i> Completato
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="action-btn edit view-sale" data-id="3">
+                                                    <i class="fas fa-eye"></i> Dettagli
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-2025-004</td>
+                                        <td>
+                                            <div class="sale-details">
+                                                <strong>Scarpe Eleganti</strong>
+                                                <small>Tod's, Taglia 42, Marrone</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-user">
+                                                <div class="user-avatar-sm">F</div>
+                                                <span>Francesca Neri</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="sale-date">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <span>28/04/2025</span>
+                                            </div>
+                                        </td>
+                                        <td class="product-price">€179.99</td>
+                                        <td>
+                                            <span class="status-badge refunded">
+                                                <i class="fas fa-times-circle"></i> Rimborsato
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="product-actions">
+                                                <button class="action-btn edit view-sale" data-id="4">
+                                                    <i class="fas fa-eye"></i> Dettagli
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Paginazione -->
+                        <div class="pagination">
+                            <div class="pagination-info">
+                                Mostrando 1-4 di 24 ordini
+                            </div>
+                            <div class="pagination-buttons">
+                                <button class="pagination-button" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="pagination-button active">1</button>
+                                <button class="pagination-button">2</button>
+                                <button class="pagination-button">3</button>
+                                <button class="pagination-button">4</button>
+                                <button class="pagination-button">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal Dettagli Vendita -->
+    <div class="modal-backdrop" id="sale-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Dettagli Ordine #ORD-2025-001</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenuto ordine -->
+                <img src="https://via.placeholder.com/800x600" alt="Prodotto" class="product-image">
+                
+                <h4 style="margin-bottom: var(--spacing-sm);">Dettagli Prodotto</h4>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Nome Prodotto:</div>
+                    <div class="sale-detail-value">Giacca Elegante</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Marca:</div>
+                    <div class="sale-detail-value">Armani</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Taglia:</div>
+                    <div class="sale-detail-value">M</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Colore:</div>
+                    <div class="sale-detail-value">Nero</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Prezzo:</div>
+                    <div class="sale-detail-value">€249.99</div>
+                </div>
+                
+                <h4 style="margin: var(--spacing-md) 0 var(--spacing-sm);">Dettagli Ordine</h4>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">ID Ordine:</div>
+                    <div class="sale-detail-value">#ORD-2025-001</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Data Acquisto:</div>
+                    <div class="sale-detail-value">01/05/2025 10:32</div>
+                </div>
+                <div class="sale-detail-row">
+                    <div class="sale-detail-label">Stato:</div>
+                    <div class="sale-detail-value">
+                        <span class="status-badge processing">
+                            <i class="fas fa-clock"></i> In elaborazione
+                        </span>
+                    </div>
+                </div>
+                
+                <h4 style="margin: var(--spacing-md) 0 var(--spacing-sm);">Dettagli Cliente</h4>
+                <div class="user-info-card">
+                    <div class="user-info-header">
+                        <div class="user-avatar-sm">A</div>
+                        <div class="user-info-name">Alessandro Bianchi</div>
+                    </div>
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Email:</div>
+                        <div class="sale-detail-value">alessandro.bianchi@email.com</div>
+                    </div>
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Telefono:</div>
+                        <div class="sale-detail-value">+39 345 678 9012</div>
+                    </div>
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Indirizzo di Spedizione:</div>
+                        <div class="sale-detail-value">Via Dante 45, 20123 Milano (MI)</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin: var(--spacing-md) 0 var(--spacing-sm);">Dettagli Pagamento</h4>
+                <div class="payment-info-card">
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Metodo di Pagamento:</div>
+                        <div class="sale-detail-value">Carta di Credito (•••• 4589)</div>
+                    </div>
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Subtotale:</div>
+                        <div class="sale-detail-value">€249.99</div>
+                    </div>
+                    <div class="sale-detail-row">
+                        <div class="sale-detail-label">Spedizione:</div>
+                        <div class="sale-detail-value">€0.00 (Gratuita)</div>
+                    </div>
+                    <div class="sale-detail-row" style="font-weight: 600;">
+                        <div class="sale-detail-label">Totale:</div>
+                        <div class="sale-detail-value">€249.99</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn refund" id="refund-sale">
+                    <i class="fas fa-undo"></i> Rimborsa
+                </button>
+                <button class="action-btn ship" id="ship-sale">
+                    <i class="fas fa-shipping-fast"></i> Segna come Spedito
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="success-toast">
+        <div class="toast-icon success">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Ordine Aggiornato</div>
+            <div class="toast-message">Lo stato dell'ordine è stato aggiornato con successo.</div>
+        </div>
+        <button class="toast-close">&times;</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar Toggle
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                
+                // Change the icon based on the state
+                const icon = this.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                }
+            });
+            
+            // Mobile Menu Toggle
+            const mobileToggle = document.getElementById('mobile-toggle');
+            
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+            });
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(e) {
+                if (
+                    sidebar.classList.contains('active') && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== mobileToggle
+                ) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Modal di dettaglio vendita
+            const saleModal = document.getElementById('sale-modal');
+            const viewButtons = document.querySelectorAll('.view-sale');
+            const closeModalButton = document.querySelector('.modal-close');
+            
+            // Apri modal al click sul pulsante dettagli
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    saleModal.classList.add('show');
+                });
+            });
+            
+            // Chiudi modal
+            closeModalButton.addEventListener('click', function() {
+                saleModal.classList.remove('show');
+            });
+            
+            // Chiudi modal cliccando all'esterno
+            saleModal.addEventListener('click', function(e) {
+                if (e.target === saleModal) {
+                    saleModal.classList.remove('show');
+                }
+            });
+            
+            // Azioni sugli ordini
+            const shipButton = document.getElementById('ship-sale');
+            const refundButton = document.getElementById('refund-sale');
+            const successToast = document.getElementById('success-toast');
+            
+            shipButton.addEventListener('click', function() {
+                saleModal.classList.remove('show');
+                
+                // Mostra notifica di successo
+                const toastTitle = successToast.querySelector('.toast-title');
+                const toastMessage = successToast.querySelector('.toast-message');
+                toastTitle.textContent = 'Ordine Spedito';
+                toastMessage.textContent = 'L\'ordine è stato contrassegnato come spedito.';
+                
+                successToast.querySelector('.toast-icon').className = 'toast-icon success';
+                successToast.querySelector('.toast-icon i').className = 'fas fa-check';
+                
+                successToast.classList.add('show');
+                
+                // Nascondi toast dopo 5 secondi
+                setTimeout(() => {
+                    successToast.classList.remove('show');
+                }, 5000);
+            });
+            
+            refundButton.addEventListener('click', function() {
+                saleModal.classList.remove('show');
+                
+                // Mostra notifica di rimborso
+                const toastTitle = successToast.querySelector('.toast-title');
+                const toastMessage = successToast.querySelector('.toast-message');
+                toastTitle.textContent = 'Rimborso Effettuato';
+                toastMessage.textContent = 'Il rimborso per l\'ordine è stato elaborato con successo.';
+                
+                successToast.querySelector('.toast-icon').className = 'toast-icon error';
+                successToast.querySelector('.toast-icon i').className = 'fas fa-times';
+                
+                successToast.classList.add('show');
+                
+                // Nascondi toast dopo 5 secondi
+                setTimeout(() => {
+                    successToast.classList.remove('show');
+                }, 5000);
+            });
+            
+            // Chiudi toast
+            const toastClose = document.querySelector('.toast-close');
+            
+            toastClose.addEventListener('click', function() {
+                successToast.classList.remove('show');
+            });
+            
+            // Paginazione
+            const pageButtons = document.querySelectorAll('.pagination-button');
+            pageButtons.forEach((button, index) => {
+                if (index !== 0 && index !== pageButtons.length - 1) {
+                    button.addEventListener('click', function() {
+                        pageButtons.forEach(btn => {
+                            if (btn !== pageButtons[0] && btn !== pageButtons[pageButtons.length - 1]) {
+                                btn.classList.remove('active');
+                            }
+                        });
+                        this.classList.add('active');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

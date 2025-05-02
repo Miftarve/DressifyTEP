@@ -582,7 +582,7 @@ app.post('/api/delete-user-data', async (req, res) => {
 function ensureAuthenticated(req, res, next) {
     // Ottieni il token da cookie o header Authorization
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-    
+
     if (!token) {
         return res.redirect('/login');
     }
@@ -591,10 +591,10 @@ function ensureAuthenticated(req, res, next) {
         // Verifica il token
         const decoded = jwt.verify(token, SECRET_KEY);
         req.user = decoded;
-        
+
         // Funzioni per mantenere retrocompatibilità con il codice esistente
         req.isAuthenticated = () => true;
-        
+
         next();
     } catch (error) {
         // Se il token non è valido, reindirizza al login
@@ -712,13 +712,13 @@ app.post('/login', (req, res) => {
         }, SECRET_KEY, {
             expiresIn: '24h' // Token valido per 24 ore
         });
-        
+
         // Salva token nei cookie
         res.cookie('token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000 // 24 ore
         });
-        
+
         // Invia token e dati utente come JSON
         res.json({
             token,
@@ -1923,10 +1923,10 @@ app.get('/api/messages/:userId', ensureAuthenticated, async (req, res) => {
     try {
         // Recupera i messaggi dal database
         const messages = await db.getConversation(currentUser.id, otherUserId);
-        
+
         // Segna i messaggi ricevuti come letti
         db.markMessagesAsRead(otherUserId, currentUser.id);
-        
+
         res.json(messages);
     } catch (error) {
         console.error('Errore nel recupero messaggi:', error);
@@ -2035,7 +2035,7 @@ io.on('connection', (socket) => {
     // Associa l'utente al socket usando l'ID convertito in stringa
     const userId = socket.userId;
     console.log(`Connessione stabilita per l'utente ID=${userId}`);
-    
+
     // Usa sempre toString() per le chiavi della mappa
     connectedUsers.set(userId.toString(), socket.id);
 
@@ -2060,19 +2060,19 @@ io.on('connection', (socket) => {
     // Gestione messaggi privati migliorata
     socket.on('private message', async ({ recipientId, text }) => {
         const senderId = socket.userId;
-        
+
         // Converti sempre recipientId in numero
         const recipientIdInt = parseInt(recipientId, 10);
-        
+
         console.log(`Messaggio da ${senderId} a ${recipientIdInt}: ${text}`);
 
         try {
             // Salva il messaggio nel database
             const message = await db.saveMessage(senderId, recipientIdInt, text);
-            
+
             // Conferma al mittente che il messaggio è stato salvato
             socket.emit('message_saved', message);
-            
+
             // Invia il messaggio al destinatario se è online
             const recipientSocketId = connectedUsers.get(recipientIdInt.toString());
             if (recipientSocketId) {
@@ -2097,6 +2097,13 @@ io.on('connection', (socket) => {
     });
 });
 
+app.get('/noleggi', (req, res) => {
+    res.render('admin/noleggi'); // Esto busca views/admin/noleggi.hbs
+});
+
+app.get('/vendite', (req, res) => {
+    res.render('admin/vendite'); // Esto busca views/admin/vendite.hbs
+});
 // Start server
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 
