@@ -91,18 +91,6 @@ Con DressifyTEP, puoi facilmente trovare nuove combinazioni e idee per i tuoi ou
 
 # Guida all'Installazione di DressifyTEP con Docker
 
-Questa guida spiega come configurare e avviare l'applicazione DressifyTEP utilizzando Docker su vari sistemi operativi.
-
-## Prerequisiti
-
-Prima di iniziare, assicurati di avere quanto segue:
-
-- Un computer con sistema operativo Windows, Linux o macOS
-- Docker e Docker Compose installati (vedi le istruzioni di installazione più avanti)
-
-## 📥Installazione di Docker
-# Guida all'Installazione di DressifyTEP con Docker
-
 Questa guida spiega come configurare e avviare l'applicazione DressifyTEP utilizzando Docker su vari sistemi operativi e su GitHub Codespaces.
 
 ## Prerequisiti

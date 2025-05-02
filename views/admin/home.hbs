@@ -5,422 +5,1736 @@
   <title>Dashboard Admin - DRESSIMIFY</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<style>
-  /* Reset e stili generali */
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', 'Segoe UI', sans-serif;
-  }
-
-  body {
-    background-color: #f8f9fa;
-    color: #212529;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Header e branding */
-  .brand-header {
-    background-color: #fff;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .brand-logo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #1a3b61;
-    letter-spacing: 1px;
-  }
-
-  .user-welcome {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #495057;
-  }
-
-  /* Navbar Styles */
-  .navbar {
-    background-color: #1a3b61;
-    display: flex;
-    align-items: center;
-    padding: 0 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  .navbar a {
-    color: rgba(255, 255, 255, 0.85);
-    padding: 1rem 1.5rem;
-    text-decoration: none;
-    font-weight: 500;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .navbar a:hover {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .navbar a.active {
-    color: #ffffff;
-    font-weight: 600;
-  }
-
-  .navbar a.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: #4a90e2;
-  }
-
-  /* Main content */
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .page-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #1a3b61;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid #4a90e2;
-    padding-left: 1rem;
-  }
-
-  /* Dashboard layout */
-  .dashboard-container {
-    display: grid;
-    grid-template-columns: minmax(350px, 30%) 1fr;
-    gap: 2rem;
-  }
-
-  /* Card styles */
-  .card {
-    background-color: #fff;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-
-  .card-header {
-    background-color: #1a3b61;
-    color: white;
-    padding: 1.25rem;
-    font-weight: 600;
-    font-size: 1.25rem;
-  }
-
-  .card-body {
-    padding: 1.5rem;
-  }
-
-  /* Form styles */
-  .form-group {
-    margin-bottom: 1.25rem;
-  }
-
-  .form-row {
-    display: flex;
-    gap: 1rem;
-  }
-
-  label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 0.5rem;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    color: #212529;
-    background-color: #f8fafc;
-  }
-
-  input:focus, select:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-  }
-
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 0.375rem;
-    background-color: #1a3b61;
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  button:hover {
-    background-color: #14304f;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Tabella utenti */
-  .table-container {
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  thead {
-    background-color: #f1f5f9;
-  }
-
-  th {
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    color: #495057;
-    border-bottom: 2px solid #dee2e6;
-  }
-
-  td {
-    padding: 1rem;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  tr:hover {
-    background-color: #f8f9fa;
-  }
-
-  /* Azioni */
-  .actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .action-btn {
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-
-  .edit-btn {
-    background-color: #4a90e2;
-    color: white;
-  }
-
-  .edit-btn:hover {
-    background-color: #3a7bc8;
-  }
-
-  .delete-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-
-  .delete-btn:hover {
-    background-color: #c82333;
-  }
-
-  /* Badge per ruolo */
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .badge-admin {
-    background-color: #1a3b61;
-    color: white;
-  }
-
-  .badge-user {
-    background-color: #4a90e2;
-    color: white;
-  }
-
-  /* Responsive design */
-  @media (max-width: 992px) {
-    .dashboard-container {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .navbar {
-      overflow-x: auto;
-      justify-content: flex-start;
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Reset e variabili */
+    :root {
+      /* Colori */
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --primary-light: #eef2ff;
+      --secondary: #4cc9f0;
+      --success: #06d6a0;
+      --warning: #ffd166;
+      --danger: #ef476f;
+      --dark: #1f2937;
+      --gray-dark: #374151;
+      --gray: #9ca3af;
+      --gray-light: #e5e7eb;
+      --white: #ffffff;
+      --body-bg: #f9fafb;
+      
+      /* Ombreggiature */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Border Radius */
+      --radius-sm: 0.375rem;
+      --radius: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      
+      /* Spaziatura */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 0.75rem;
+      --spacing: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      
+      /* Layout */
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --container-width: 1400px;
+      
+      /* Transizioni */
+      --transition-fast: 0.15s ease;
+      --transition: 0.3s ease;
     }
 
-    .brand-header {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--body-bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Scrollbar personalizzata */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-light);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gray);
+    }
+
+    /* Layout principale */
+    .dashboard-layout {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100%;
+      background-color: var(--white);
+      border-right: 1px solid var(--gray-light);
+      display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+      transition: all var(--transition);
+      z-index: 100;
     }
 
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      border-radius: 12px;
+      font-size: 1.5rem;
+      margin-right: var(--spacing);
+    }
+
+    .sidebar-logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-light);
+      margin-bottom: var(--spacing);
+    }
+
+    .sidebar-user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-light), #e6e6ff);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-right: var(--spacing);
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+    }
+
+    .sidebar-user-name {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-user-role {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-sm) var(--spacing);
+    }
+
+    .menu-category {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: var(--spacing-sm) var(--spacing);
+      margin-top: var(--spacing);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing) var(--spacing);
+      color: var(--gray-dark);
+      text-decoration: none;
+      border-radius: var(--radius);
+      margin-bottom: var(--spacing-xs);
+      transition: all var(--transition-fast);
+    }
+
+    .menu-item:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .menu-item.active {
+      background-color: var(--primary);
+      color: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .menu-item i {
+      font-size: 1.2rem;
+      width: 24px;
+      margin-right: var(--spacing);
+    }
+
+    .menu-item span {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      padding: var(--spacing) var(--spacing-lg);
+      border-top: 1px solid var(--gray-light);
+      font-size: 0.8rem;
+      color: var(--gray);
+      text-align: center;
+    }
+
+    /* Main Content */
     .main-content {
-      padding: 1.5rem;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .form-row {
+      flex: 1;
+      display: flex;
       flex-direction: column;
-      gap: 1rem;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      height: var(--header-height);
+      background-color: var(--white);
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing);
+    }
+
+    .header-date {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-sm) var(--spacing);
+      background-color: var(--primary-light);
+      border-radius: var(--radius);
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-date i {
+      margin-right: var(--spacing-xs);
+    }
+
+    .action-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .action-button:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .notification-button {
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: var(--danger);
+      color: var(--white);
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--white);
+    }
+
+    /* Hamburger Menu */
+    .hamburger-menu {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .hamburger-menu:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+
+    /* Main Container */
+    .main-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+    }
+
+    .page-title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      position: relative;
+      padding-bottom: var(--spacing-xs);
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      border-radius: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    /* Dashboard Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stat-card {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-md);
+      display: flex;
+      align-items: center;
+      transition: all var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: var(--spacing-md);
+      font-size: 1.5rem;
+      color: var(--white);
+    }
+
+    .stat-icon.purple {
+      background: linear-gradient(135deg, var(--primary), #7266ff);
+    }
+
+    .stat-icon.blue {
+      background: linear-gradient(135deg, #0ea5e9, var(--secondary));
+    }
+
+    .stat-icon.green {
+      background: linear-gradient(135deg, #10b981, var(--success));
+    }
+
+    .stat-icon.orange {
+      background: linear-gradient(135deg, #f59e0b, var(--warning));
+    }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .stat-trend.up {
+      color: var(--success);
+    }
+
+    .stat-trend.down {
+      color: var(--danger);
+    }
+
+    .stat-trend i {
+      margin-right: 3px;
+    }
+
+    /* Graph Section */
+    .graph-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .graph-card {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-md);
+      overflow: hidden;
+    }
+
+    .graph-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .graph-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .graph-card-tabs {
+      display: flex;
+      border-radius: var(--radius-sm);
+      background-color: var(--primary-light);
+      padding: 3px;
+    }
+
+    .graph-tab {
+      padding: var(--spacing-xs) var(--spacing);
+      font-size: 0.8rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .graph-tab.active {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .chart-container {
+      height: 300px;
+      position: relative;
+    }
+
+    /* Two Columns Layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* Card styles */
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: all var(--transition);
+      height: 100%;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      padding: var(--spacing-md);
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .card-header-button {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-sm);
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .card-header-button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
     .card-body {
-      padding: 1rem;
+      padding: var(--spacing-md);
     }
-  }
-</style>
+
+    /* Form styles */
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-row {
+      display: flex;
+      gap: var(--spacing);
+    }
+
+    .form-col {
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: var(--spacing);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: var(--spacing);
+      border: 1px solid var(--gray-light);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      transition: all var(--transition-fast);
+      color: var(--dark);
+      background-color: var(--white);
+    }
+
+    input.with-icon, select.with-icon {
+      padding-left: 2.5rem;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .input-hint {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    button {
+      padding: var(--spacing) var(--spacing-md);
+      border: none;
+      border-radius: var(--radius);
+      background-color: var(--primary);
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button i {
+      margin-right: var(--spacing-xs);
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-success {
+      background-color: var(--success);
+    }
+
+    .btn-success:hover {
+      background-color: #05c091;
+    }
+
+    /* Tabella utenti */
+    .table-container {
+      overflow-x: auto;
+      margin-top: var(--spacing);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background-color: var(--primary-light);
+    }
+
+    th {
+      padding: var(--spacing);
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 2px solid var(--gray-light);
+      font-size: 0.9rem;
+    }
+
+    td {
+      padding: var(--spacing);
+      border-bottom: 1px solid var(--gray-light);
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background-color: rgba(67, 97, 238, 0.02);
+    }
+
+    /* Badge per ruolo */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge i {
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
+
+    .badge-admin {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .badge-user {
+      background-color: rgba(76, 201, 240, 0.15);
+      color: var(--secondary);
+    }
+
+    /* Azioni tabella */
+    .actions {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+
+    .edit-btn {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .edit-btn:hover {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .delete-btn {
+      background-color: rgba(239, 71, 111, 0.1);
+      color: var(--danger);
+    }
+
+    .delete-btn:hover {
+      background-color: var(--danger);
+      color: var(--white);
+    }
+
+    .view-btn {
+      background-color: rgba(6, 214, 160, 0.1);
+      color: var(--success);
+    }
+
+    .view-btn:hover {
+      background-color: var(--success);
+      color: var(--white);
+    }
+
+    /* Paginazione */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: var(--spacing-md);
+    }
+
+    .pagination-info {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-right: var(--spacing);
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .pagination-button {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .pagination-button:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+
+    .pagination-button.active {
+      background-color: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      right: 0;
+      min-width: 200px;
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all var(--transition-fast);
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing) var(--spacing-md);
+      color: var(--gray-dark);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .dropdown-item i {
+      width: 20px;
+      margin-right: var(--spacing);
+      font-size: 1rem;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--gray-light);
+      margin: 0.25rem 0;
+    }
+
+    /* Notifica Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing-md);
+      display: flex;
+      align-items: center;
+      min-width: 300px;
+      max-width: 400px;
+      z-index: 1000;
+      transform: translateX(calc(100% + 20px));
+      transition: all var(--transition);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: var(--spacing);
+      flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+      background-color: rgba(6, 214, 160, 0.1);
+      color: var(--success);
+    }
+
+    .toast-icon.error {
+      background-color: rgba(239, 71, 111, 0.1);
+      color: var(--danger);
+    }
+
+    .toast-icon.info {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    .toast-message {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    .toast-close {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--gray-light);
+      color: var(--gray);
+      margin-left: var(--spacing);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+      background-color: var(--gray);
+      color: var(--white);
+    }
+
+    /* Tooltip */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 10px;
+      background-color: var(--dark);
+      color: var(--white);
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-fast);
+    }
+
+    [data-tooltip]:hover:before {
+      opacity: 1;
+      transform: translate(-50%, -5px);
+    }
+
+    /* Media Queries per Responsività */
+    @media (max-width: 1200px) {
+      .graph-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: -100%;
+      }
+
+      .sidebar.show {
+        left: 0;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .hamburger-menu {
+        display: flex;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 90;
+        opacity: 0;
+        pointer-events: none;
+        transition: all var(--transition);
+      }
+
+      .overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        flex-direction: column;
+      }
+
+      .header {
+        padding: 0 var(--spacing);
+      }
+
+      .header-title {
+        font-size: 1.2rem;
+      }
+
+      .main-container {
+        padding: var(--spacing);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .action-button span {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 8px;
+      }
+
+      .page-title-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing);
+      }
+    }
+  </style>
+</head>
 
 <body>
-  <!-- Header con branding e benvenuto -->
-  <header class="brand-header">
-    <div class="brand-logo">DRESSIMIFY</div>
-    <div class="user-welcome">Benvenuto, {{name}}!</div>
-  </header>
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+  
+  <!-- Dashboard Layout -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+          <i class="fas fa-tshirt"></i>
+        </div>
+        <div class="sidebar-logo-text">DRESSIMIFY</div>
+      </div>
+      
+      <!-- User Info -->
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">M</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Miftarve</div>
+          <div class="sidebar-user-role">Amministratore</div>
+        </div>
+      </div>
+      
+      <!-- Menu -->
+      <div class="sidebar-menu">
+        <div class="menu-category">Principale</div>
+        <a href="#" class="menu-item active">
+          <i class="fas fa-home"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/prodotti" class="menu-item">
+          <i class="fas fa-tshirt"></i>
+          <span>Prodotti</span>
+        </a>
+        <a href="/noleggi" class="menu-item">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Noleggi</span>
+        </a>
+        <div class="menu-category">Comunicazione</div>
+        <a href="/static/index.html" class="menu-item">
+          <i class="fas fa-comments"></i>
+          <span>Chat</span>
+        </a>
 
-  <!-- Navbar migliorata -->
-  <div class="navbar">
-    <a href="/" class="active">Dashboard</a>
-    <a href="/static/index.html">Chat</a>
-    <a href="/prodotti">Prodotti</a>
-    <a href="/logout">Logout</a>
-  </div>
-
-  <!-- Contenuto principale -->
-  <div class="main-content">
-    <h1 class="page-title">Dashboard Amministrazione</h1>
-
-    <div class="dashboard-container">
-      <!-- Registra un Nuovo Utente Form -->
-      <div class="card">
-        <div class="card-header">Registra un Nuovo Utente</div>
-        <div class="card-body">
-          <form action="/registraUtente" method="post">
-            <div class="form-group">
-              <div class="form-row">
-                <div class="input-group">
-                  <label for="nome">Nome</label>
-                  <input type="text" id="nome" name="nome" required>
+        <div class="menu-category">Account</div>
+        <a href="/logout" class="menu-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+      
+      <!-- Footer -->
+      <div class="sidebar-footer">
+        Dressimify &copy; 2025 - Tutti i diritti riservati
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="hamburger-menu" id="hamburger-menu">
+          <i class="fas fa-bars"></i>
+        </div>
+        <h1 class="header-title">Dashboard Amministrazione</h1>
+        <div class="header-actions">
+          <div class="header-date">
+            <i class="far fa-calendar-alt"></i>
+            <span>02/05/2025 - 11:28</span>
+          </div>
+          <button class="action-button notification-button">
+            <i class="far fa-bell"></i>
+            <div class="notification-badge">3</div>
+          </button>
+          <div class="dropdown">
+            <button class="action-button" id="user-dropdown">
+              <i class="fas fa-user"></i>
+            </button>
+            <div class="dropdown-menu" id="user-menu">
+              <a href="#" class="dropdown-item">
+                <i class="fas fa-user"></i>
+                Profilo
+              </a>
+              <a href="#" class="dropdown-item">
+                <i class="fas fa-cog"></i>
+                Impostazioni
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/logout" class="dropdown-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Container -->
+      <div class="main-container">
+        <!-- Page Title -->
+        <div class="page-title-container">
+          <div>
+            <h1 class="page-title">Dashboard Amministrazione</h1>
+            <p class="page-subtitle">Visualizza e gestisci tutti gli utenti del sistema</p>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Utenti Totali</div>
+              <div class="stat-value">124</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +12% questo mese
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fas fa-tshirt"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Capi a Noleggio</div>
+              <div class="stat-value">84</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +5% questa settimana
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Noleggi Attivi</div>
+              <div class="stat-value">38</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +18% questo mese
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fas fa-euro-sign"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Entrate Mensili</div>
+              <div class="stat-value">8.492€</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +7.2% questo mese
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Graph Section -->
+        <div class="graph-section">
+          <div class="graph-card">
+            <div class="graph-card-header">
+              <h2 class="graph-card-title">Andamento Noleggi</h2>
+              <div class="graph-card-tabs">
+                <div class="graph-tab active">Settimanale</div>
+                <div class="graph-tab">Mensile</div>
+                <div class="graph-tab">Annuale</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="noleggiChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="graph-card">
+            <div class="graph-card-header">
+              <h2 class="graph-card-title">Distribuzione Utenti</h2>
+            </div>
+            <div class="chart-container">
+              <canvas id="utentiChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Two Columns Layout -->
+        <div class="main-layout">
+          <!-- Registra Utente Form -->
+          <div class="card">
+            <div class="card-header">
+              <span>Registra un Nuovo Utente</span>
+              <div class="card-header-actions">
+                <button class="card-header-button" title="Aiuto">
+                  <i class="fas fa-question"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <form action="/registraUtente" method="post" id="registraUtenteForm">
+                <div class="form-group">
+                  <div class="form-row">
+                    <div class="form-col">
+                      <label for="nome">Nome</label>
+                      <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="nome" name="nome" class="with-icon" placeholder="Inserisci il nome" required>
+                      </div>
+                    </div>
+                    <div class="form-col">
+                      <label for="cognome">Cognome</label>
+                      <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="cognome" name="cognome" class="with-icon" placeholder="Inserisci il cognome" required>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="input-group">
-                  <label for="cognome">Cognome</label>
-                  <input type="text" id="cognome" name="cognome" required>
+
+                <div class="form-row">
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="dataNascita">Data di Nascita</label>
+                      <div class="input-group">
+                        <i class="fas fa-calendar input-icon"></i>
+                        <input type="date" id="dataNascita" name="dataNascita" class="with-icon" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="luogoNascita">Luogo di Nascita</label>
+                      <div class="input-group">
+                        <i class="fas fa-map-marker-alt input-icon"></i>
+                        <input type="text" id="luogoNascita" name="luogoNascita" class="with-icon" placeholder="Città di nascita" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="email" name="email" class="with-icon" placeholder="nome@esempio.com" required>
+                  </div>
+                  <div class="input-hint">L'email verrà utilizzata per il login e le comunicazioni</div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="password">Password</label>
+                      <div class="input-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" name="password" class="with-icon" placeholder="Crea una password" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="ruolo">Ruolo</label>
+                      <div class="input-group">
+                        <i class="fas fa-user-shield input-icon"></i>
+                        <select id="ruolo" name="ruolo" class="with-icon" required>
+                          <option value="" disabled selected>Seleziona un ruolo</option>
+                          <option value="admin">Amministratore</option>
+                          <option value="user">Utente</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-block">
+                  <i class="fas fa-user-plus"></i>
+                  Registra Utente
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Lista Utenti -->
+          <div class="card">
+            <div class="card-header">
+              <span>Lista Utenti</span>
+              <div class="card-header-actions">
+                <button class="card-header-button" title="Filtra">
+                  <i class="fas fa-filter"></i>
+                </button>
+                <button class="card-header-button" title="Esporta">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nome</th>
+                      <th>Email</th>
+                      <th>Ruolo</th>
+                      <th>Stato</th>
+                      <th>Azioni</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each users}}
+                    <tr>
+                      <td>{{id}}</td>
+                      <td>{{nome}} {{cognome}}</td>
+                      <td>{{email}}</td>
+                      <td>
+                        {{#if (eq ruolo "admin")}}
+                        <span class="badge badge-admin">
+                          <i class="fas fa-user-shield"></i>Admin
+                        </span>
+                        {{else}}
+                        <span class="badge badge-user">
+                          <i class="fas fa-user"></i>Utente
+                        </span>
+                        {{/if}}
+                      </td>
+                      <td>
+                        <span class="badge" style="background-color: rgba(6, 214, 160, 0.1); color: var(--success);">
+                          <i class="fas fa-circle" style="font-size: 8px;"></i>
+                          Attivo
+                        </span>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          <a href="/visualizzaUtente/{{id}}" class="action-btn view-btn" data-tooltip="Visualizza">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="/modificaUtente/{{id}}" class="action-btn edit-btn" data-tooltip="Modifica">
+                            <i class="fas fa-pen"></i>
+                          </a>
+                          <a href="/eliminaUtente/{{id}}" class="action-btn delete-btn" data-tooltip="Elimina">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {{/each}}
+                    <!-- Utenti demo per l'anteprima -->
+                    <tr>
+                      <td>1</td>
+                      <td>Miftarve</td>
+                      <td>miftarve@dressimify.com</td>
+                      <td>
+                        <span class="badge badge-admin">
+                          <i class="fas fa-user-shield"></i>Admin
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge" style="background-color: rgba(6, 214, 160, 0.1); color: var(--success);">
+                          <i class="fas fa-circle" style="font-size: 8px;"></i>
+                          Attivo
+                        </span>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          <a href="#" class="action-btn view-btn" data-tooltip="Visualizza">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="#" class="action-btn edit-btn" data-tooltip="Modifica">
+                            <i class="fas fa-pen"></i>
+                          </a>
+                          <a href="#" class="action-btn delete-btn" data-tooltip="Elimina">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>Fabrizio Rossi</td>
+                      <td>fabrizio@email.com</td>
+                      <td>
+                        <span class="badge badge-user">
+                          <i class="fas fa-user"></i>Utente
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge" style="background-color: rgba(6, 214, 160, 0.1); color: var(--success);">
+                          <i class="fas fa-circle" style="font-size: 8px;"></i>
+                          Attivo
+                        </span>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          <a href="#" class="action-btn view-btn" data-tooltip="Visualizza">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="#" class="action-btn edit-btn" data-tooltip="Modifica">
+                            <i class="fas fa-pen"></i>
+                          </a>
+                          <a href="#" class="action-btn delete-btn" data-tooltip="Elimina">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>Maria Verdi</td>
+                      <td>maria@email.com</td>
+                      <td>
+                        <span class="badge badge-user">
+                          <i class="fas fa-user"></i>Utente
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge" style="background-color: rgba(6, 214, 160, 0.1); color: var(--success);">
+                          <i class="fas fa-circle" style="font-size: 8px;"></i>
+                          Attivo
+                        </span>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          <a href="#" class="action-btn view-btn" data-tooltip="Visualizza">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="#" class="action-btn edit-btn" data-tooltip="Modifica">
+                            <i class="fas fa-pen"></i>
+                          </a>
+                          <a href="#" class="action-btn delete-btn" data-tooltip="Elimina">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Paginazione -->
+              <div class="pagination">
+                <div class="pagination-info">
+                  Mostrando 1-3 di 3 risultati
+                </div>
+                <div class="pagination-buttons">
+                  <button class="pagination-button">
+                    <i class="fas fa-angle-left"></i>
+                  </button>
+                  <button class="pagination-button active">1</button>
+                  <button class="pagination-button">
+                    <i class="fas fa-angle-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
-
-            <div class="form-group">
-              <label for="dataNascita">Data di Nascita</label>
-              <input type="date" id="dataNascita" name="dataNascita" required>
-            </div>
-
-            <div class="form-group">
-              <label for="luogoNascita">Luogo di Nascita</label>
-              <input type="text" id="luogoNascita" name="luogoNascita" required>
-            </div>
-
-            <div class="form-group">
-              <label for="ruolo">Ruolo</label>
-              <select id="ruolo" name="ruolo" required>
-                <option value="admin">Amministratore</option>
-                <option value="user">Utente</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
-            </div>
-
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" id="password" name="password" required>
-            </div>
-
-            <button type="submit">Registra Utente</button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Elenco Utenti -->
-      <div class="card">
-        <div class="card-header">Lista Utenti</div>
-        <div class="card-body">
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nome</th>
-                  <th>Cognome</th>
-                  <th>Data di Nascita</th>
-                  <th>Email</th>
-                  <th>Ruolo</th>
-                  <th>Azioni</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{#each users}}
-                <tr>
-                  <td>{{id}}</td>
-                  <td>{{nome}}</td>
-                  <td>{{cognome}}</td>
-                  <td>{{dataNascita}}</td>
-                  <td>{{email}}</td>
-                  <td>
-                    {{#if (eq ruolo "admin")}}
-                    <span class="badge badge-admin">Admin</span>
-                    {{else}}
-                    <span class="badge badge-user">Utente</span>
-                    {{/if}}
-                  </td>
-                  <td>
-                    <div class="actions">
-                      <a href="/modificaUtente/{{id}}" class="action-btn edit-btn">Modifica</a>
-                      <a href="/eliminaUtente/{{id}}" class="action-btn delete-btn">Elimina</a>
-                    </div>
-                  </td>
-                </tr>
-                {{/each}}
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
+    </main>
+  </div>
+  
+  <!-- Notifica Toast -->
+  <div class="toast" id="toast">
+    <div class="toast-icon success">
+      <i class="fas fa-check"></i>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">Completato!</div>
+      <div class="toast-message">L'operazione è stata completata con successo.</div>
+    </div>
+    <div class="toast-close" id="toast-close">
+      <i class="fas fa-times"></i>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Variabili per dati utente
+      const currentUser = {
+        name: 'Miftarve',
+        role: 'Amministratore',
+        loginTime: '2025-05-02 11:28:53'
+      };
+      
+      // Setup Menu Mobile
+      const hamburger = document.getElementById('hamburger-menu');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      
+      hamburger.addEventListener('click', function() {
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+      });
+      
+      overlay.addEventListener('click', function() {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+      });
+      
+      // User Dropdown
+      const userDropdown = document.getElementById('user-dropdown');
+      const userMenu = document.getElementById('user-menu');
+      
+      userDropdown.addEventListener('click', function() {
+        userMenu.classList.toggle('show');
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!userDropdown.contains(e.target) && !userMenu.contains(e.target)) {
+          userMenu.classList.remove('show');
+        }
+      });
+      
+      // Toast Notifications
+      const toast = document.getElementById('toast');
+      const toastClose = document.getElementById('toast-close');
+      
+      // Esempio di visualizzazione toast
+      setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 5000);
+      }, 2000);
+      
+      toastClose.addEventListener('click', function() {
+        toast.classList.remove('show');
+      });
+      
+      // Invio Form con Prevenzione Default + Toast
+      const registraUtenteForm = document.getElementById('registraUtenteForm');
+      
+      registraUtenteForm.addEventListener('submit', function(e) {
+        // Solo per demo - rimuovere in produzione
+        if (document.location.href.includes('github.io')) {
+          e.preventDefault();
+          
+          // Simula invio form e mostra notifica
+          toast.querySelector('.toast-title').textContent = 'Utente Registrato!';
+          toast.querySelector('.toast-message').textContent = 'Il nuovo utente è stato registrato con successo.';
+          toast.classList.add('show');
+          
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 5000);
+          
+          // Reset form
+          this.reset();
+        }
+      });
+      
+      // Grafici
+      setupCharts();
+    });
+    
+    function setupCharts() {
+      // Chart.js - Noleggi
+      const noleggiCtx = document.getElementById('noleggiChart').getContext('2d');
+      const noleggiChart = new Chart(noleggiCtx, {
+        type: 'line',
+        data: {
+          labels: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
+          datasets: [{
+            label: 'Noleggi',
+            data: [12, 19, 15, 8, 22, 27, 25],
+            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+            borderColor: '#4361ee',
+            borderWidth: 3,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#4361ee',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#1f2937',
+              padding: 12,
+              cornerRadius: 8
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false,
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // Chart.js - Utenti
+      const utentiCtx = document.getElementById('utentiChart').getContext('2d');
+      const utentiChart = new Chart(utentiCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Utenti Attivi', 'Nuovi Utenti', 'Utenti Inattivi'],
+          datasets: [{
+            data: [85, 15, 24],
+            backgroundColor: [
+              '#4361ee',
+              '#4cc9f0',
+              '#e5e7eb'
+            ],
+            borderWidth: 0,
+            borderRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1f2937',
+              padding: 12,
+              cornerRadius: 8
+            }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>

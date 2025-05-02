@@ -1,265 +1,940 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <title>Modifica Utente</title>
+  <title>Dressimify | Modifica Utente</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
+    /* ===== VARIABILI CSS E TEMA ===== */
     :root {
+      /* Colori primari */
       --primary: #4361ee;
-      --primary-light: #4895ef;
-      --primary-dark: #3a0ca3;
-      --secondary: #f72585;
-      --success: #4cc9f0;
-      --background: #f8f9fa;
+      --primary-dark: #3a56d4;
+      --primary-light: #eef2ff;
+      --secondary: #7c3aed;
+      --accent: #4cc9f0;
+      
+      /* Colori di stato */
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #0ea5e9;
+      
+      /* Colori neutri */
       --white: #ffffff;
-      --text: #212529;
-      --text-light: #6c757d;
-      --border: #dee2e6;
-      --shadow: rgba(0, 0, 0, 0.1);
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      
+      /* Arrotondamento */
+      --radius-sm: 0.375rem;
+      --radius: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-full: 9999px;
+      
+      /* Ombre */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Animazioni */
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+      
+      /* Spaziatura */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
     }
-    
+
+    /* ===== RESET E STILI GENERALI ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
+
     body {
-      background-color: var(--background);
-      background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: var(--gray-800);
+      background-color: var(--gray-50);
       min-height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    
-    .container {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      padding: 32px;
-      max-width: 550px;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 6px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-    }
-    
-    h1 {
-      font-size: 1.8rem;
-      color: var(--primary-dark);
-      margin-bottom: 24px;
-      text-align: center;
-      font-weight: 600;
-      position: relative;
-      padding-bottom: 10px;
-    }
-    
-    h1::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: var(--secondary);
-      border-radius: 2px;
-    }
-    
-    form {
-      display: flex;
       flex-direction: column;
-      gap: 20px;
     }
-    
-    .form-group {
-      position: relative;
-    }
-    
-    .form-row {
-      display: flex;
-      gap: 15px;
-    }
-    
-    .form-row .form-group {
-      flex: 1;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--text);
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-    
-    input, select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      color: var(--text);
+
+    /* ===== HEADER ===== */
+    .header {
       background-color: var(--white);
-    }
-    
-    input:focus, select:focus {
-      border-color: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-      outline: none;
-    }
-    
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%236c757d' d='M4.646 6.646a.5.5 0 01.708 0L8 9.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 40px;
-    }
-    
-    .button-group {
+      box-shadow: var(--shadow);
+      padding: var(--spacing) var(--spacing-xl);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    
-    button {
-      padding: 12px 24px;
-      background: linear-gradient(to right, var(--primary), var(--primary-light));
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
     }
-    
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      font-size: 1.25rem;
     }
-    
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(67, 97, 238, 0.2);
+
+    .header-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--gray-900);
+      display: flex;
+      flex-direction: column;
     }
-    
-    .cancel-btn {
-      background: transparent;
-      color: var(--text-light);
-      box-shadow: none;
-      border: 1px solid var(--border);
-    }
-    
-    .cancel-btn:hover {
-      background: #f1f3f5;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    p {
-      text-align: center;
-      margin-top: 20px;
-      color: var(--text-light);
-    }
-    
-    p a {
-      color: var(--primary);
-      text-decoration: none;
+
+    .header-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
       font-weight: 500;
-      transition: color 0.3s;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray-600);
+      font-size: 0.875rem;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-xs) var(--spacing);
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--radius-full);
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .user-avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      background-color: var(--white);
+      padding: var(--spacing) var(--spacing-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      border-bottom: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray-500);
+      font-size: 0.875rem;
+    }
+
+    .breadcrumb-item:not(:last-child)::after {
+      content: '/';
+      margin-left: var(--spacing-xs);
+      color: var(--gray-300);
+    }
+
+    .breadcrumb-item:last-child {
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+
+    .breadcrumb-item a {
+      color: var(--gray-500);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .breadcrumb-item a:hover {
+      color: var(--primary);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 var(--spacing-lg) var(--spacing-xl);
+    }
+
+    .page-header {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .page-title-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius);
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .page-description {
+      color: var(--gray-600);
+      max-width: 50rem;
+      font-size: 0.875rem;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transition: transform var(--transition), box-shadow var(--transition);
+      overflow: hidden;
+      max-width: 40rem;
+      margin: 0 auto;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .card-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius);
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .card-body {
+      padding: var(--spacing-lg);
+    }
+
+    /* ===== FORM ===== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem var(--spacing);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      color: var(--gray-800);
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-input:focus, .form-input:active {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: var(--gray-400);
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: var(--spacing);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+    }
+
+    .input-with-icon {
+      padding-left: 2.5rem;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.75rem var(--spacing);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      color: var(--gray-800);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%236B7280' d='M4.646 6.646a.5.5 0 01.708 0L8 9.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--spacing) center;
+      background-size: 16px;
+      padding-right: 2.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    .form-hint {
+      margin-top: var(--spacing-xs);
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .form-error {
+      margin-top: var(--spacing-xs);
+      font-size: 0.75rem;
+      color: var(--danger);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Avatar Upload */
+    .avatar-upload {
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing);
+    }
+
+    .avatar-preview {
+      width: 6rem;
+      height: 6rem;
+      border-radius: var(--radius-full);
+      background-color: var(--gray-200);
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow-md);
+      border: 3px solid var(--white);
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-500);
+      font-size: 2rem;
+      background-color: var(--primary-light);
+    }
+
+    .avatar-upload-button {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 2rem;
+      height: 2rem;
+      background-color: var(--primary);
+      color: var(--white);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--white);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .avatar-upload-button:hover {
+      background-color: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .avatar-upload-input {
+      display: none;
+    }
+
+    .avatar-info {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-align: center;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn {
+      padding: 0.75rem var(--spacing-lg);
+      border-radius: var(--radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-xs);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background-color: var(--white);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+
+    .btn-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger);
+      color: var(--white);
+      border-color: var(--danger);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing);
+      margin-top: var(--spacing-lg);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      padding: var(--spacing) var(--spacing-xl);
+      background-color: var(--white);
+      border-top: 1px solid var(--gray-200);
+      text-align: center;
+      margin-top: var(--spacing-xl);
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: var(--spacing);
+    }
+
+    .footer-link {
+      color: var(--gray-600);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-link:hover {
+      color: var(--primary);
+    }
+
+    /* ===== TOAST NOTIFICATION ===== */
+    .toast {
+      position: fixed;
+      bottom: var(--spacing-lg);
+      right: var(--spacing-lg);
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing);
+      min-width: 20rem;
+      max-width: 100%;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all var(--transition-fast);
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .toast-icon.error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+
+    .toast-message {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--gray-500);
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: color var(--transition-fast);
+    }
+
+    .toast-close:hover {
+      color: var(--gray-900);
     }
     
-    p a:hover {
-      color: var(--primary-dark);
-      text-decoration: underline;
-    }
-    
-    @media (max-width: 600px) {
-      .container {
-        padding: 24px;
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .header {
+        padding: var(--spacing) var(--spacing);
       }
       
-      h1 {
-        font-size: 1.5rem;
+      .breadcrumb {
+        padding: var(--spacing) var(--spacing);
       }
       
-      .form-row {
-        flex-direction: column;
-        gap: 20px;
+      .main-content {
+        padding: 0 var(--spacing) var(--spacing-lg);
       }
       
-      button {
-        width: 100%;
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group.full-width {
+        grid-column: span 1;
       }
       
       .button-group {
         flex-direction: column-reverse;
-        gap: 15px;
+        gap: var(--spacing-sm);
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+        gap: var(--spacing);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header-title {
+        font-size: 1.25rem;
+      }
+      
+      .header-info, .header-subtitle {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Modifica Utente</h1>
-    <form action="/modificaUtente/{{user.id}}" method="post">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nome">Nome</label>
-          <input type="text" id="nome" name="nome" value="{{user.nome}}" placeholder="Inserisci il nome" required>
-        </div>
-        <div class="form-group">
-          <label for="cognome">Cognome</label>
-          <input type="text" id="cognome" name="cognome" value="{{user.cognome}}" placeholder="Inserisci il cognome" required>
-        </div>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">
+        <i class="fas fa-tshirt"></i>
       </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="dataNascita">Data di Nascita</label>
-          <input type="date" id="dataNascita" name="dataNascita" value="{{user.dataNascita}}" required>
-        </div>
-        <div class="form-group">
-          <label for="luogoNascita">Luogo di Nascita</label>
-          <input type="text" id="luogoNascita" name="luogoNascita" value="{{user.luogoNascita}}" placeholder="Inserisci il luogo di nascita" required>
-        </div>
+      <div class="header-title">
+        Dressimify
+        <span class="header-subtitle">Sistema di Gestione</span>
       </div>
-      
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="{{user.email}}" placeholder="Inserisci l'email" required>
+    </div>
+    <div class="header-actions">
+      <div class="header-info">
+        <i class="far fa-calendar-alt"></i>
+        <span>02/05/2025 - 13:58</span>
       </div>
-      
-      <div class="form-group">
-        <label for="ruolo">Ruolo</label>
-        <select id="ruolo" name="ruolo" required>
-          <option value="admin" {{#if (eq user.ruolo "admin")}}selected{{/if}}>Amministratore</option>
-          <option value="user" {{#if (eq user.ruolo "user")}}selected{{/if}}>Utente</option>
-        </select>
+      <div class="header-user">
+        <div class="user-avatar">M</div>
+        <span>Miftarve</span>
       </div>
-      
-      <div class="button-group">
-        <button type="button" class="cancel-btn" onclick="history.back()">Annulla</button>
-        <button type="submit">Salva Modifiche</button>
-      </div>
-    </form>
+    </div>
+  </header>
+  
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-item">
+      <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+    </div>
+    <div class="breadcrumb-item">
+      <a href="/utenti">Gestione Utenti</a>
+    </div>
+    <div class="breadcrumb-item">
+      <i class="fas fa-user-edit"></i> Modifica Utente
+    </div>
   </div>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">
+        <span class="page-title-icon"><i class="fas fa-user-edit"></i></span>
+        Modifica Dati Utente
+      </h1>
+      <p class="page-description">
+        Aggiorna i dati dell'utente. Tutti i campi contrassegnati con * sono obbligatori.
+      </p>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="fas fa-user-cog"></i>
+        </div>
+        <h2 class="card-title">Informazioni Personali</h2>
+      </div>
+      <div class="card-body">
+        <!-- Avatar Upload -->
+        <div class="avatar-upload">
+          <div class="avatar-preview">
+            <div class="avatar-placeholder">
+              <i class="fas fa-user"></i>
+            </div>
+            <label class="avatar-upload-button" for="avatar-input">
+              <i class="fas fa-camera"></i>
+            </label>
+            <input type="file" id="avatar-input" class="avatar-upload-input" accept="image/*">
+          </div>
+          <div class="avatar-info">
+            Carica un'immagine del profilo (opzionale)<br>
+            JPG, PNG o GIF fino a 2MB
+          </div>
+        </div>
+        
+        <form action="/modificaUtente/{{user.id}}" method="post" id="edit-user-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="nome">Nome *</label>
+              <div class="input-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="nome" name="nome" value="Mario" placeholder="Inserisci il nome" class="form-input input-with-icon" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="cognome">Cognome *</label>
+              <div class="input-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="cognome" name="cognome" value="Rossi" placeholder="Inserisci il cognome" class="form-input input-with-icon" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="dataNascita">Data di Nascita *</label>
+              <div class="input-group">
+                <i class="fas fa-calendar input-icon"></i>
+                <input type="date" id="dataNascita" name="dataNascita" value="1990-05-15" class="form-input input-with-icon" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="luogoNascita">Luogo di Nascita *</label>
+              <div class="input-group">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <input type="text" id="luogoNascita" name="luogoNascita" value="Milano" placeholder="Inserisci il luogo di nascita" class="form-input input-with-icon" required>
+              </div>
+            </div>
+            
+            <div class="form-group full-width">
+              <label class="form-label" for="email">Email *</label>
+              <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" name="email" value="mario.rossi@example.com" placeholder="Inserisci l'email" class="form-input input-with-icon" required>
+              </div>
+              <div class="form-hint">L'email verrà utilizzata per l'accesso al sistema e le comunicazioni</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="ruolo">Ruolo *</label>
+              <select id="ruolo" name="ruolo" class="form-select" required>
+                <option value="admin">Amministratore</option>
+                <option value="user" selected>Utente</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="stato">Stato Account</label>
+              <select id="stato" name="stato" class="form-select">
+                <option value="active" selected>Attivo</option>
+                <option value="suspended">Sospeso</option>
+                <option value="inactive">Inattivo</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="cambiaPassword">Modifica Password</label>
+            <div class="input-group">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="cambiaPassword" name="cambiaPassword" placeholder="Lascia vuoto per mantenere la password attuale" class="form-input input-with-icon">
+            </div>
+            <div class="form-hint">Per sicurezza, crea una password di almeno 8 caratteri con lettere, numeri e simboli</div>
+          </div>
+          
+          <div class="button-group">
+            <button type="button" class="btn btn-outline" onclick="location.href='/home'">
+              <i class="fas fa-times"></i> Annulla
+            </button>
+            <button type="button" class="btn btn-danger" id="delete-user-btn">
+              <i class="fas fa-trash"></i> Elimina Utente
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Salva Modifiche
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fas fa-tshirt"></i> Dressimify &copy; 2025
+      </div>
+      <div class="footer-links">
+        <a href="/privacy" class="footer-link">Privacy</a>
+        <a href="/termini" class="footer-link">Termini di Servizio</a>
+        <a href="/supporto" class="footer-link">Supporto</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Toast Notification -->
+  <div class="toast" id="success-toast">
+    <div class="toast-icon success">
+      <i class="fas fa-check"></i>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">Modifiche Salvate</div>
+      <div class="toast-message">Le modifiche all'utente sono state salvate con successo.</div>
+    </div>
+    <button class="toast-close">&times;</button>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Gestione upload avatar
+      const avatarInput = document.getElementById('avatar-input');
+      const avatarPreview = document.querySelector('.avatar-preview');
+      
+      avatarInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            // Rimuovi il placeholder e aggiungi l'immagine
+            avatarPreview.innerHTML = `
+              <img src="${e.target.result}" alt="Avatar anteprima">
+              <label class="avatar-upload-button" for="avatar-input">
+                <i class="fas fa-camera"></i>
+              </label>
+            `;
+          }
+          
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+      
+      // Gestione form submit
+      const editUserForm = document.getElementById('edit-user-form');
+      const successToast = document.getElementById('success-toast');
+      
+      editUserForm.addEventListener('submit', function(e) {
+        // Solo per demo - in produzione rimuovere questa parte
+        e.preventDefault();
+        
+        // Simula salvataggio
+        setTimeout(() => {
+          successToast.classList.add('show');
+          
+          setTimeout(() => {
+            successToast.classList.remove('show');
+          }, 5000);
+        }, 1000);
+      });
+      
+      // Chiusura toast
+      const toastClose = document.querySelector('.toast-close');
+      
+      toastClose.addEventListener('click', function() {
+        successToast.classList.remove('show');
+      });
+      
+      // Eliminazione utente
+      const deleteUserBtn = document.getElementById('delete-user-btn');
+      
+      deleteUserBtn.addEventListener('click', function() {
+        if (confirm('Sei sicuro di voler eliminare questo utente? Questa azione non può essere annullata.')) {
+          // Qui andrebbe il codice per l'eliminazione effettiva
+          alert('Utente eliminato con successo');
+          window.location.href = '/utenti';
+        }
+      });
+      
+      // Aggiorna data e ora nell'header
+      const dateTimeDisplay = document.querySelector('.header-info span');
+      dateTimeDisplay.textContent = '02/05/2025 - 13:58';
+    });
+  </script>
 </body>
 </html>

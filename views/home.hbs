@@ -6,10 +6,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <style>
     /* General Reset and Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-    
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,32 +18,59 @@
     }
 
     :root {
-      /* Nuova palette di colori professionale */
-      --primary: #5048E5;
-      --primary-dark: #3832A0;
-      --primary-light: #F3F2FF;
-      --secondary: #0EA5E9;
-      --accent: #16BDCA;
-      --dark: #111827;
-      --gray-dark: #374151;
-      --gray: #9CA3AF;
-      --gray-light: #F9FAFB;
-      --white: #FFFFFF;
+      /* Palette di colori moderna e vibrante */
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --primary-light: #f1f5ff;
+      --secondary: #4cc9f0;
+      --accent: #f72585;
+      --success: #06d6a0;
+      --warning: #ffd166;
+      --dark: #01161e;
+      --dark-light: #124559;
+      --gray-dark: #495057;
+      --gray: #adb5bd;
+      --gray-light: #f8f9fa;
+      --white: #ffffff;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --shadow-primary: 0 6px 15px rgba(67, 97, 238, 0.15);
+      
+      /* Border-radius */
+      --radius-sm: 8px;
+      --radius: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 30px;
+      
+      /* Transitions */
+      --transition-fast: 0.2s ease;
+      --transition: 0.3s ease;
+      --transition-slow: 0.5s ease;
+      
+      /* Spacing */
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space: 1.5rem;
+      --space-md: 2rem;
+      --space-lg: 3rem;
+      --space-xl: 5rem;
     }
 
     body {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: var(--gray-light);
       color: var(--dark);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding-top: 80px;
       position: relative;
+      overflow-x: hidden;
     }
 
-    /* Elegant Patterns */
+    /* Background Elements */
     .bg-pattern {
       position: fixed;
       top: 0;
@@ -50,262 +78,426 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(rgba(80, 72, 229, 0.03) 2px, transparent 2px),
-        radial-gradient(rgba(80, 72, 229, 0.02) 2px, transparent 2px);
+        radial-gradient(rgba(67, 97, 238, 0.03) 2px, transparent 2px),
+        radial-gradient(rgba(67, 97, 238, 0.02) 2px, transparent 2px);
       background-size: 40px 40px;
       background-position: 0 0, 20px 20px;
       z-index: -2;
     }
 
-    /* Navbar Styling */
-    .navbar {
-      width: 100%;
-      background-color: var(--white);
-      padding: 16px 0;
-      box-shadow: 0 4px 20px rgba(17, 24, 39, 0.05);
+    .bg-blob {
       position: fixed;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(76, 201, 240, 0.03), rgba(67, 97, 238, 0.05));
+      filter: blur(60px);
+      z-index: -1;
+      animation: blob-move 30s ease-in-out infinite;
     }
 
-    .navbar-container {
-      width: 92%;
+    .bg-blob-1 {
+      top: -400px;
+      right: -200px;
+    }
+
+    .bg-blob-2 {
+      bottom: -300px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle at center, rgba(247, 37, 133, 0.03), rgba(67, 97, 238, 0.02));
+      animation-delay: -15s;
+    }
+
+    @keyframes blob-move {
+      0% { transform: translate(0, 0); }
+      33% { transform: translate(50px, -50px); }
+      66% { transform: translate(-30px, 30px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* Header Styling */
+    .header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      background-color: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .header.scrolled {
+      box-shadow: var(--shadow);
+      padding: 0.5rem 0;
+    }
+
+    .navbar {
       max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .navbar-brand {
-      font-size: 1.7rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.8rem;
       font-weight: 700;
-      color: var(--primary);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar-brand i {
-      font-size: 1.2rem;
-      margin-right: 10px;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    
-    .navbar-brand span {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
       position: relative;
-      display: inline-block;
+      transition: var(--transition);
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
     }
     
-    .navbar-brand span::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, var(--secondary), transparent);
+    .navbar-brand i {
+      margin-right: 0.5rem;
+      font-size: 1.5rem;
+      color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .navbar-links {
       display: flex;
-      gap: 8px;
-    }
-
-    .navbar a {
-      color: var(--gray-dark);
-      text-decoration: none;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      display: flex;
+      gap: 0.8rem;
       align-items: center;
     }
 
-    .navbar a i {
-      margin-right: 8px;
-      font-size: 1.1rem;
+    .nav-link {
+      color: var(--gray-dark);
+      text-decoration: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .navbar a:hover {
-      background-color: var(--primary-light);
+    .nav-link i {
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .nav-link:hover {
       color: var(--primary);
+      background-color: var(--primary-light);
       transform: translateY(-2px);
     }
 
-    .navbar a.active {
+    .nav-link:hover i {
+      transform: translateY(-3px);
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s ease;
+    }
+
+    .nav-link:hover::before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .nav-link.active {
+      color: var(--white);
       background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: var(--shadow-primary);
+    }
+
+    .nav-link.active i {
       color: var(--white);
     }
 
-    /* Main Content */
+    .nav-link.active::before {
+      display: none;
+    }
+
+    /* Hamburger Menu for Mobile */
+    .hamburger {
+      display: none;
+      cursor: pointer;
+      width: 30px;
+      height: 20px;
+      position: relative;
+      z-index: 1100;
+    }
+
+    .hamburger span {
+      display: block;
+      position: absolute;
+      height: 3px;
+      width: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      opacity: 1;
+      left: 0;
+      transform: rotate(0deg);
+      transition: var(--transition-fast);
+    }
+
+    .hamburger span:nth-child(1) { top: 0px; }
+    .hamburger span:nth-child(2) { top: 9px; }
+    .hamburger span:nth-child(3) { top: 18px; }
+
+    .hamburger.active span:nth-child(1) {
+      top: 9px;
+      transform: rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      top: 9px;
+      transform: rotate(-45deg);
+    }
+
+    /* Main Content Styling */
     main {
-      max-width: 1400px;
-      width: 92%;
-      margin: 40px auto;
+      flex: 1;
+      margin-top: 4rem;
+      width: 100%;
       display: flex;
       flex-direction: column;
       position: relative;
     }
 
-    /* Hero Section */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Hero Section Styling */
     .hero-section {
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 0 4rem;
+    }
+
+    .hero-container {
       display: flex;
       align-items: center;
-      background: linear-gradient(135deg, var(--white), var(--primary-light));
-      border-radius: 20px;
-      overflow: hidden;
-      padding: 0;
-      box-shadow: 0 8px 30px rgba(80, 72, 229, 0.1);
-      position: relative;
-      min-height: 400px;
-      margin-bottom: 60px;
+      gap: 3rem;
     }
-    
+
     .hero-content {
       flex: 1;
-      padding: 60px;
       position: relative;
       z-index: 1;
     }
-    
-    .hero-image {
+
+    .hero-title-pre {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .hero-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      position: relative;
+    }
+
+    .hero-title-gradient {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--gray-dark);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 90%;
+    }
+
+    .hero-image-container {
       flex: 1;
       position: relative;
-      min-height: 400px;
+      height: 500px;
+      perspective: 1000px;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+    }
+
+    .hero-image:hover {
+      transform: rotateY(-5deg) rotateX(5deg);
+    }
+
+    .hero-image-bg {
+      position: absolute;
+      width: 90%;
+      height: 90%;
+      top: 5%;
+      left: 5%;
+      background: linear-gradient(135deg, var(--primary-light), rgba(76, 201, 240, 0.2));
+      border-radius: var(--radius-lg);
+      transform: translateZ(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-image-frame {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      border-radius: var(--radius-lg);
+      transform: translateZ(20px);
+      box-shadow: var(--shadow-lg);
       overflow: hidden;
     }
-    
+
     .hero-image-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(80, 72, 229, 0.8), rgba(14, 165, 233, 0.7));
+      background: linear-gradient(135deg, rgba(67, 97, 238, 0.4), rgba(76, 201, 240, 0.3));
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    
+
     .hero-image-icon {
-      font-size: 10rem;
+      font-size: 8rem;
       color: rgba(255, 255, 255, 0.2);
       transform: rotate(-5deg);
     }
-    
-    .circle-decoration {
-      position: absolute;
-      border-radius: 50%;
-      z-index: 0;
-    }
-    
-    .circle-1 {
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(var(--secondary), transparent 70%);
-      opacity: 0.05;
-      top: -100px;
-      right: 10%;
-    }
-    
-    .circle-2 {
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(var(--accent), transparent 70%);
-      opacity: 0.04;
-      bottom: -50px;
-      left: 30%;
-    }
 
-    h1 {
-      font-size: 3rem;
-      color: var(--dark);
-      margin-bottom: 24px;
-      font-weight: 700;
-      position: relative;
-      display: inline-block;
-    }
-    
-    h1::after {
-      content: '';
-      position: absolute;
-      height: 4px;
-      width: 50%;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      bottom: -10px;
-      left: 0;
-      border-radius: 30px;
-    }
-
-    .hero-text {
-      font-size: 1.2rem;
-      color: var(--gray-dark);
-      line-height: 1.7;
-      margin-bottom: 35px;
-      max-width: 80%;
-    }
-
-    .highlight {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    /* Buttons */
+    /* Button Styles */
     .btn {
       display: inline-flex;
       align-items: center;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      padding: 14px 32px;
-      border-radius: 10px;
+      justify-content: center;
+      padding: 0.9rem 2rem;
+      border-radius: var(--radius);
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: 1rem;
       text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 15px rgba(80, 72, 229, 0.2);
+      transition: var(--transition);
       position: relative;
       overflow: hidden;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      text-align: center;
     }
-    
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      box-shadow: var(--shadow-primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      margin-left: 1rem;
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-3px);
+    }
+
     .btn i {
-      margin-right: 10px;
-      font-size: 1.2rem;
+      margin-right: 0.5rem;
+      font-size: 1.1rem;
       transition: transform 0.3s ease;
     }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(80, 72, 229, 0.25);
-    }
-    
+
     .btn:hover i {
       transform: translateX(3px);
     }
 
-    /* Features Section */
+    /* Features Section Styling */
     .features-section {
+      padding: 5rem 0;
       position: relative;
-      padding: 30px 0;
     }
 
     .section-header {
       text-align: center;
-      margin-bottom: 50px;
+      margin-bottom: 3rem;
     }
 
-    .feature-heading {
-      font-size: 2rem;
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
       color: var(--dark);
-      margin-bottom: 15px;
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
     }
 
-    .feature-subheading {
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    .section-subtitle {
       font-size: 1.1rem;
       color: var(--gray-dark);
       max-width: 700px;
@@ -313,46 +505,50 @@
       line-height: 1.7;
     }
 
-    .features-container {
-      display: flex;
-      gap: 30px;
-      margin-top: 30px;
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
     }
 
     .feature-card {
-      flex: 1;
       background-color: var(--white);
-      border-radius: 16px;
-      padding: 40px 30px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(17, 24, 39, 0.05);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      position: relative;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
     }
-    
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
     .feature-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 4px;
+      height: 5px;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
       opacity: 0;
       transition: opacity 0.3s ease;
     }
 
-    .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(17, 24, 39, 0.1);
-    }
-    
     .feature-card:hover::before {
       opacity: 1;
+    }
+
+    .feature-icon-container {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
     }
 
     .feature-icon {
@@ -361,207 +557,1191 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 25px;
       border-radius: 20px;
       background: var(--primary-light);
       position: relative;
+      transition: var(--transition);
     }
-    
-    .feature-icon::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(80, 72, 229, 0.2), rgba(14, 165, 233, 0.1));
-      border-radius: 20px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+
+    .feature-card:hover .feature-icon {
+      background: linear-gradient(135deg, var(--primary-light), rgba(76, 201, 240, 0.2));
+      transform: rotate(5deg);
     }
-    
-    .feature-card:hover .feature-icon::after {
-      opacity: 1;
-    }
-    
+
     .feature-icon i {
       font-size: 2.2rem;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      transition: var(--transition);
+    }
+
+    .feature-card:hover .feature-icon i {
+      transform: scale(1.1);
+    }
+
+    .feature-content {
+      padding: 0 1.5rem 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .feature-title {
-      font-size: 1.4rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.3rem;
       font-weight: 600;
-      margin-bottom: 15px;
+      margin-bottom: 1rem;
       color: var(--dark);
+      text-align: center;
     }
 
-    .feature-desc {
+    .feature-description {
       font-size: 1rem;
       color: var(--gray-dark);
       line-height: 1.6;
+      text-align: center;
+      flex-grow: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: auto;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .feature-link i {
+      margin-left: 0.3rem;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-link:hover {
+      color: var(--secondary);
+    }
+
+    .feature-link:hover i {
+      transform: translateX(3px);
+    }
+
+    /* Personalized Section Styling */
+    .personalized-section {
+      padding: 4rem 0;
+      background-color: var(--primary-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .personalized-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23f8f9fa' fill-opacity='1' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: bottom;
+    }
+
+    .personalized-container {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .personalized-image {
+      flex: 1;
+      position: relative;
+      height: 400px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .personalized-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.5s ease;
+    }
+
+    .personalized-image:hover .personalized-img {
+      transform: scale(1.05);
+    }
+
+    .personalized-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+    }
+
+    .personalized-content {
+      flex: 1;
+      position: relative;
+    }
+
+    .personalized-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .personalized-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    .personalized-text {
+      font-size: 1.1rem;
+      color: var(--gray-dark);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .highlighted-text {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .recommendation-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+
+    .badge {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--dark);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    .badge:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .badge i {
+      margin-right: 0.5rem;
+      color: var(--accent);
+    }
+
+    /* Seasonal Section Styling */
+    .seasonal-section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    .seasonal-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .seasonal-card {
+      background-color: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .seasonal-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .seasonal-image {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .seasonal-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .seasonal-card:hover .seasonal-img {
+      transform: scale(1.1);
+    }
+
+    .seasonal-tag {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.4rem 0.8rem;
+      background-color: var(--accent);
+      color: var(--white);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      z-index: 1;
+    }
+
+    .seasonal-content {
+      padding: 1.5rem;
+    }
+
+    .seasonal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+
+    .seasonal-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .seasonal-price i {
+      margin-right: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .seasonal-description {
+      font-size: 0.9rem;
+      color: var(--gray-dark);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .seasonal-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-sm);
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .seasonal-btn:hover {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .seasonal-btn i {
+      margin-right: 0.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .seasonal-btn:hover i {
+      transform: translateX(3px);
+    }
+
+    /* Footer Styling */
+    .footer {
+      background-color: var(--dark);
+      color: var(--white);
+      padding: 3rem 0 1rem;
+      position: relative;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      transform: translateY(-100%);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2301161e' fill-opacity='1' d='M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,101.3C672,85,768,75,864,96C960,117,1056,171,1152,181.3C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: bottom;
+    }
+
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .footer-logo {
+      color: var(--white);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-logo i {
+      margin-right: 0.5rem;
+      color: var(--secondary);
+    }
+
+    .footer-description {
+      color: var(--gray);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--dark-light);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .social-link:hover {
+      background-color: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .footer-heading {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+      position: relative;
+      display: inline-block;
+    }
+
+    .footer-heading::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--secondary);
+      border-radius: 1.5px;
+    }
+
+    .footer-links {
+      list-style-type: none;
+    }
+
+    .footer-link-item {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-link {
+      color: var(--gray);
+      text-decoration: none;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-link i {
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: var(--transition-fast);
+    }
+
+    .footer-link:hover {
+      color: var(--secondary);
+      transform: translateX(5px);
+    }
+
+    .footer-link:hover i {
+      opacity: 1;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      color: var(--gray);
+    }
+
+    .contact-item i {
+      margin-right: 0.8rem;
+      margin-top: 0.4rem;
+      color: var(--secondary);
+    }
+
+    .footer-bottom {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(156, 163, 175, 0.2);
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .current-user {
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    .current-date {
+      color: var(--gray);
+      margin-left: 0.5rem;
+    }
+
+    /* User greeting */
+    .user-greeting {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 0.8rem 1.5rem;
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .user-greeting i {
+      margin-right: 0.8rem;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .user-greeting-text {
+      font-weight: 500;
+      color: var(--gray-dark);
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    .animate-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Mobile Navigation */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 350px;
+      height: 100%;
+      background-color: var(--white);
+      z-index: 1100;
+      transition: right 0.3s ease;
+      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-menu.active {
+      right: 0;
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .mobile-menu-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .mobile-menu-close {
+      background: none;
+      border: none;
+      color: var(--gray-dark);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .mobile-menu-close:hover {
+      color: var(--accent);
+      transform: rotate(90deg);
+    }
+
+    .mobile-nav-links {
+      list-style-type: none;
+      margin-top: 1rem;
+    }
+
+    .mobile-nav-link {
+      margin-bottom: 1rem;
+    }
+
+    .mobile-nav-link a {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      color: var(--gray-dark);
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .mobile-nav-link a i {
+      margin-right: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .mobile-nav-link a:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .mobile-nav-link a.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
     }
 
     /* Responsive Design */
-    @media (max-width: 1100px) {
-      .hero-section {
-        flex-direction: column;
+    @media (max-width: 1200px) {
+      .hero-title {
+        font-size: 3rem;
       }
       
-      .hero-content {
-        padding: 40px;
-        text-align: center;
+      .hero-image-container {
+        height: 450px;
       }
       
-      .hero-text {
-        max-width: 100%;
+      .section-title {
+        font-size: 2.2rem;
       }
       
-      h1::after {
-        left: 25%;
+      .personalized-title {
+        font-size: 2rem;
       }
     }
 
-    @media (max-width: 900px) {
-      .features-container {
+    @media (max-width: 992px) {
+      .hero-container {
         flex-direction: column;
+        text-align: center;
       }
       
-      .feature-card {
+      .hero-subtitle {
         max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .hero-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      .user-greeting {
+        justify-content: center;
+      }
+      
+      .personalized-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .personalized-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      .recommendation-badges {
+        justify-content: center;
       }
     }
 
     @media (max-width: 768px) {
-      .navbar-container {
-        flex-direction: column;
-      }
-      
-      .navbar-brand {
-        margin-bottom: 12px;
-      }
-      
       .navbar-links {
-        width: 100%;
-        justify-content: space-around;
+        display: none;
       }
       
-      .navbar a {
-        padding: 10px 14px;
-        font-size: 0.9rem;
+      .hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
       
-      h1 {
+      .hero-title {
         font-size: 2.5rem;
+      }
+      
+      .hero-image-container {
+        height: 350px;
+      }
+      
+      .btn {
+        padding: 0.8rem 1.5rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .seasonal-cards {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       }
     }
 
     @media (max-width: 576px) {
-      .navbar-links {
-        flex-wrap: wrap;
-        gap: 5px;
+      .container {
+        padding: 0 1.5rem;
       }
       
-      .navbar a {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-      }
-      
-      .navbar a i {
-        margin-right: 6px;
-        font-size: 1rem;
-      }
-      
-      h1 {
+      .hero-title {
         font-size: 2.2rem;
       }
       
-      .hero-content {
-        padding: 30px 20px;
+      .hero-title-pre {
+        font-size: 1rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .hero-image-container {
+        height: 300px;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+      }
+      
+      .features-grid {
+        gap: 1.2rem;
       }
       
       .btn {
-        padding: 12px 24px;
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
       }
+      
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Overlay for mobile menu */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
     }
   </style>
 </head>
 
 <body>
-  <!-- Background Pattern -->
+  <!-- Background Elements -->
   <div class="bg-pattern"></div>
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
 
-  <div class="navbar">
-    <div class="navbar-container">
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="navbar">
       <a href="/home" class="navbar-brand">
         <i class="fas fa-tshirt"></i>
-        <span>Dressmify</span>
+        Dressmify
       </a>
+      
       <div class="navbar-links">
-        <a href="/home" class="active"><i class="fas fa-home"></i> <span>Home</span></a>
-        <a href="/noleggio"><i class="fas fa-tshirt"></i> <span>Noleggio</span></a>
-        <a href="/static/index.html"><i class="fas fa-comments"></i> <span>Chat</span></a>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        <a href="/home" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+        <a href="/noleggio" class="nav-link"><i class="fas fa-tshirt"></i> Noleggio</a>
+        <a href="/static/index.html" class="nav-link"><i class="fas fa-comments"></i> Chat</a>
+        <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
-  </div>
+  </header>
 
-  <main>
-    <section class="hero-section">
-      <div class="circle-decoration circle-1"></div>
-      <div class="circle-decoration circle-2"></div>
-      
-      <div class="hero-content">
-        <h1>Welcome Back</h1>
-        <p class="hero-text">{{message}}</p>
-        <a href="/noleggio" class="btn">
-          <i class="fas fa-search"></i>
-          Esplora i Servizi
-        </a>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-logo">
+        <i class="fas fa-tshirt"></i> Dressmify
       </div>
-      
-      <div class="hero-image">
-        <div class="hero-image-overlay">
-          <i class="fas fa-tshirt hero-image-icon"></i>
+      <button class="mobile-menu-close" id="mobile-menu-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <ul class="mobile-nav-links">
+      <li class="mobile-nav-link"><a href="/home" class="active"><i class="fas fa-home"></i> Home</a></li>
+      <li class="mobile-nav-link"><a href="/noleggio"><i class="fas fa-tshirt"></i> Noleggio</a></li>
+      <li class="mobile-nav-link"><a href="/static/index.html"><i class="fas fa-comments"></i> Chat</a></li>
+      <li class="mobile-nav-link"><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </div>
+  
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-container">
+        <div class="hero-content" data-aos="fade-right">
+          <div class="user-greeting">
+            <i class="fas fa-user-circle"></i>
+            <span class="user-greeting-text">Bentornato, <span class="user-name">Miftarve</span>!</span>
+          </div>
+          
+          <span class="hero-title-pre">La moda sostenibile</span>
+          <h1 class="hero-title">Rinnova il tuo stile con <span class="hero-title-gradient">Dressmify</span></h1>
+          
+          <p class="hero-subtitle">
+            {{message}} Scopri la nostra collezione <span class="highlighted-text">Primavera/Estate 2025</span> con capi perfetti per ogni occasione, disponibili per noleggio o acquisto.
+          </p>
+          
+          <div>
+            <a href="/noleggio" class="btn btn-primary">
+              <i class="fas fa-search"></i>
+              Esplora il Catalogo
+            </a>
+            <a href="/static/index.html" class="btn btn-outline">
+              <i class="fas fa-comments"></i>
+              Chiedi Consigli
+            </a>
+          </div>
+        </div>
+        
+        <div class="hero-image-container" data-aos="fade-left">
+          <div class="hero-image">
+            <div class="hero-image-bg"></div>
+            <div class="hero-image-frame">
+              <div class="hero-image-overlay">
+                <i class="fas fa-tshirt hero-image-icon"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- Features Section -->
     <section class="features-section">
-      <div class="section-header">
-        <h2 class="feature-heading">Dressmify: La moda a portata di click</h2>
-        <p class="feature-subheading">Dressmify è la piattaforma innovativa che ti consente di noleggiare capi d'abbigliamento di alta qualità per ogni occasione, risparmiando e rispettando l'ambiente.</p>
+      <div class="container">
+        <div class="section-header" data-aos="fade-up">
+          <h2 class="section-title">La moda a portata di click</h2>
+          <p class="section-subtitle">
+            Dressmify è la piattaforma innovativa che ti consente di noleggiare capi d'abbigliamento di alta qualità per ogni occasione, risparmiando e rispettando l'ambiente.
+          </p>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-icon-container">
+              <div class="feature-icon">
+                <i class="fas fa-tshirt"></i>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Noleggio Smart</h3>
+              <p class="feature-description">
+                Accedi a un guardaroba infinito di capi firmati, pagando solo per il tempo che li utilizzi.
+              </p>
+              <a href="/noleggio" class="feature-link">
+                Scopri come funziona <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-icon-container">
+              <div class="feature-icon">
+                <i class="fas fa-leaf"></i>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Sostenibilità</h3>
+              <p class="feature-description">
+                Riduci il tuo impatto ambientale scegliendo il noleggio invece dell'acquisto di nuovi capi.
+              </p>
+              <a href="#" class="feature-link">
+                Il nostro impegno verde <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon-container">
+              <div class="feature-icon">
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+            <div class="feature-content">
+              <h3 class="feature-title">Qualità Premium</h3>
+              <p class="feature-description">
+                Solo capi selezionati dei migliori brand, controllati e igienizzati dopo ogni utilizzo.
+              </p>
+              <a href="#" class="feature-link">
+                I nostri standard <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div class="features-container">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-tshirt"></i>
+    </section>
+
+    <!-- Personalized Section -->
+    <section class="personalized-section">
+      <div class="personalized-wave"></div>
+      <div class="container personalized-container">
+        <div class="personalized-content" data-aos="fade-right">
+          <h2 class="personalized-title">Personalizzato per te</h2>
+          <p class="personalized-text">
+            Abbiamo selezionato alcuni capi perfetti per la <span class="highlighted-text">stagione Primavera/Estate 2025</span> che potrebbero interessarti. La nostra collezione si adatta alle tue esigenze, offrendoti capi alla moda per ogni occasione.
+          </p>
+          
+          <div class="recommendation-badges">
+            <div class="badge"><i class="fas fa-sun"></i> Estate</div>
+            <div class="badge"><i class="fas fa-tshirt"></i> Casual</div>
+            <div class="badge"><i class="fas fa-glass-cheers"></i> Elegante</div>
+            <div class="badge"><i class="fas fa-umbrella-beach"></i> Vacanze</div>
           </div>
-          <h3 class="feature-title">Noleggio Smart</h3>
-          <p class="feature-desc">Accedi a un guardaroba infinito di capi firmati, pagando solo per il tempo che li utilizzi.</p>
+          
+          <div class="mt-4">
+            <a href="/noleggio" class="btn btn-primary">
+              <i class="fas fa-thumbs-up"></i>
+              Scopri i consigli
+            </a>
+          </div>
         </div>
         
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-leaf"></i>
+        <div class="personalized-image" data-aos="fade-left">
+          <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1171&auto=format&fit=crop" alt="Collezione Primavera/Estate" class="personalized-img">
+          <div class="personalized-overlay">
+            <!-- Overlay content if needed -->
           </div>
-          <h3 class="feature-title">Sostenibilità</h3>
-          <p class="feature-desc">Riduci il tuo impatto ambientale scegliendo il noleggio invece dell'acquisto di nuovi capi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seasonal Recommendations -->
+    <section class="seasonal-section">
+      <div class="container">
+        <div class="section-header" data-aos="fade-up">
+          <h2 class="section-title">Collezione Primavera/Estate</h2>
+          <p class="section-subtitle">
+            Scopri i capi più richiesti della stagione, perfetti per il tuo stile.
+          </p>
         </div>
         
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-star"></i>
+        <div class="seasonal-cards">
+          <div class="seasonal-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="seasonal-image">
+              <img src="https://images.unsplash.com/photo-1591369822096-ffd140ec948f?q=80&w=1374&auto=format&fit=crop" alt="Abito Estivo" class="seasonal-img">
+              <div class="seasonal-tag">Novità</div>
+            </div>
+            <div class="seasonal-content">
+              <h3 class="seasonal-title">Abito Estivo Floreale</h3>
+              <p class="seasonal-price"><i class="fas fa-tag"></i> 45€ / settimana</p>
+              <p class="seasonal-description">
+                Leggero e versatile, perfetto per le giornate estive o eventi informali.
+              </p>
+              <a href="/noleggio" class="seasonal-btn">
+                <i class="fas fa-shopping-bag"></i> Noleggia ora
+              </a>
+            </div>
           </div>
-          <h3 class="feature-title">Qualità Premium</h3>
-          <p class="feature-desc">Solo capi selezionati dei migliori brand, controllati e igienizzati dopo ogni utilizzo.</p>
+          
+          <div class="seasonal-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="seasonal-image">
+              <img src="https://images.unsplash.com/photo-1618517351616-38fb9c5210c6?q=80&w=1374&auto=format&fit=crop" alt="Camicia Lino" class="seasonal-img">
+              <div class="seasonal-tag">Popolare</div>
+            </div>
+            <div class="seasonal-content">
+              <h3 class="seasonal-title">Camicia in Lino Premium</h3>
+              <p class="seasonal-price"><i class="fas fa-tag"></i> 30€ / settimana</p>
+              <p class="seasonal-description">
+                Camicia in lino naturale, fresca e traspirante per l'estate.
+              </p>
+              <a href="/noleggio" class="seasonal-btn">
+                <i class="fas fa-shopping-bag"></i> Noleggia ora
+              </a>
+            </div>
+          </div>
+          
+          <div class="seasonal-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="seasonal-image">
+              <img src="https://images.unsplash.com/photo-1543076447-215ad9ba6923?q=80&w=1374&auto=format&fit=crop" alt="Outfit Completo" class="seasonal-img">
+              <div class="seasonal-tag">Consigliato</div>
+            </div>
+            <div class="seasonal-content">
+              <h3 class="seasonal-title">Outfit Completo Cerimonia</h3>
+              <p class="seasonal-price"><i class="fas fa-tag"></i> 75€ / settimana</p>
+              <p class="seasonal-description">
+                Set completo per cerimonie primaverili ed estive, elegante e raffinato.
+              </p>
+              <a href="/noleggio" class="seasonal-btn">
+                <i class="fas fa-shopping-bag"></i> Noleggia ora
+              </a>
+            </div>
+          </div>
+          
+          <div class="seasonal-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="seasonal-image">
+              <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1528&auto=format&fit=crop" alt="Accessori" class="seasonal-img">
+              <div class="seasonal-tag">Accessori</div>
+            </div>
+            <div class="seasonal-content">
+              <h3 class="seasonal-title">Set Accessori Estate</h3>
+              <p class="seasonal-price"><i class="fas fa-tag"></i> 25€ / settimana</p>
+              <p class="seasonal-description">
+                Completa il tuo look con questo set di accessori coordinati per l'estate.
+              </p>
+              <a href="/noleggio" class="seasonal-btn">
+                <i class="fas fa-shopping-bag"></i> Noleggia ora
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-wave"></div>
+    <div class="container">
+      <div class="footer-container">
+        <div class="footer-info">
+          <div class="footer-logo">
+            <i class="fas fa-tshirt"></i> Dressmify
+          </div>
+          <p class="footer-description">
+            La piattaforma innovativa per il noleggio di abbigliamento che ti permette di rinnovare il tuo stile in modo sostenibile.
+          </p>
+          <div class="footer-social">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-links-container">
+          <h3 class="footer-heading">Collegamenti Rapidi</h3>
+          <ul class="footer-links">
+            <li class="footer-link-item"><a href="/home" class="footer-link"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li class="footer-link-item"><a href="/noleggio" class="footer-link"><i class="fas fa-chevron-right"></i> Noleggio</a></li>
+            <li class="footer-link-item"><a href="/static/index.html" class="footer-link"><i class="fas fa-chevron-right"></i> Chat</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Come Funziona</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-links-container">
+          <h3 class="footer-heading">Categorie</h3>
+          <ul class="footer-links">
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Abbigliamento Casual</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Cerimonia</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Sport</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Business</a></li>
+            <li class="footer-link-item"><a href="#" class="footer-link"><i class="fas fa-chevron-right"></i> Accessori</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-contact">
+          <h3 class="footer-heading">Contattaci</h3>
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div>Via della Moda, 123<br>20100 Milano, Italia</div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone-alt"></i>
+            <div>+39 02 1234567</div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <div>info@dressmify.com</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>
+          &copy; 2025 Dressmify. Tutti i diritti riservati. Utente: <span class="current-user">Miftarve</span>
+          <span class="current-date">02/05/2025</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inizializza AOS (Animate On Scroll)
+      AOS.init({
+        duration: 800,
+        once: true,
+        mirror: false
+      });
+      
+      // Gestione header al scroll
+      const header = document.getElementById('header');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+      
+      // Mobile menu toggle
+      const hamburger = document.getElementById('hamburger');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('overlay');
+      const mobileMenuClose = document.getElementById('mobile-menu-close');
+      
+      hamburger.addEventListener('click', function() {
+        mobileMenu.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      function closeMenu() {
+        mobileMenu.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+      
+      mobileMenuClose.addEventListener('click', closeMenu);
+      overlay.addEventListener('click', closeMenu);
+      
+      // Effetto parallasse per hero-image
+      const heroImage = document.querySelector('.hero-image');
+      if (heroImage) {
+        document.addEventListener('mousemove', function(e) {
+          const x = e.clientX / window.innerWidth;
+          const y = e.clientY / window.innerHeight;
+          
+          heroImage.style.transform = `rotateY(${x * 10 - 5}deg) rotateX(${y * -10 + 5}deg)`;
+        });
+      }
+      
+      // Data attuale formattata
+      const currentDate = '2025-05-02';
+      const dateParts = currentDate.split('-');
+      const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+      document.querySelector('.current-date').textContent = formattedDate;
+      
+      // Verifica la stagione e personalizza i consigli
+      const currentMonth = new Date('2025-05-02').getMonth(); // 4 = maggio
+      
+      // Primavera/estate: mesi 2-8 (marzo-settembre)
+      if (currentMonth >= 2 && currentMonth <= 8) {
+        // Già personalizzato per primavera/estate
+      } else {
+        // Inverno/autunno: cambia il titolo della sezione
+        document.querySelector('.personalized-title').textContent = 'Collezione Autunno/Inverno';
+        
+        // Cambia i badge per la stagione fredda
+        const badges = document.querySelectorAll('.badge');
+        badges[0].innerHTML = '<i class="fas fa-snowflake"></i> Inverno';
+        badges[3].innerHTML = '<i class="fas fa-mountain"></i> Montagna';
+      }
+    });
+  </script>
 </body>
 
 </html>
