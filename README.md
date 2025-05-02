@@ -101,10 +101,9 @@ Prima di iniziare, assicurati di avere quanto segue:
 - Docker e Docker Compose installati (vedi le istruzioni di installazione più avanti)
 
 ## 📥Installazione di Docker
-
 # Guida all'Installazione di DressifyTEP con Docker
 
-Questa guida spiega come configurare e avviare l'applicazione DressifyTEP utilizzando Docker su vari sistemi operativi.
+Questa guida spiega come configurare e avviare l'applicazione DressifyTEP utilizzando Docker su vari sistemi operativi e su GitHub Codespaces.
 
 ## Prerequisiti
 
@@ -171,9 +170,50 @@ Docker Compose è incluso in Docker Desktop. Non è necessaria un'installazione 
    docker-compose --version
    ```
 
-## Configurazione e Avvio di DressifyTEP
+## 🖥️ Utilizzo su GitHub Codespace
 
-Ci sono due metodi per configurare e avviare DressifyTEP: **manuale** e **automatico**.
+Se desideri eseguire DressifyTEP in un ambiente GitHub Codespace, segui questi passaggi:
+
+1. **Clona il Repository**:
+   ```bash
+   git clone https://github.com/Miftarve/DressifyTEP.git
+   cd DressifyTEP
+   ```
+
+2. **Configurazione del File .env**:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Apri il file .env con l'editor di testo e inserisci le tue credenziali OAuth:
+   ```
+   # Google OAuth credentials
+   GOOGLE_CLIENT_ID=tuo_client_id_google
+   GOOGLE_CLIENT_SECRET=tuo_client_secret_google
+
+   # Facebook OAuth credentials
+   FACEBOOK_APP_ID=tuo_app_id_facebook
+   FACEBOOK_APP_SECRET=tuo_app_secret_facebook
+   ```
+   
+   **IMPORTANTE**: Non committare mai il file .env su GitHub!
+
+3. **Avvio dell'Applicazione**:
+   ```bash
+   docker-compose up --build -d
+   ```
+   
+   Spiegazione dei parametri:
+   - `up`: Avvia i servizi definiti nel file docker-compose.yml
+   - `--build`: Ricostruisce le immagini Docker (importante se hai modificato il codice)
+   - `-d`: Avvia i container in background (modalità "detached")
+
+4. **Accesso all'Applicazione**:
+   L'applicazione sarà disponibile sulla porta 3000. In un Codespace, puoi accedervi facendo clic sul link che appare nella tab "Ports" o utilizzando il pulsante "Open in Browser".
+
+## Configurazione e Avvio di DressifyTEP (Installazione Locale)
+
+Ci sono due metodi per configurare e avviare DressifyTEP localmente: **manuale** e **automatico**.
 
 ### Metodo 1: Configurazione Automatica (Solo Windows)
 
