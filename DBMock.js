@@ -40,6 +40,8 @@ class DBMock {
 
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
         this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
+        this.rentals = this.rentals || []; // Array per memorizzare i noleggi
+        this.purchases = this.purchases || [];
     }
 
 
@@ -201,6 +203,43 @@ class DBMock {
         return [];
     }
 
+    // Metodo per salvare un noleggio
+saveRental(userId, productId, days, price, startDate, endDate) {
+    const rental = {
+      id: this.rentals.length + 1,
+      userId,
+      productId,
+      days,
+      price,
+      startDate,
+      endDate,
+      timestamp: new Date().toISOString()
+    };
+    this.rentals.push(rental);
+    return rental;
+  }
+  
+  // Metodo per salvare un acquisto
+  savePurchase(userId, productId, price) {
+    const purchase = {
+      id: this.purchases.length + 1,
+      userId,
+      productId,
+      price,
+      timestamp: new Date().toISOString()
+    };
+    this.purchases.push(purchase);
+    return purchase;
+  }
+  
+  // Metodi per recuperare i dati
+  getAllRentals() {
+    return this.rentals;
+  }
+  
+  getAllPurchases() {
+    return this.purchases;
+  }
     // Aggiorna il metodo saveMessage nel file DBMock.js per gestire correttamente i tipi di ID
 
     // Aggiorna il metodo saveMessage nel file DBMock.js per gestire Promise in modo appropriato
@@ -257,6 +296,7 @@ class DBMock {
         });
     }
 }
+
 
 
 module.exports = DBMock;

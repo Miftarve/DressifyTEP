@@ -2104,6 +2104,237 @@ app.get('/noleggi', (req, res) => {
 app.get('/vendite', (req, res) => {
     res.render('admin/vendite'); // Esto busca views/admin/vendite.hbs
 });
+
+// Arrays para armazenar aluguéis e vendas
+const rentals = [];
+const sales = [];
+
+// Criar aluguel e incrementar ID
+function createRental(data) {
+  const newRental = {
+    id: rentals.length + 1,
+    ...data,
+    timestamp: new Date().toISOString(),
+    status: 'pending' // pending, approved, rejected
+  };
+  rentals.push(newRental);
+  return newRental;
+}
+
+// Criar venda e incrementar ID
+function createSale(data) {
+  const newSale = {
+    id: sales.length + 1,
+    orderId: `ORD-${new Date().getFullYear()}-${String(sales.length + 1).padStart(3, '0')}`,
+    ...data,
+    timestamp: new Date().toISOString(),
+    status: 'processing' // processing, completed, refunded
+  };
+  sales.push(newSale);
+  return newSale;
+}
+
+// Obter todos os aluguéis
+function getAllRentals() {
+  return rentals;
+}
+
+// Obter todas as vendas
+function getAllSales() {
+  return sales;
+}
+
+// Atualizar status do aluguel
+function updateRentalStatus(id, status) {
+  const rental = rentals.find(r => r.id === id);
+  if (rental) {
+    rental.status = status;
+    return rental;
+  }
+  return null;
+}
+
+// Atualizar status da venda
+function updateSaleStatus(id, status) {
+  const sale = sales.find(s => s.id === id);
+  if (sale) {
+    sale.status = status;
+    return sale;
+  }
+  return null;
+}
+
+// Adicione suporte para JSON no endpoint completa
+app.use(express.json());
+
+// Modifique o endpoint /completa para processar requisições JSON
+app.post('/completa', ensureAuthenticated, (req, res) => {
+    const { action, productId, days, price, startDate, endDate } = req.body;
+    const product = db.getProductById(Number(productId));
+    
+    if (!product) {
+        return res.status(404).json({ error: 'Produto não encontrado!' });
+    }
+    
+    // Obter dados do usuário atual
+    const user = req.user;
+    
+    if (action === 'purchase') {
+        // Criar um novo registro de venda
+        const sale = createSale({
+            productId: Number(productId),
+            product: product,
+            userId: user.id,
+            user: {
+                id: user.id,
+                nome: user.name || user.nome,
+                email: user.email
+            },
+            price: parseFloat(price)
+        });
+        
+        return res.json({ 
+            success: true, 
+            message: 'Acquisto completato con successo!', 
+            orderId: sale.orderId 
+        });
+    } else if (action === 'rental') {
+        // Criar um novo registro de aluguel
+        const rental = createRental({
+            productId: Number(productId),
+            product: product,
+            userId: user.id,
+            user: {
+                id: user.id,
+                nome: user.name || user.nome,
+                email: user.email
+            },
+            days: Number(days),
+            price: parseFloat(price),
+            startDate: startDate || new Date().toISOString(),
+            endDate: endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
+        });
+        
+        return res.json({ 
+            success: true, 
+            message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}` 
+        });
+    } else {
+        return res.status(400).json({ error: 'Ação não válida!' });
+    }
+});
+
+// Rotas para sucesso e checkout
+app.get('/success', ensureAuthenticated, (req, res) => {
+    res.render('success');
+});
+
+app.get('/checkout', ensureAuthenticated, (req, res) => {
+    res.render('checkout', { user: req.user });
+});
+
+// Rotas admin para obter dados
+app.get('/api/rentals', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.json(getAllRentals());
+});
+
+app.get('/api/sales', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.json(getAllSales());
+});
+
+// Atualizar noleggi e vendite para usar dados reais
+app.get('/noleggi', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.render('admin/noleggi', { rentals: getAllRentals() });
+});
+
+app.get('/vendite', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.render('admin/vendite', { sales: getAllSales() });
+});
+
+// Endpoint para atualizar status do aluguel
+app.post('/api/rentals/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: 'Status não válido' });
+    }
+    
+    const updatedRental = updateRentalStatus(id, status);
+    
+    if (!updatedRental) {
+        return res.status(404).json({ error: 'Aluguel não encontrado' });
+    }
+    
+    res.json(updatedRental);
+});
+
+// Endpoint para atualizar status da venda
+app.post('/api/sales/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    if (!status || !['processing', 'completed', 'refunded'].includes(status)) {
+        return res.status(400).json({ error: 'Status não válido' });
+    }
+    
+    const updatedSale = updateSaleStatus(id, status);
+    
+    if (!updatedSale) {
+        return res.status(404).json({ error: 'Venda não encontrada' });
+    }
+    
+    res.json(updatedSale);
+});
+
+// Adicione estes helpers para formatação
+hbs.registerHelper('eq', function (a, b) {
+    return a === b;
+});
+
+hbs.registerHelper('firstLetter', function (str) {
+    return str ? str.charAt(0).toUpperCase() : '';
+});
+
+hbs.registerHelper('formatDate', function (dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+});
+
+hbs.registerHelper('formatPrice', function (price) {
+    return parseFloat(price).toFixed(2);
+});
+// Registra gli helper personalizzati per Handlebars
+module.exports = function(hbs) {
+    hbs.registerHelper('eq', function(a, b) {
+      return a === b;
+    });
+  
+    hbs.registerHelper('lt', function(a, b) {
+      return parseFloat(a) < parseFloat(b);
+    });
+  
+    hbs.registerHelper('gt', function(a, b) {
+      return parseFloat(a) > parseFloat(b);
+    });
+  
+    hbs.registerHelper('multiply', function(a, b) {
+      return (parseFloat(a) * parseFloat(b)).toFixed(2);
+    });
+  
+    hbs.registerHelper('getProductImage', function(category, color, brand) {
+      // Genera un ID univoco per rendere diverse le immagini
+      const uniqueId = category.charCodeAt(0) + (color ? color.charCodeAt(0) : 0) + (brand ? brand.length : 0);
+      
+      // URL di alta qualità per le immagini di abbigliamento
+      return `https://source.unsplash.com/500x600/?${encodeURIComponent(category.toLowerCase())},${color ? encodeURIComponent(color.toLowerCase()) : 'clothing'},fashion&sig=${uniqueId}`;
+    });
+  };
 // Start server
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 

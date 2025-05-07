@@ -1351,9 +1351,11 @@
   <main>
     <!-- Hero Section -->
     <section class="hero">
+      <div class="hero-overlay"></div>
       <div class="hero-content">
         <h1>Catalogo Noleggio e Vendita</h1>
         <p>Scopri la nostra selezione di prodotti disponibili per noleggio o acquisto</p>
+        <a href="#products-section" class="hero-button">Esplora i prodotti</a>
       </div>
     </section>
 
@@ -1395,7 +1397,7 @@
     </div>
 
     <!-- Prodotti -->
-    <div class="products-container">
+    <div class="products-container" id="products-section">
       <h2 class="section-title with-subtitle" data-aos="fade-up">Risultati della Ricerca</h2>
       <p class="section-subtitle" data-aos="fade-up" data-aos-delay="50">Esplora i prodotti disponibili nel nostro catalogo</p>
 
@@ -1406,18 +1408,38 @@
       <div id="products" class="products-grid">
         {{#if products.length}}
         {{#each products}}
-        <div class="product-card" data-aos="fade-up">
-          <div class="product-img" style="background-image: url('https://source.unsplash.com/500x300/?{{category}},{{color}}')">
-            <div class="product-tag">Disponibile</div>
+        <div class="product-card" data-aos="fade-up" 
+             data-id="{{id}}" 
+             data-brand="{{brand}}" 
+             data-category="{{category}}" 
+             data-color="{{color}}" 
+             data-condition="{{condition}}" 
+             data-price="{{price}}">
+          <div class="product-badges">
+            <!-- I badge verranno aggiunti dinamicamente via JavaScript -->
           </div>
+          
+          <div class="product-img-container">
+            <img class="product-img" src="https://source.unsplash.com/500x600/?{{category}},{{color}},fashion&sig={{id}}" alt="{{brand}} {{category}}" loading="lazy">
+            <div class="product-overlay">
+              <button class="quick-view-btn" data-id="{{id}}"><i class="fas fa-search-plus"></i> Anteprima</button>
+            </div>
+          </div>
+          
           <div class="product-content">
-            <h3 class="product-title">{{brand}} - {{category}}</h3>
+            <div class="product-brand">{{brand}}</div>
+            <h3 class="product-title">{{category}}</h3>
+            
             <div class="product-details">
               <div class="product-detail"><i class="fas fa-info-circle"></i> Condizione: {{condition}}</div>
               <div class="product-detail"><i class="fas fa-palette"></i> Colore: {{color}}</div>
             </div>
             
-            <div class="product-price"><i class="fas fa-tag"></i> {{price}}€</div>
+            <div class="product-price">
+              <i class="fas fa-tag"></i> 
+              <span class="current-price">{{price}}€</span>
+              <span class="old-price"></span>
+            </div>
             
             <div class="product-actions">
               <!-- Form per il noleggio -->
@@ -1464,6 +1486,54 @@
     </div>
   </main>
 
+  <!-- Modale Anteprima Prodotto -->
+  <div id="product-modal" class="product-modal">
+    <div class="product-modal-container">
+      <button class="modal-close"><i class="fas fa-times"></i></button>
+      <div class="product-modal-content">
+        <div class="product-modal-gallery">
+          <div class="main-image-container">
+            <img id="modal-main-image" src="" alt="Immagine prodotto">
+          </div>
+          <div class="thumbnail-container">
+            <div class="thumbnail active" data-index="0"></div>
+            <div class="thumbnail" data-index="1"></div>
+            <div class="thumbnail" data-index="2"></div>
+          </div>
+        </div>
+        <div class="product-modal-info">
+          <h2 id="modal-brand" class="modal-brand"></h2>
+          <h3 id="modal-title" class="modal-title"></h3>
+          <div class="modal-price">
+            <span id="modal-price"></span>
+          </div>
+          <div class="modal-details">
+            <div class="modal-detail">
+              <span class="detail-label">Condizione:</span>
+              <span id="modal-condition" class="detail-value"></span>
+            </div>
+            <div class="modal-detail">
+              <span class="detail-label">Colore:</span>
+              <span id="modal-color" class="detail-value"></span>
+            </div>
+          </div>
+          <div class="modal-description">
+            <p>Questo capo di abbigliamento è perfetto per ogni occasione. Realizzato con materiali di alta qualità per garantire comfort e durata. Disponibile per noleggio o acquisto diretto.</p>
+            <p>La nostra politica di noleggio prevede la possibilità di restituire il prodotto in qualsiasi momento entro il periodo selezionato.</p>
+          </div>
+          <div class="modal-actions">
+            <button id="modal-rent-button" class="modal-action-button modal-rent">
+              <i class="fas fa-calendar-check"></i> Seleziona date e noleggia
+            </button>
+            <button id="modal-buy-button" class="modal-action-button modal-buy">
+              <i class="fas fa-shopping-cart"></i> Acquista ora
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modale Carrello -->
   <div id="cart-modal" class="cart-modal">
     <div class="cart-container">
@@ -1508,6 +1578,514 @@
     <span class="notification-message"></span>
   </div>
 
+  <!-- Style aggiuntivo -->
+  <style>
+    /* Miglioramenti visivi per le card prodotto */
+    .product-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      background: #fff;
+      position: relative;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .product-img-container {
+      position: relative;
+      height: 280px;
+      overflow: hidden;
+    }
+    
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+    
+    .product-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .product-card:hover .product-overlay {
+      opacity: 1;
+    }
+    
+    .quick-view-btn {
+      background: white;
+      color: #333;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .quick-view-btn:hover {
+      background: #f0f0f0;
+      transform: scale(1.05);
+    }
+    
+    .product-badges {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .badge {
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .badge-new {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .badge-sale {
+      background: #FF5722;
+      color: white;
+    }
+    
+    .badge-season {
+      background: #FF9800;
+      color: white;
+    }
+    
+    .product-content {
+      padding: 20px;
+    }
+    
+    .product-brand {
+      font-size: 14px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    
+    .product-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 15px;
+      color: #333;
+    }
+    
+    .product-details {
+      margin-bottom: 15px;
+    }
+    
+    .product-detail {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .product-detail i {
+      color: #888;
+      width: 18px;
+    }
+    
+    .product-price {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .current-price {
+      font-size: 20px;
+    }
+    
+    .old-price {
+      font-size: 16px;
+      color: #999;
+      text-decoration: line-through;
+    }
+    
+    .product-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .date-range-container {
+      margin-bottom: 10px;
+    }
+    
+    .days-count {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .action-button {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .rental-button {
+      background: #4A90E2;
+      color: white;
+    }
+    
+    .rental-button:hover {
+      background: #3A7BC8;
+    }
+    
+    .purchase-button {
+      background: #F5F5F5;
+      color: #333;
+    }
+    
+    .purchase-button:hover {
+      background: #E0E0E0;
+    }
+    
+    /* Modale Anteprima Prodotto */
+    .product-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .product-modal.open {
+      opacity: 1;
+    }
+    
+    .product-modal-container {
+      background: white;
+      width: 90%;
+      max-width: 1000px;
+      max-height: 85vh;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .product-modal.open .product-modal-container {
+      transform: translateY(0);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .product-modal-content {
+      display: flex;
+      flex-direction: column;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    @media (min-width: 768px) {
+      .product-modal-content {
+        flex-direction: row;
+      }
+    }
+    
+    .product-modal-gallery {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .main-image-container {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    #modal-main-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .thumbnail-container {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .thumbnail {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .thumbnail.active {
+      opacity: 1;
+      border-color: #4A90E2;
+    }
+    
+    .product-modal-info {
+      flex: 1;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+    
+    .modal-brand {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #777;
+      margin: 0 0 5px;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin: 0 0 20px;
+    }
+    
+    .modal-price {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .modal-details {
+      margin-bottom: 20px;
+    }
+    
+    .modal-detail {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      width: 100px;
+      color: #555;
+    }
+    
+    .detail-value {
+      color: #333;
+    }
+    
+    .modal-description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .modal-action-button {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-rent {
+      background: #4A90E2;
+      color: white;
+      flex: 1;
+    }
+    
+    .modal-rent:hover {
+      background: #3A7BC8;
+    }
+    
+    .modal-buy {
+      background: #333;
+      color: white;
+      flex: 1;
+    }
+    
+    .modal-buy:hover {
+      background: #222;
+    }
+    
+    /* Hero Section migliorata */
+    .hero {
+      position: relative;
+      background: url('https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+      background-size: cover;
+      padding: 100px 20px;
+      margin-bottom: 40px;
+      color: white;
+      text-align: center;
+    }
+    
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 25px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .hero-button {
+      display: inline-block;
+      padding: 14px 28px;
+      background: white;
+      color: #333;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .hero-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .product-modal-container {
+        width: 95%;
+        max-height: 90vh;
+      }
+      
+      .main-image-container {
+        height: 250px;
+      }
+      
+      .thumbnail {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .modal-title {
+        font-size: 20px;
+      }
+      
+      .hero h1 {
+        font-size: 28px;
+      }
+      
+      .hero p {
+        font-size: 16px;
+      }
+    }
+    
+    /* Highlight effect per la card prodotto */
+    .highlight {
+      animation: highlight 1.5s ease;
+    }
+    
+    @keyframes highlight {
+      0% { box-shadow: 0 0 0 rgba(74, 144, 226, 0); }
+      50% { box-shadow: 0 0 25px rgba(74, 144, 226, 0.8); }
+      100% { box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    }
+  </style>
+
   <!-- Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -1517,6 +2095,45 @@
         once: true,
         offset: 50
       });
+
+      // Miglioriamo le card dei prodotti con JavaScript invece di usare helper Handlebars
+      function enhanceProductCards() {
+        document.querySelectorAll('.product-card').forEach(card => {
+          const condition = card.getAttribute('data-condition');
+          const price = parseFloat(card.getAttribute('data-price'));
+          const category = card.getAttribute('data-category').toLowerCase();
+          const badges = card.querySelector('.product-badges');
+          
+          // Aggiungi badge "Nuovo" se la condizione è "Nuovo"
+          if (condition === 'Nuovo') {
+            badges.innerHTML += '<span class="badge badge-new">Nuovo</span>';
+          }
+          
+          // Aggiungi badge "Offerta" se il prezzo è < 30€
+          if (price < 30) {
+            badges.innerHTML += '<span class="badge badge-sale">Offerta</span>';
+          }
+          
+          // Aggiungi prezzo originale (barrato) se il prezzo è > 100€
+          if (price > 100) {
+            const oldPriceElement = card.querySelector('.old-price');
+            const oldPrice = (price * 1.2).toFixed(2);
+            oldPriceElement.textContent = oldPrice + '€';
+          }
+          
+          // Aggiungi badge stagionale se è un prodotto estivo (periodo maggio-settembre)
+          const currentMonth = new Date().getMonth();
+          if (currentMonth >= 4 && currentMonth <= 8) {
+            if (category.includes('t-shirt') || category.includes('bermuda') || 
+                category.includes('sandali') || category.includes('estate')) {
+              badges.innerHTML += '<span class="badge badge-season">Estate</span>';
+            }
+          }
+        });
+      }
+      
+      // Chiamiamo subito la funzione per migliorare le card all'avvio
+      enhanceProductCards();
 
       // Effetto dello scroll sull'header
       window.addEventListener('scroll', function() {
@@ -1530,6 +2147,146 @@
       // Inizializza il carrello dal localStorage
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       updateCartCount();
+      
+      // Modale anteprima prodotto
+      const productModal = document.getElementById('product-modal');
+      const modalClose = document.querySelector('.modal-close');
+      let currentProduct = null;
+      
+      // Funzione per aprire il modale prodotto
+      function openProductModal(productId) {
+        // Trova il prodotto dal DOM
+        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+        const brand = productCard.getAttribute('data-brand');
+        const category = productCard.getAttribute('data-category');
+        const price = productCard.getAttribute('data-price');
+        const color = productCard.getAttribute('data-color');
+        const condition = productCard.getAttribute('data-condition');
+        const imgSrc = productCard.querySelector('.product-img').src;
+        
+        // Imposta i dati nel modale
+        document.getElementById('modal-brand').textContent = brand;
+        document.getElementById('modal-title').textContent = category;
+        document.getElementById('modal-price').textContent = price + '€';
+        document.getElementById('modal-color').textContent = color;
+        document.getElementById('modal-condition').textContent = condition;
+        document.getElementById('modal-main-image').src = imgSrc;
+        
+        // Imposta le immagini thumbnail
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails[0].style.backgroundImage = `url('${imgSrc}')`;
+        
+        // Genera diverse prospettive dell'immagine per le miniature
+        // Creiamo URL diverse per dare l'impressione di diverse angolazioni
+        const categoryEncoded = encodeURIComponent(category.toLowerCase());
+        const colorEncoded = encodeURIComponent(color.toLowerCase());
+        
+        thumbnails[1].style.backgroundImage = `url('https://source.unsplash.com/500x600/?${categoryEncoded},${colorEncoded},model&sig=${productId}1')`;
+        thumbnails[2].style.backgroundImage = `url('https://source.unsplash.com/500x600/?${categoryEncoded},${colorEncoded},detail&sig=${productId}2')`;
+        
+        // Salva riferimento al prodotto corrente
+        currentProduct = {
+          id: productId,
+          brand,
+          category,
+          price,
+          color,
+          condition
+        };
+        
+        // Mostra il modale con animazione
+        productModal.style.display = 'flex';
+        setTimeout(() => {
+          productModal.classList.add('open');
+        }, 10);
+        
+        document.body.style.overflow = 'hidden';
+      }
+      
+      // Event listener per i pulsanti di anteprima rapida
+      document.querySelectorAll('.quick-view-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const productId = this.getAttribute('data-id');
+          openProductModal(productId);
+        });
+      });
+      
+      // Event listener per chiudere il modale
+      modalClose.addEventListener('click', function() {
+        productModal.classList.remove('open');
+        setTimeout(() => {
+          productModal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }, 300);
+      });
+      
+      // Event listener per le miniature
+      document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.addEventListener('click', function() {
+          const index = this.getAttribute('data-index');
+          
+          // Attiva la miniatura corrente
+          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Aggiorna l'immagine principale
+          if (index === '0') {
+            document.getElementById('modal-main-image').src = this.style.backgroundImage.slice(5, -2);
+          } else {
+            // Usa l'url di sfondo della thumbnail
+            document.getElementById('modal-main-image').src = this.style.backgroundImage.slice(5, -2);
+          }
+        });
+      });
+      
+      // Event listener per i pulsanti del modale
+      document.getElementById('modal-rent-button').addEventListener('click', function() {
+        // Scorrimento alla card del prodotto per selezionare le date
+        productModal.classList.remove('open');
+        setTimeout(() => {
+          productModal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          
+          // Trova la card del prodotto e scorri ad essa
+          const productCard = document.querySelector(`.product-card[data-id="${currentProduct.id}"]`);
+          productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Evidenzia la card
+          productCard.classList.add('highlight');
+          setTimeout(() => {
+            productCard.classList.remove('highlight');
+          }, 2000);
+          
+          // Focalizza sul datepicker
+          const dateInput = productCard.querySelector('.date-range-input');
+          setTimeout(() => {
+            dateInput.focus();
+          }, 800);
+        }, 300);
+      });
+      
+      document.getElementById('modal-buy-button').addEventListener('click', function() {
+        // Aggiungi direttamente al carrello il prodotto come acquisto
+        const purchaseItem = {
+          type: 'purchase',
+          id: currentProduct.id,
+          brand: currentProduct.brand,
+          category: currentProduct.category,
+          price: currentProduct.price,
+          color: currentProduct.color,
+          condition: currentProduct.condition
+        };
+        
+        addToCart(purchaseItem);
+        
+        // Chiudi il modale
+        productModal.classList.remove('open');
+        setTimeout(() => {
+          productModal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }, 300);
+      });
 
       // Mobile menu toggle
       const hamburger = document.getElementById('hamburger');
@@ -1783,7 +2540,6 @@
           endDateInput.value = formatDate(endDate);
 
           // Aggiorna il testo che mostra il numero di giorni
-                    // Aggiorna il testo che mostra il numero di giorni
           daysCountElement.innerHTML = `<i class="far fa-calendar-alt"></i> Durata: ${diffDays} ${diffDays === 1 ? 'giorno' : 'giorni'}`;
         });
 
@@ -1893,115 +2649,14 @@
             if (newProducts) {
               productsContainer.innerHTML = newProducts.innerHTML;
 
-              // Riattacca gli event listener ai nuovi form
-              productsContainer.querySelectorAll('.rental-form').forEach(form => {
-                form.addEventListener('submit', function (e) {
-                  e.preventDefault();
-
-                  const formData = new FormData(this);
-                  const rentalItem = {
-                    type: 'rental',
-                    id: formData.get('id'),
-                    brand: formData.get('brand'),
-                    category: formData.get('category'),
-                    price: formData.get('price'),
-                    color: formData.get('color'),
-                    condition: formData.get('condition'),
-                    duration: formData.get('durata'),
-                    startDate: formData.get('startDate'),
-                    endDate: formData.get('endDate'),
-                    dateRange: formData.get('daterange')
-                  };
-
-                  addToCart(rentalItem);
-                });
-              });
-
-              productsContainer.querySelectorAll('.purchase-form').forEach(form => {
-                form.addEventListener('submit', function (e) {
-                  e.preventDefault();
-
-                  const formData = new FormData(this);
-                  const purchaseItem = {
-                    type: 'purchase',
-                    id: formData.get('id'),
-                    brand: formData.get('brand'),
-                    category: formData.get('category'),
-                    price: formData.get('price'),
-                    color: formData.get('color'),
-                    condition: formData.get('condition')
-                  };
-
-                  addToCart(purchaseItem);
-                });
-              });
-
+              // Migliora le card dei prodotti appena caricate
+              enhanceProductCards();
+              
+              // Riattacca gli event listener ai nuovi form e ai pulsanti di anteprima
+              attachEventListeners();
+              
               // Reinizializza le animazioni AOS
               AOS.refresh();
-
-              // Reinizializza i date range picker per i nuovi prodotti
-              productsContainer.querySelectorAll('.date-range-input').forEach(input => {
-                const productId = input.id.split('-')[1];
-                const durataInput = document.getElementById('durata-' + productId);
-                const daysCountElement = document.getElementById('days-count-' + productId);
-                const startDateInput = document.getElementById('startDate-' + productId);
-                const endDateInput = document.getElementById('endDate-' + productId);
-
-                // Imposta la data di oggi come minima selezionabile
-                const today = new Date();
-
-                // Ottenere domani come data predefinita di fine
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-
-                // Imposta i valori iniziali degli input nascosti per le date
-                startDateInput.value = formatDate(today);
-                endDateInput.value = formatDate(tomorrow);
-
-                $(input).daterangepicker({
-                  opens: 'center',
-                  minDate: today,
-                  startDate: today,
-                  endDate: tomorrow,
-                  locale: {
-                    format: 'DD/MM/YYYY',
-                    separator: ' - ',
-                    applyLabel: 'Applica',
-                    cancelLabel: 'Annulla',
-                    fromLabel: 'Da',
-                    toLabel: 'A',
-                    weekLabel: 'W',
-                    customRangeLabel: 'Intervallo personalizzato',
-                    daysOfWeek: ['Do', 'Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa'],
-                    monthNames: [
-                      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-                      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
-                    ],
-                    firstDay: 1
-                  }
-                }, function (start, end, label) {
-                  // Calcola il numero di giorni
-                  const startDate = start.toDate();
-                  const endDate = end.toDate();
-                  const diffTime = Math.abs(endDate - startDate);
-                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                  // Aggiorna il campo nascosto con il numero di giorni
-                  durataInput.value = diffDays;
-
-                  // Aggiorna i campi nascosti per le date
-                  startDateInput.value = formatDate(startDate);
-                  endDateInput.value = formatDate(endDate);
-
-                  // Aggiorna il testo che mostra il numero di giorni
-                  daysCountElement.innerHTML = `<i class="far fa-calendar-alt"></i> Durata: ${diffDays} ${diffDays === 1 ? 'giorno' : 'giorni'}`;
-                });
-
-                // Imposta i valori iniziali
-                const initialDiffDays = 1;
-                durataInput.value = initialDiffDays;
-                daysCountElement.innerHTML = `<i class="far fa-calendar-alt"></i> Durata: ${initialDiffDays} giorno`;
-              });
             } else {
               // Fallback se non riesce a trovare la sezione prodotti
               productsContainer.innerHTML = `
@@ -2022,6 +2677,129 @@
             productsContainer.style.opacity = '1';
           });
       }
+      
+      // Funzione per allegare tutti gli event listener necessari dopo il caricamento di nuovi prodotti
+      function attachEventListeners() {
+        // Event listener per i pulsanti di anteprima rapida
+        document.querySelectorAll('.quick-view-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.getAttribute('data-id');
+            openProductModal(productId);
+          });
+        });
+        
+        // Gestione noleggio prodotti (aggiunta al carrello)
+        document.querySelectorAll('.rental-form').forEach(form => {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const rentalItem = {
+              type: 'rental',
+              id: formData.get('id'),
+              brand: formData.get('brand'),
+              category: formData.get('category'),
+              price: formData.get('price'),
+              color: formData.get('color'),
+              condition: formData.get('condition'),
+              duration: formData.get('durata'),
+              startDate: formData.get('startDate'),
+              endDate: formData.get('endDate'),
+              dateRange: formData.get('daterange')
+            };
+
+            addToCart(rentalItem);
+          });
+        });
+
+        // Gestione acquisto prodotti (aggiunta al carrello)
+        document.querySelectorAll('.purchase-form').forEach(form => {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const purchaseItem = {
+              type: 'purchase',
+              id: formData.get('id'),
+              brand: formData.get('brand'),
+              category: formData.get('category'),
+              price: formData.get('price'),
+              color: formData.get('color'),
+              condition: formData.get('condition')
+            };
+
+            addToCart(purchaseItem);
+          });
+        });
+        
+        // Reinizializza i date range picker per i nuovi prodotti
+        document.querySelectorAll('.date-range-input').forEach(input => {
+          const productId = input.id.split('-')[1];
+          const durataInput = document.getElementById('durata-' + productId);
+          const daysCountElement = document.getElementById('days-count-' + productId);
+          const startDateInput = document.getElementById('startDate-' + productId);
+          const endDateInput = document.getElementById('endDate-' + productId);
+
+          // Imposta la data di oggi come minima selezionabile
+          const today = new Date();
+
+          // Ottenere domani come data predefinita di fine
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+
+          // Imposta i valori iniziali degli input nascosti per le date
+          startDateInput.value = formatDate(today);
+          endDateInput.value = formatDate(tomorrow);
+
+          $(input).daterangepicker({
+            opens: 'center',
+            minDate: today,
+            startDate: today,
+            endDate: tomorrow,
+            locale: {
+              format: 'DD/MM/YYYY',
+              separator: ' - ',
+              applyLabel: 'Applica',
+              cancelLabel: 'Annulla',
+              fromLabel: 'Da',
+              toLabel: 'A',
+              weekLabel: 'W',
+              customRangeLabel: 'Intervallo personalizzato',
+              daysOfWeek: ['Do', 'Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa'],
+              monthNames: [
+                'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+                'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+              ],
+              firstDay: 1
+            }
+          }, function (start, end, label) {
+            // Calcola il numero di giorni
+            const startDate = start.toDate();
+            const endDate = end.toDate();
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            // Aggiorna il campo nascosto con il numero di giorni
+            durataInput.value = diffDays;
+
+            // Aggiorna i campi nascosti per le date
+            startDateInput.value = formatDate(startDate);
+            endDateInput.value = formatDate(endDate);
+
+            // Aggiorna il testo che mostra il numero di giorni
+            daysCountElement.innerHTML = `<i class="far fa-calendar-alt"></i> Durata: ${diffDays} ${diffDays === 1 ? 'giorno' : 'giorni'}`;
+          });
+
+          // Imposta i valori iniziali
+          const initialDiffDays = 1;
+          durataInput.value = initialDiffDays;
+          daysCountElement.innerHTML = `<i class="far fa-calendar-alt"></i> Durata: ${initialDiffDays} giorno`;
+        });
+      }
+
+      // Allegare gli event listener iniziali
+      attachEventListeners();
 
       // Funzione per mostrare notifiche
       function showNotification(message, isError = false) {
@@ -2047,7 +2825,7 @@
       }
 
       // Controllo data utente
-      const currentDate = '2025-05-02';
+      const currentDate = '2025-05-03';
       const currentUser = 'Miftarve';
       const welcomeMessage = `Benvenuto, ${currentUser}!`;
       
@@ -2055,25 +2833,6 @@
       if (currentUser) {
         // Mostriamo un messaggio di benvenuto personalizzato
         showNotification(welcomeMessage);
-        
-        // Personalizzazione dell'esperienza in base al mese
-        const currentMonth = new Date().getMonth();
-        
-        // Se siamo in periodo estivo (maggio-settembre), mostriamo prodotti adatti all'estate
-        if (currentMonth >= 4 && currentMonth <= 8) {
-          // Aggiunge un piccolo badge ai prodotti adatti all'estate
-          document.querySelectorAll('.product-card').forEach(card => {
-            const category = card.querySelector('.product-title').textContent.toLowerCase();
-            if (category.includes('estate') || category.includes('leggero') || 
-                category.includes('t-shirt') || category.includes('sandali')) {
-              const tag = card.querySelector('.product-tag');
-              if (tag) {
-                tag.textContent = 'Perfetto per l\'Estate';
-                tag.style.backgroundColor = '#FF9500';
-              }
-            }
-          });
-        }
       }
     });
   </script>
