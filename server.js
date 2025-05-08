@@ -13,6 +13,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const session = require('express-session');
 
+// Aggiungi all'inizio del file, dopo i require e prima della definizione delle app
+const SERVER_START_TIME = Date.now().toString();
 // Carica le variabili d'ambiente dal file .env
 require('dotenv').config();
 
@@ -853,7 +855,6 @@ app.post('/api/confirm-order', ensureAuthenticated, (req, res) => {
         // Salva l'ora di visualizzazione della conferma
         order.confirmedAt = new Date().toISOString();
         
-        console.log(`Ordine ${orderId} confermato dall'utente`);
         
         res.json({ success: true, message: 'Conferma ordine registrata con successo' });
     } catch (error) {
@@ -950,6 +951,7 @@ app.get('/login', (req, res) => {
  *                   type: string
  *                   example: Username o password errati!
  */
+// Modifica la generazione del token JWT nella route /login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -957,12 +959,13 @@ app.post('/login', (req, res) => {
     const user = db.getUserByUsername(username);
 
     if (user && user.password === password) {
-        // Genera token JWT
+        // Genera token JWT CON SERVER_START_TIME
         const token = jwt.sign({
             id: user.id,
             name: user.nome,
             email: user.email,
-            ruolo: user.ruolo
+            ruolo: user.ruolo,
+            serverStartTime: SERVER_START_TIME // Aggiungi questa riga
         }, SECRET_KEY, {
             expiresIn: '24h' // Token valido per 24 ore
         });
@@ -988,6 +991,38 @@ app.post('/login', (req, res) => {
         res.status(401).json({ message: 'Username o password errati!' });
     }
 });
+
+// Modifica anche la funzione ensureAuthenticated per verificare il SERVER_START_TIME
+function ensureAuthenticated(req, res, next) {
+    // Ottieni il token da cookie o header Authorization
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.redirect('/login');
+    }
+
+    try {
+        // Verifica il token
+        const decoded = jwt.verify(token, SECRET_KEY);
+        
+        // Verifica se il token è stato generato con lo stesso SERVER_START_TIME
+        if (decoded.serverStartTime !== SERVER_START_TIME) {
+            res.clearCookie('token');
+            return res.redirect('/login');
+        }
+        
+        req.user = decoded;
+
+        // Funzioni per mantenere retrocompatibilità con il codice esistente
+        req.isAuthenticated = () => true;
+
+        next();
+    } catch (error) {
+        // Se il token non è valido, reindirizza al login
+        res.clearCookie('token');
+        return res.redirect('/login');
+    }
+}
 
 /**
  * @swagger
@@ -1709,12 +1744,9 @@ app.get('/eliminaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
  */
 app.get('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
     try {
-        // Log per debug
-        console.log("Recupero prodotti dal database...");
         
         // Ottieni i prodotti dal database
         const products = db.getAllProducts();
-        console.log(`Recuperati ${products.length} prodotti`);
         
         // Renderizza la pagina con i prodotti
         res.render('prodotti', { 
@@ -1722,7 +1754,6 @@ app.get('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
             user: req.user
         });
     } catch (error) {
-        console.error("Errore nel caricamento dei prodotti:", error);
         res.render('error', { message: 'Errore nel caricamento dei prodotti: ' + error.message });
     }
 });
@@ -1878,8 +1909,6 @@ app.get('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =>
 app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     try {
         const productId = parseInt(req.params.id);
-        console.log("Modifica prodotto - ID:", productId);
-        console.log("Dati ricevuti:", req.body);
         
         const { category, size, color, brand, condition, price } = req.body;
         
@@ -1896,7 +1925,6 @@ app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =
         });
         
         if (!updatedProduct) {
-            console.log("Aggiornamento prodotto fallito");
             return res.render('error', { message: 'Prodotto non trovato!' });
         }
         
@@ -2691,11 +2719,9 @@ function formatOrderForView(orderData) {
 app.post('/completa', ensureAuthenticated, (req, res) => {
     try {
         const { action, productId, days, price, startDate, endDate } = req.body;
-        console.log("Richiesta completa ricevuta:", req.body);
         
         // Verifica che i dati necessari siano presenti
         if (!action || !productId || !price) {
-            console.error("Dati mancanti nella richiesta:", req.body);
             return res.status(400).json({ success: false, error: 'Dati mancanti nella richiesta' });
         }
         
@@ -2703,7 +2729,6 @@ app.post('/completa', ensureAuthenticated, (req, res) => {
         const product = db.getProductById(Number(productId));
         
         if (!product) {
-            console.error("Prodotto non trovato:", productId);
             return res.status(404).json({ success: false, error: 'Prodotto non trovato!' });
         }
         
@@ -2759,14 +2784,12 @@ app.post('/completa', ensureAuthenticated, (req, res) => {
                     total: parseFloat(price)
                 });
                 
-                console.log("Acquisto salvato con ID:", orderId);
                 return res.json({ 
                     success: true, 
                     message: 'Acquisto completato con successo!', 
                     orderId: orderId 
                 });
             } catch (err) {
-                console.error("Errore nel salvataggio dell'acquisto:", err);
                 return res.status(500).json({ success: false, error: 'Errore nel salvataggio dell\'acquisto' });
             }
         } else if (action === 'rental') {
@@ -2802,22 +2825,18 @@ app.post('/completa', ensureAuthenticated, (req, res) => {
                     total: parseFloat(price)
                 });
                 
-                console.log("Noleggio salvato con ID:", orderId);
                 return res.json({ 
                     success: true, 
                     message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}`,
                     orderId: orderId
                 });
             } catch (err) {
-                console.error("Errore nel salvataggio del noleggio:", err);
                 return res.status(500).json({ success: false, error: 'Errore nel salvataggio del noleggio' });
             }
         } else {
-            console.error("Azione non valida:", action);
             return res.status(400).json({ success: false, error: 'Azione non valida!' });
         }
     } catch (error) {
-        console.error("Errore durante il completamento dell'ordine:", error);
         return res.status(500).json({ success: false, error: 'Errore interno del server: ' + error.message });
     }
 });
@@ -2831,7 +2850,6 @@ app.get('/my-orders', ensureAuthenticated, (req, res) => {
         const sales = db.getAllSales ? db.getAllSales().filter(sale => sale.userId === user.id) : [];
         const rentals = db.getAllRentals ? db.getAllRentals().filter(rental => rental.userId === user.id) : [];
         
-        console.log(`Trovati ${sales.length} acquisti e ${rentals.length} noleggi per l'utente ${user.id}`);
         
         // Formatta i dati per la visualizzazione
         const purchaseOrders = sales.map(sale => {
@@ -3214,20 +3232,16 @@ io.use((socket, next) => {
     socket.userId = parseInt(userId, 10);
     socket.username = username;
 
-    console.log(`Utente connesso: ID=${socket.userId}, Username=${socket.username}`);
     next();
 });
 
 io.on('connection', (socket) => {
     // Associa l'utente al socket usando l'ID convertito in stringa
     const userId = socket.userId;
-    console.log(`Connessione stabilita per l'utente ID=${userId}`);
 
     // Usa sempre toString() per le chiavi della mappa
     connectedUsers.set(userId.toString(), socket.id);
 
-    // Log degli utenti connessi per debug
-    console.log("Utenti connessi:", Array.from(connectedUsers.keys()));
 
     // Invia la lista degli utenti connessi
     const users = [];
@@ -3251,8 +3265,6 @@ io.on('connection', (socket) => {
         // Converti sempre recipientId in numero
         const recipientIdInt = parseInt(recipientId, 10);
 
-        console.log(`Messaggio da ${senderId} a ${recipientIdInt}: ${text}`);
-
         try {
             // Salva il messaggio nel database
             const message = await db.saveMessage(senderId, recipientIdInt, text);
@@ -3263,20 +3275,16 @@ io.on('connection', (socket) => {
             // Invia il messaggio al destinatario se è online
             const recipientSocketId = connectedUsers.get(recipientIdInt.toString());
             if (recipientSocketId) {
-                console.log(`Destinatario ${recipientIdInt} è online, invio messaggio`);
                 socket.to(recipientSocketId).emit('private message', message);
             } else {
-                console.log(`Destinatario ${recipientIdInt} non è online`);
             }
         } catch (error) {
-            console.error('Errore nell\'invio/salvataggio del messaggio:', error);
             socket.emit('message_error', { error: 'Errore nell\'invio del messaggio' });
         }
     });
 
     // Disconnessione con log migliorato
     socket.on('disconnect', () => {
-        console.log(`Utente disconnesso: ID=${socket.userId}`);
         connectedUsers.delete(socket.userId.toString());
 
         // Notifica gli altri utenti della disconnessione
