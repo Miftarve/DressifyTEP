@@ -169,11 +169,16 @@ Se desideri eseguire DressifyTEP in un ambiente GitHub Codespace, segui questi p
    ```
 
 2. **Configurazione del File .env**:
-   ```bash
-   cp .env.example .env
-   ```
+   Crea il file .env:
+    ```bash
+   touch .env
+   ```   
    
    Apri il file .env con l'editor di testo e inserisci le tue credenziali OAuth:
+     ```bash
+   nano .env
+   ```
+   **Dentro il file, incolla queste righe**
    ```
    # Google OAuth credentials
    GOOGLE_CLIENT_ID=tuo_client_id_google
@@ -186,7 +191,7 @@ Se desideri eseguire DressifyTEP in un ambiente GitHub Codespace, segui questi p
    
    **IMPORTANTE**: Non committare mai il file .env su GitHub!
 
-3. **Avvio dell'Applicazione**:
+4. **Avvio dell'Applicazione**:
    ```bash
    docker-compose up --build -d
    ```
@@ -196,7 +201,7 @@ Se desideri eseguire DressifyTEP in un ambiente GitHub Codespace, segui questi p
    - `--build`: Ricostruisce le immagini Docker (importante se hai modificato il codice)
    - `-d`: Avvia i container in background (modalità "detached")
 
-4. **Accesso all'Applicazione**:
+5. **Accesso all'Applicazione**:
    L'applicazione sarà disponibile sulla porta 3000. In un Codespace, puoi accedervi facendo clic sul link che appare nella tab "Ports" o utilizzando il pulsante "Open in Browser".
 
 ## Configurazione e Avvio di DressifyTEP (Installazione Locale)
