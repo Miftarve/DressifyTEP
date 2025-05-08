@@ -458,6 +458,39 @@
                 });
             }
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Recupera i parametri dalla query string
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            const items = urlParams.get('items') ? JSON.parse(decodeURIComponent(urlParams.get('items'))) : [];
+            const details = urlParams.get('details') ? JSON.parse(decodeURIComponent(urlParams.get('details'))) : {};
+
+            console.log('Dettagli ordine completato:', { orderId, items, details });
+
+            // Invia una richiesta al server per assicurarsi che l'ordine sia stato registrato correttamente
+            fetch('/api/confirm-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    items: items,
+                    details: details
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Conferma ordine salvata con successo');
+                    } else {
+                        console.error('Errore nella conferma dell\'ordine:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore nella conferma dell\'ordine:', error);
+                });
+        });
     </script>
 </body>
 

@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <title>Gestione Ordini - DRESSIMIFY</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Reset e variabili */
+    :root {
+      /* Colori */
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #eef2ff;
+      --secondary: #ec4899;
+      --secondary-light: #fce7f3;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      --dark: #1f2937;
+      --gray-dark: #374151;
+      --gray: #9ca3af;
+      --gray-light: #e5e7eb;
+      --white: #ffffff;
+      --body-bg: #f9fafb;
+
+      /* Gradienti */
+      --gradient-primary: linear-gradient(135deg, var(--primary), var(--accent));
+      --gradient-secondary: linear-gradient(135deg, var(--secondary), #f59e0b);
+      
+      /* Ombreggiature */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+      /* Border Radius */
+      --radius-sm: 0.375rem;
+      --radius: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+
+      /* Spaziatura */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 0.75rem;
+      --spacing: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+
+      /* Layout */
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --container-width: 1400px;
+
+      /* Transizioni */
+      --transition-fast: 0.15s ease;
+      --transition: 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--body-bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Scrollbar personalizzata */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-light);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gray);
+    }
+
+    /* Layout principale */
+    .dashboard-layout {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100%;
+      background-color: var(--white);
+      border-right: 1px solid var(--gray-light);
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition);
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: 12px;
+      font-size: 1.5rem;
+      margin-right: var(--spacing);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-light);
+      margin-bottom: var(--spacing);
+      background-color: rgba(99, 102, 241, 0.02);
+    }
+
+    .sidebar-user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-right: var(--spacing);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+    }
+
+    .sidebar-user-name {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-user-role {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-sm) var(--spacing);
+    }
+
+    .menu-category {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: var(--spacing-sm) var(--spacing);
+      margin-top: var(--spacing);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing) var(--spacing);
+      color: var(--gray-dark);
+      text-decoration: none;
+      border-radius: var(--radius);
+      margin-bottom: var(--spacing-xs);
+      transition: all var(--transition-fast);
+    }
+
+    .menu-item:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .menu-item.active {
+      background: var(--gradient-primary);
+      color: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .menu-item i {
+      font-size: 1.1rem;
+      width: 24px;
+      margin-right: var(--spacing);
+    }
+
+    .menu-item span {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      padding: var(--spacing) var(--spacing-lg);
+      border-top: 1px solid var(--gray-light);
+      font-size: 0.8rem;
+      color: var(--gray);
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      height: var(--header-height);
+      background-color: var(--white);
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+    
+    .header-title i {
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing);
+    }
+
+    .header-date {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-sm) var(--spacing);
+      background-color: var(--primary-light);
+      border-radius: var(--radius);
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .header-date i {
+      margin-right: var(--spacing-xs);
+    }
+
+    .action-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .action-button:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .notification-button {
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: var(--danger);
+      color: var(--white);
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--white);
+    }
+
+    /* Hamburger Menu */
+    .hamburger-menu {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .hamburger-menu:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+
+    /* Main Container */
+    .main-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+    }
+
+    .page-title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--dark);
+      position: relative;
+      padding-bottom: var(--spacing-xs);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    /* Dashboard Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stat-card {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-md);
+      display: flex;
+      align-items: center;
+      transition: all var(--transition);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: var(--spacing-md);
+      font-size: 1.5rem;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-primary);
+      opacity: 0.9;
+      z-index: -1;
+    }
+
+    .stat-icon.purple::before {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    .stat-icon.blue::before {
+      background: linear-gradient(135deg, #3b82f6, #38bdf8);
+    }
+
+    .stat-icon.green::before {
+      background: linear-gradient(135deg, #10b981, #34d399);
+    }
+
+    .stat-icon.orange::before {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .stat-trend.up {
+      color: var(--success);
+    }
+
+    .stat-trend.down {
+      color: var(--danger);
+    }
+
+    .stat-trend i {
+      margin-right: 3px;
+    }
+
+    /* Graph Section */
+    .graph-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .graph-card {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-md);
+      overflow: hidden;
+    }
+
+    .graph-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .graph-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+    
+    .graph-card-title i {
+      color: var(--primary);
+    }
+
+    .graph-card-tabs {
+      display: flex;
+      border-radius: var(--radius-sm);
+      background-color: var(--primary-light);
+      padding: 3px;
+    }
+
+    .graph-tab {
+      padding: var(--spacing-xs) var(--spacing);
+      font-size: 0.8rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .graph-tab.active {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .chart-container {
+      height: 300px;
+      position: relative;
+    }
+
+    /* Orders Table Section */
+    .orders-section {
+      background-color: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--spacing-lg);
+      overflow: hidden;
+    }
+
+    .orders-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--gray-light);
+      background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    }
+
+    .orders-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+    
+    .orders-title i {
+      color: var(--primary);
+    }
+
+    .orders-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    .order-action-button {
+      padding: var(--spacing-xs) var(--spacing);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      background-color: var(--white);
+      color: var(--dark);
+      border: 1px solid var(--gray-light);
+    }
+
+    .order-action-button:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+
+    .order-action-button.primary {
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+    }
+
+    .order-action-button.primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Filtri */
+    .filters-container {
+      display: flex;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background-color: var(--gray-light);
+      background: linear-gradient(to right, rgba(99, 102, 241, 0.03), rgba(139, 92, 246, 0.03));
+      border-bottom: 1px solid var(--gray-light);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+    }
+
+    .filter-select {
+      padding: var(--spacing-xs) var(--spacing);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-light);
+      font-size: 0.85rem;
+      background-color: var(--white);
+      color: var(--dark);
+      min-width: 140px;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-container {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: var(--spacing-xs) var(--spacing);
+      padding-left: 35px;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-light);
+      font-size: 0.85rem;
+      background-color: var(--white);
+      color: var(--dark);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
+    /* Tabella ordini */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    }
+
+    th {
+      padding: var(--spacing);
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary-dark);
+      border-bottom: 2px solid var(--gray-light);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--spacing);
+      border-bottom: 1px solid var(--gray-light);
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background-color: rgba(99, 102, 241, 0.03);
+    }
+
+    /* Badge per status */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge i {
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
+
+    .badge-completed {
+      background-color: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge-processing {
+      background-color: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .badge-cancelled {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .badge-pending {
+      background-color: var(--info-light);
+      color: var(--info);
+    }
+
+    .badge-rental {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .badge-purchase {
+      background-color: var(--secondary-light);
+      color: var(--secondary);
+    }
+
+    /* User info in table */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-light), #e0e7ff);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-name {
+      font-weight: 500;
+    }
+
+    .user-email {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    /* Azioni tabella */
+    .actions {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .view-btn {
+      background-color: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+    }
+
+    .view-btn:hover {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .edit-btn {
+      background-color: rgba(59, 130, 246, 0.1);
+      color: var(--info);
+    }
+
+    .edit-btn:hover {
+      background-color: var(--info);
+      color: var(--white);
+    }
+
+    .delete-btn {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .delete-btn:hover {
+      background-color: var(--danger);
+      color: var(--white);
+    }
+
+    /* Paginazione */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .pagination-info {
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .pagination-button {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background-color: var(--white);
+      border: 1px solid var(--gray-light);
+      color: var(--gray-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.9rem;
+    }
+
+    .pagination-button:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+
+    .pagination-button.active {
+      background-color: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    /* Modal e tooltip */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition);
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-width: 800px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px) scale(0.95);
+      transition: all var(--transition);
+    }
+
+    .modal-backdrop.show .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Tooltip */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 10px;
+      background-color: var(--dark);
+      color: var(--white);
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-fast);
+      z-index: 100;
+    }
+
+    [data-tooltip]:hover:before {
+      opacity: 1;
+      transform: translate(-50%, -5px);
+    }
+
+    /* Media Queries per Responsività */
+    @media (max-width: 1200px) {
+      .graph-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        position: fixed;
+        left: -100%;
+      }
+
+      .sidebar.show {
+        left: 0;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .hamburger-menu {
+        display: flex;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 90;
+        opacity: 0;
+        pointer-events: none;
+        transition: all var(--transition);
+      }
+
+      .overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        padding: 0 var(--spacing);
+      }
+
+      .header-title {
+        font-size: 1.2rem;
+      }
+
+      .main-container {
+        padding: var(--spacing);
+      }
+
+      .filters-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .filter-group {
+        width: 100%;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .action-button span {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 8px;
+      }
+
+      .page-title-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing);
+      }
+
+      .actions {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Dashboard Layout -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+          <i class="fas fa-tshirt"></i>
+        </div>
+        <div class="sidebar-logo-text">DRESSIMIFY</div>
+      </div>
+
+      <!-- User Info -->
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">{{#if user.nome}}{{user.nome.[0]}}{{else}}M{{/if}}</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">{{#if user.nome}}{{user.nome}} {{user.cognome}}{{else}}Miftarve{{/if}}</div>
+          <div class="sidebar-user-role">Amministratore</div>
+        </div>
+      </div>
+
+      <!-- Menu -->
+      <div class="sidebar-menu">
+        <div class="menu-category">Principale</div>
+        <a href="/home" class="menu-item">
+          <i class="fas fa-home"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/prodotti" class="menu-item">
+          <i class="fas fa-tshirt"></i>
+          <span>Prodotti</span>
+        </a>
+        <a href="/ordini" class="menu-item active">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Ordini Utenti</span>
+        </a>
+
+        <div class="menu-category">Comunicazione</div>
+        <a href="/chat" class="menu-item">
+          <i class="fas fa-comments"></i>
+          <span>Chat Supporto</span>
+        </a>
+
+        <a href="/logout" class="menu-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <div class="sidebar-footer">
+        Dressimify &copy; 2025 - Tutti i diritti riservati
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="hamburger-menu" id="hamburger-menu">
+          <i class="fas fa-bars"></i>
+        </div>
+        <h1 class="header-title">
+          <i class="fas fa-shopping-bag"></i>
+          Gestione Ordini Utenti
+        </h1>
+        <div class="header-actions">
+          <div class="header-date">
+            <i class="far fa-calendar-alt"></i>
+            <span>
+              {{#if currentDate}}
+                {{formatDate currentDate}}
+              {{else}}
+                08/05/2025 - 17:55
+              {{/if}}
+            </span>
+          </div>
+
+          <div class="action-button notification-button">
+            <i class="fas fa-bell"></i>
+            <div class="notification-badge">3</div>
+          </div>
+
+          <div class="action-button">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Container -->
+      <div class="main-container">
+        <!-- Page Title -->
+        <div class="page-title-container">
+          <div>
+            <h1 class="page-title">Ordini degli Utenti</h1>
+            <p class="page-subtitle">Visualizza e gestisci tutti gli ordini di acquisto e noleggio effettuati dagli utenti</p>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Ordini Totali</div>
+              <div class="stat-value">{{stats.totalOrders}}</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +15% questo mese
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fas fa-tshirt"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Noleggi Attivi</div>
+              <div class="stat-value">{{stats.activeRentals}}</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +8% questa settimana
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Incasso Mensile</div>
+              <div class="stat-value">{{formatPrice stats.monthlyRevenue}}</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +12% questo mese
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Clienti Attivi</div>
+              <div class="stat-value">{{stats.activeUsers}}</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                +5.8% questo mese
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Table Section -->
+        <div class="orders-section">
+          <div class="orders-header">
+            <h2 class="orders-title">
+              <i class="fas fa-list"></i>
+              Lista Ordini
+            </h2>
+            <div class="orders-actions">
+              <button class="order-action-button">
+                <i class="fas fa-download"></i>
+                Esporta
+              </button>
+              <button class="order-action-button primary" id="refreshOrdersBtn">
+                <i class="fas fa-sync-alt"></i>
+                Aggiorna
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="filters-container">
+            <div class="filter-group">
+              <span class="filter-label">Tipo:</span>
+              <select class="filter-select" id="orderTypeFilter">
+                <option value="all" {{#if (eq filters.type "all")}}selected{{/if}}>Tutti</option>
+                <option value="rental" {{#if (eq filters.type "rental")}}selected{{/if}}>Noleggio</option>
+                <option value="purchase" {{#if (eq filters.type "purchase")}}selected{{/if}}>Acquisto</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <span class="filter-label">Stato:</span>
+              <select class="filter-select" id="orderStatusFilter">
+                <option value="all" {{#if (eq filters.status "all")}}selected{{/if}}>Tutti</option>
+                <option value="completed" {{#if (eq filters.status "completed")}}selected{{/if}}>Completati</option>
+                <option value="processing" {{#if (eq filters.status "processing")}}selected{{/if}}>In elaborazione</option>
+                <option value="pending" {{#if (eq filters.status "pending")}}selected{{/if}}>In attesa</option>
+                <option value="cancelled" {{#if (eq filters.status "cancelled")}}selected{{/if}}>Annullati</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <span class="filter-label">Periodo:</span>
+              <select class="filter-select" id="orderPeriodFilter">
+                <option value="all" {{#if (eq filters.period "all")}}selected{{/if}}>Tutti</option>
+                <option value="today" {{#if (eq filters.period "today")}}selected{{/if}}>Oggi</option>
+                <option value="week" {{#if (eq filters.period "week")}}selected{{/if}}>Questa settimana</option>
+                <option value="month" {{#if (eq filters.period "month")}}selected{{/if}}>Questo mese</option>
+                <option value="year" {{#if (eq filters.period "year")}}selected{{/if}}>Quest'anno</option>
+              </select>
+            </div>
+
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" class="search-input" placeholder="Cerca per utente, ID, prodotto..." id="orderSearchInput" value="{{filters.search}}">
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Ordine</th>
+                  <th>Utente</th>
+                  <th>Tipo</th>
+                  <th>Prodotti</th>
+                  <th>Totale</th>
+                  <th>Data</th>
+                  <th>Stato</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if orders.length}}
+                  {{#each orders}}
+                  <tr>
+                    <td>{{orderId}}</td>
+                    <td>
+                      <div class="user-info">
+                        <div class="user-avatar">{{userName.[0]}}{{userName.[1]}}</div>
+                        <div>
+                          <div class="user-name">{{userName}}</div>
+                          <div class="user-email">{{userEmail}}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge badge-{{type}}">
+                        <i class="fas {{#if (eq type "rental")}}fa-exchange-alt{{else}}fa-shopping-cart{{/if}}"></i>
+                        {{#if (eq type "rental")}}Noleggio{{else}}Acquisto{{/if}}
+                      </span>
+                    </td>
+                    <td>
+                      {{#each products}}
+                        {{name}}{{#unless @last}}, {{/unless}}
+                      {{/each}}
+                    </td>
+                    <td>{{formatPrice total}}</td>
+                    <td>{{formatDate timestamp}}</td>
+                    <td>
+                      <span class="badge badge-{{status}}">
+                        <i class="fas 
+                          {{#if (eq status "completed")}}fa-check-circle
+                          {{else if (eq status "processing")}}fa-clock
+                          {{else if (eq status "pending")}}fa-hourglass-half
+                          {{else}}fa-times-circle{{/if}}
+                        "></i>
+                        {{#if (eq status "completed")}}Completato
+                        {{else if (eq status "processing")}}In elaborazione
+                        {{else if (eq status "pending")}}In attesa
+                        {{else}}Annullato{{/if}}
+                      </span>
+                    </td>
+                   
+                  </tr>
+                  {{/each}}
+                {{else}}
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 30px;">
+                      <div style="color: var(--gray); font-size: 1.1rem;">
+                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        Nessun ordine trovato con i criteri di ricerca specificati.
+                      </div>
+                    </td>
+                  </tr>
+                {{/if}}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginazione -->
+          <div class="pagination">
+            <div class="pagination-info">
+              Mostrando {{#if orders.length}}1-{{orders.length}} di {{orders.length}}{{else}}0-0 di 0{{/if}} ordini
+            </div>
+            <div class="pagination-buttons">
+              <button class="pagination-button" disabled>
+                <i class="fas fa-angle-double-left"></i>
+              </button>
+              <button class="pagination-button">
+                <i class="fas fa-angle-left"></i>
+              </button>
+              <button class="pagination-button active">1</button>
+              <button class="pagination-button">
+                <i class="fas fa-angle-right"></i>
+              </button>
+              <button class="pagination-button">
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Dettagli Ordine -->
+  <div class="modal-backdrop" id="orderDetailsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-receipt"></i>
+          Dettagli Ordine #<span id="orderIdDisplay"></span>
+        </h3>
+        <div class="modal-close" id="closeOrderDetailsModal">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      <div class="modal-body" id="orderDetailsContent">
+        <!-- I dettagli dell'ordine verranno caricati qui dinamicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Script JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Setup Menu Mobile
+      const hamburger = document.getElementById('hamburger-menu');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+
+      if (hamburger) {
+        hamburger.addEventListener('click', function() {
+          sidebar.classList.toggle('show');
+          overlay.classList.toggle('show');
+        });
+      }
+
+      if (overlay) {
+        overlay.addEventListener('click', function() {
+          sidebar.classList.remove('show');
+          overlay.classList.remove('show');
+        });
+      }
+
+      // Setup modal
+      const modal = document.getElementById('orderDetailsModal');
+      const closeModal = document.getElementById('closeOrderDetailsModal');
+
+      if (closeModal) {
+        closeModal.addEventListener('click', function() {
+          modal.classList.remove('show');
+        });
+      }
+
+      // Setup filtri
+      const typeFilter = document.getElementById('orderTypeFilter');
+      const statusFilter = document.getElementById('orderStatusFilter');
+      const periodFilter = document.getElementById('orderPeriodFilter');
+      const searchInput = document.getElementById('orderSearchInput');
+
+      // Funzione per applicare i filtri
+      function applyFilters() {
+        const type = typeFilter?.value || 'all';
+        const status = statusFilter?.value || 'all';
+        const period = periodFilter?.value || 'all';
+        const search = searchInput?.value || '';
+
+        // Costruisci l'URL con i parametri di query
+        const url = `/admin/ordini?type=${type}&status=${status}&period=${period}&search=${encodeURIComponent(search)}`;
+        
+        // Reindirizza alla nuova URL
+        window.location.href = url;
+      }
+
+      // Aggiungi event listener ai filtri
+      if (typeFilter) typeFilter.addEventListener('change', applyFilters);
+      if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+      if (periodFilter) periodFilter.addEventListener('change', applyFilters);
+
+      // Per la ricerca, attendiamo che l'utente finisca di digitare
+      let searchTimeout;
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(applyFilters, 500);
+        });
+
+        // Supporto per l'invio via tasto Enter
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchTimeout);
+            applyFilters();
+          }
+        });
+      }
+
+      // Pulsante di aggiornamento
+      const refreshBtn = document.getElementById('refreshOrdersBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+          window.location.reload();
+        });
+      }
+
+      // Add ChartJS sample charts if needed
+      setupCharts();
+    });
+
+    // Visualizza i dettagli dell'ordine
+    function viewOrderDetails(orderId) {
+      const modal = document.getElementById('orderDetailsModal');
+      const orderIdDisplay = document.getElementById('orderIdDisplay');
+      const orderDetailsContent = document.getElementById('orderDetailsContent');
+      
+      if (!modal || !orderIdDisplay || !orderDetailsContent) return;
+      
+      // Imposta l'ID dell'ordine
+      orderIdDisplay.textContent = orderId;
+      
+      // Mostra il modal
+      modal.classList.add('show');
+      
+      // Simula il caricamento dei dati (in produzione, farebbero una richiesta al server)
+      orderDetailsContent.innerHTML = '<div style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i><div style="margin-top: 15px;">Caricamento dettagli ordine...</div></div>';
+      
+      // In produzione, qui faresti una richiesta AJAX al server
+      // Per questa demo, simuliamo un ritardo e mostriamo dati fittizi
+      setTimeout(() => {
+        orderDetailsContent.innerHTML = `
+          <div style="padding: 20px;">
+            <h4 style="margin-bottom: 20px;">Dettagli Ordine #${orderId}</h4>
+            <p style="color: var(--gray);">Qui verrebbero mostrati i dettagli completi dell'ordine caricati dal server.</p>
+            <div style="margin-top: 20px; padding: 15px; background-color: var(--primary-light); border-radius: 8px; color: var(--primary-dark);">
+              <p>Per completare questa implementazione:</p>
+              <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Creazione di API endpoint per recuperare i dettagli dell'ordine</li>
+                <li>Aggiungere funzionalità per visualizzare tutti i prodotti nell'ordine</li>
+                <li>Implementare le opzioni per aggiornare lo stato dell'ordine</li>
+              </ol>
+            </div>
+          </div>
+        `;
+      }, 1000);
+    }
+
+    function setupCharts() {
+      // Questo è solo un esempio di come aggiungere grafici
+      // In produzione, i dati verrebbero caricati dal server
+    }
+  </script>
+</body>
+
+</html>

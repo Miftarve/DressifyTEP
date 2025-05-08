@@ -667,6 +667,9 @@
                 // Nel file checkout.hbs, modifica la funzione che gestisce l'invio del form:
 
                 // Processo tutte le transazioni
+                // Modifica la funzione che gestisce l'invio del form nel file checkout.hbs:
+
+                // Processo tutte le transazioni
                 Promise.all(promises)
                     .then(responses => Promise.all(responses.map(r => r.json())))
                     .then(results => {
@@ -681,14 +684,24 @@
                             // Ottieni l'ID dell'ordine dalla prima risposta
                             const orderId = results[0].orderId || Date.now();
 
-                            // Svuota il carrello
-                            localStorage.removeItem('cart');
-
                             // Salva temporaneamente i dati dell'ordine per la visualizzazione nella pagina di dettaglio
                             const cartItemsEncoded = encodeURIComponent(JSON.stringify(cart));
 
-                            // Reindirizza alla pagina di successo con l'orderId e i dati del carrello
-                            window.location.href = '/success?orderId=' + orderId + '&items=' + cartItemsEncoded;
+                            // Aggiungi anche i dati di spedizione e pagamento
+                            const orderDetails = {
+                                address: document.getElementById('address').value,
+                                city: document.getElementById('city').value,
+                                zip: document.getElementById('zip').value,
+                                cardNumber: document.getElementById('card-number').value.replace(/\D/g, '').slice(-4) // Solo ultime 4 cifre
+                            };
+
+                            const orderDetailsEncoded = encodeURIComponent(JSON.stringify(orderDetails));
+
+                            // Svuota il carrello
+                            localStorage.removeItem('cart');
+
+                            // Reindirizza alla pagina di successo con tutti i dati necessari
+                            window.location.href = `/success?orderId=${orderId}&items=${cartItemsEncoded}&details=${orderDetailsEncoded}`;
                         } else {
                             throw new Error('Errore durante l\'elaborazione dell\'ordine');
                         }
@@ -701,8 +714,8 @@
                         submitButton.disabled = false;
                         submitButton.innerHTML = '<i class="fas fa-lock"></i> Completa Ordine';
                     });
+                 });   
             });
-        });
     </script>
 </body>
 

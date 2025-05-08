@@ -42,8 +42,9 @@ class DBMock {
         this.conversations = {};
 
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
-        this.rentals = this.rentals || [];
-        this.sales = this.sales || [];
+          this.rentals = this.rentals || [];
+    this.sales = this.sales || [];
+    this.adminOrders = this.adminOrders || [];
     }
 
     resetProducts() {
@@ -413,8 +414,128 @@ class DBMock {
         // Se non trovato, restituisci null
         return null;
     }
+    saveRental(userId, productId, days, price, startDate, endDate, orderData = null) {
+        const rentalId = this.rentals.length + 1;
+        const timestamp = new Date().toISOString();
+        const orderId = orderData?.orderId || `R-${Date.now()}`;
+        
+        const product = this.getProductById(Number(productId));
+        
+        const rental = {
+            id: rentalId,
+            orderId: orderId,
+            userId: userId,
+            productId: productId,
+            product: product,
+            days: days,
+            price: price,
+            startDate: startDate,
+            endDate: endDate,
+            timestamp: timestamp,
+            status: 'completed',
+            ...orderData
+        };
+        
+        this.rentals.push(rental);
+        console.log(`Noleggio salvato: ID=${rentalId}, OrderID=${orderId}`);
+        return rental;
+    }
+    
+    // Metodo per salvare un acquisto
+    saveSale(userId, productId, price, orderData = null) {
+        const saleId = this.sales.length + 1;
+        const timestamp = new Date().toISOString();
+        const orderId = orderData?.orderId || `P-${Date.now()}`;
+        
+        const product = this.getProductById(Number(productId));
+        
+        const sale = {
+            id: saleId,
+            orderId: orderId,
+            userId: userId,
+            productId: productId,
+            product: product,
+            price: price,
+            timestamp: timestamp,
+            status: 'completed',
+            ...orderData
+        };
+        
+        this.sales.push(sale);
+        console.log(`Vendita salvata: ID=${saleId}, OrderID=${orderId}`);
+        return sale;
+    }
+    
+    // Metodo per ottenere tutti gli ordini per l'admin
+    getAllOrders() {
+        return this.adminOrders || [];
+    }
+    
+    // Metodo per filtrare gli ordini
+    filterOrders(filters = {}) {
+        let orders = this.adminOrders || [];
+        
+        // Filtra per tipo
+        if (filters.type && filters.type !== 'all') {
+            orders = orders.filter(order => order.type === filters.type);
+        }
+        
+        // Filtra per stato
+        if (filters.status && filters.status !== 'all') {
+            orders = orders.filter(order => order.status === filters.status);
+        }
+        
+        // Filtra per periodo
+        if (filters.period) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            switch(filters.period) {
+                case 'today':
+                    orders = orders.filter(order => new Date(order.timestamp) >= today);
+                    break;
+                case 'week':
+                    const oneWeekAgo = new Date(today);
+                    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                    orders = orders.filter(order => new Date(order.timestamp) >= oneWeekAgo);
+                    break;
+                case 'month':
+                    const oneMonthAgo = new Date(today);
+                    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                    orders = orders.filter(order => new Date(order.timestamp) >= oneMonthAgo);
+                    break;
+                case 'year':
+                    const oneYearAgo = new Date(today);
+                    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+                    orders = orders.filter(order => new Date(order.timestamp) >= oneYearAgo);
+                    break;
+            }
+        }
+        
+        // Filtra per testo di ricerca
+        if (filters.search) {
+            const search = filters.search.toLowerCase();
+            orders = orders.filter(order => 
+                order.orderId.toLowerCase().includes(search) ||
+                order.userName.toLowerCase().includes(search) ||
+                order.userEmail.toLowerCase().includes(search) ||
+                order.products.some(product => 
+                    product.name.toLowerCase().includes(search) ||
+                    product.brand.toLowerCase().includes(search) ||
+                    product.category.toLowerCase().includes(search)
+                )
+            );
+        }
+        
+        return orders;
+    }
+    
+    // Metodo per ottenere un ordine specifico
+    getOrderById(orderId) {
+        return this.adminOrders.find(order => order.orderId === orderId) ||
+               this.sales.find(sale => sale.orderId === orderId) ||
+               this.rentals.find(rental => rental.orderId === orderId);
+    }
 }
-
-
 
 module.exports = DBMock;

@@ -11,6 +11,7 @@ const socketIo = require('socket.io');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const session = require('express-session');
 
 // Carica le variabili d'ambiente dal file .env
 require('dotenv').config();
@@ -51,9 +52,18 @@ app.use(express.json());
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 hbs.registerHelper('json', context => JSON.stringify(context, null, 2));
-
+app.use(session({
+    secret: 'dressify_session_secret', // Cambia con una stringa segreta più robusta in produzione
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production', // true in produzione, false in sviluppo
+      maxAge: 24 * 60 * 60 * 1000 // 24 ore in millisecondi
+    }
+  }));
 // Inizializza Passport.js (solo per OAuth)
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Swagger Configuration
 const swaggerOptions = {
@@ -680,13 +690,177 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
-// Middleware per controllare se l'utente è un amministratore
+// Middleware per verificare ruolo admin
 function ensureAdmin(req, res, next) {
-    if (req.isAuthenticated && req.isAuthenticated() && req.user.ruolo === 'admin') {
+    if (req.user && req.user.ruolo === 'admin') {
         return next();
     }
-    return res.status(403).json({ error: 'Accesso non autorizzato' });
+    return res.status(403).render('error', { message: 'Accesso negato. Richiesti privilegi di amministratore.' });
 }
+
+// Rotta per visualizzare tutti gli ordini (admin)
+app.get('/admin/ordini', ensureAuthenticated, ensureAdmin, (req, res) => {
+    try {
+        // Ottieni i filtri dalla query string
+        const filters = {
+            type: req.query.type || 'all',
+            status: req.query.status || 'all',
+            period: req.query.period || 'all',
+            search: req.query.search || ''
+        };
+        
+        // Recupera gli ordini filtrati
+        const orders = db.filterOrders(filters);
+        
+        // Prepara le statistiche per la dashboard
+        const stats = {
+            totalOrders: db.getAllOrders().length,
+            activeRentals: db.getAllOrders().filter(o => o.type === 'rental' && o.status === 'completed').length,
+            monthlyRevenue: db.getAllOrders()
+                .filter(o => {
+                    const orderDate = new Date(o.timestamp);
+                    const now = new Date();
+                    return orderDate.getMonth() === now.getMonth() && 
+                           orderDate.getFullYear() === now.getFullYear();
+                })
+                .reduce((total, order) => total + order.total, 0)
+                .toFixed(2),
+            activeUsers: [...new Set(db.getAllOrders().map(o => o.userId))].length
+        };
+        
+        res.render('admin-orders', { 
+            user: req.user,
+            orders: orders,
+            stats: stats,
+            filters: filters,
+            currentDate: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error("Errore nel recupero degli ordini:", error);
+        res.status(500).render('error', { message: 'Si è verificato un errore durante il recupero degli ordini.' });
+    }
+});
+
+// API per recuperare i dettagli di un ordine specifico
+app.get('/api/admin/orders/:orderId', ensureAuthenticated, ensureAdmin, (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = db.getOrderById(orderId);
+        
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Ordine non trovato' });
+        }
+        
+        res.json({ success: true, order: order });
+    } catch (error) {
+        console.error("Errore nel recupero dei dettagli dell'ordine:", error);
+        res.status(500).json({ success: false, error: 'Errore interno del server' });
+    }
+});
+
+// API per aggiornare lo stato di un ordine
+app.put('/api/admin/orders/:orderId/status', ensureAuthenticated, ensureAdmin, (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const { status } = req.body;
+        
+        if (!status) {
+            return res.status(400).json({ success: false, error: 'Stato non fornito' });
+        }
+        
+        // Trova l'ordine e aggiorna lo stato
+        const order = db.getOrderById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Ordine non trovato' });
+        }
+        
+        // Aggiorna lo stato dell'ordine
+        order.status = status;
+        
+        // Aggiorna anche negli array originali (sales/rentals)
+        if (order.type === 'purchase') {
+            const sale = db.sales.find(s => s.orderId === orderId);
+            if (sale) sale.status = status;
+        } else {
+            const rental = db.rentals.find(r => r.orderId === orderId);
+            if (rental) rental.status = status;
+        }
+        
+        // Aggiorna anche nell'array adminOrders
+        const adminOrder = db.adminOrders.find(o => o.orderId === orderId);
+        if (adminOrder) adminOrder.status = status;
+        
+        res.json({ success: true, message: 'Stato dell\'ordine aggiornato con successo', order: order });
+    } catch (error) {
+        console.error("Errore nell'aggiornamento dello stato dell'ordine:", error);
+        res.status(500).json({ success: false, error: 'Errore interno del server' });
+    }
+});
+
+// Aggiungere questo helper in server.js
+hbs.registerHelper('formatDate', function(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('it-IT', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+});
+
+// Per formattare il prezzo
+hbs.registerHelper('formatPrice', function(price) {
+    if (price === undefined || price === null) return '0,00 €';
+    return parseFloat(price).toFixed(2).replace('.', ',') + ' €';
+});
+
+// Rotta per confermare che l'ordine è stato ricevuto e visualizzato dall'utente
+app.post('/api/confirm-order', ensureAuthenticated, (req, res) => {
+    try {
+        const { orderId, items, details } = req.body;
+        
+        // Trova l'ordine nel database
+        const order = db.getOrderById(orderId);
+        
+        if (!order) {
+            console.warn(`Ordine ${orderId} non trovato nel database durante la conferma`);
+            return res.json({ success: false, error: 'Ordine non trovato' });
+        }
+        
+        // Aggiorna eventualmente ulteriori dettagli dell'ordine
+        if (details) {
+            order.shippingDetails = {
+                ...order.shippingAddress,
+                ...details
+            };
+            
+            // Aggiorna anche il metodo di pagamento se disponibile
+            if (details.cardNumber) {
+                order.paymentMethod = {
+                    type: 'Carta di Credito',
+                    lastFour: details.cardNumber
+                };
+            }
+        }
+        
+        // Aggiorna lo stato dell'ordine se necessario
+        if (order.status === 'pending') {
+            order.status = 'completed';
+        }
+        
+        // Salva l'ora di visualizzazione della conferma
+        order.confirmedAt = new Date().toISOString();
+        
+        console.log(`Ordine ${orderId} confermato dall'utente`);
+        
+        res.json({ success: true, message: 'Conferma ordine registrata con successo' });
+    } catch (error) {
+        console.error("Errore nella conferma dell'ordine:", error);
+        res.status(500).json({ success: false, error: 'Errore interno del server' });
+    }
+});
 
 // ===== AUTHENTICATION ROUTES =====
 
@@ -2517,53 +2691,136 @@ function formatOrderForView(orderData) {
 app.post('/completa', ensureAuthenticated, (req, res) => {
     try {
         const { action, productId, days, price, startDate, endDate } = req.body;
+        console.log("Richiesta completa ricevuta:", req.body);
+        
+        // Verifica che i dati necessari siano presenti
+        if (!action || !productId || !price) {
+            console.error("Dati mancanti nella richiesta:", req.body);
+            return res.status(400).json({ success: false, error: 'Dati mancanti nella richiesta' });
+        }
+        
+        // Ottieni il prodotto dal database
         const product = db.getProductById(Number(productId));
         
         if (!product) {
+            console.error("Prodotto non trovato:", productId);
             return res.status(404).json({ success: false, error: 'Prodotto non trovato!' });
         }
         
         // Ottieni dati dell'utente attuale
         const user = req.user;
         
+        // Crea un ID univoco per l'ordine basato su timestamp e utente
+        const timestamp = Date.now();
+        
+        // Fix: Gestisci correttamente user.id che potrebbe non essere una stringa
+        let userIdPart = 'USER';
+        if (user && user.id) {
+            userIdPart = typeof user.id === 'string' 
+                ? user.id.substring(0, 4) 
+                : String(user.id).substring(0, 4);
+        } else if (user && user.email) {
+            userIdPart = user.email.substring(0, 4);
+        }
+        
+        const orderId = `${action === 'purchase' ? 'P' : 'R'}-${timestamp}-${userIdPart}`;
+        
+        // Preparazione dati ordine comuni
+        let orderData = {
+            orderId: orderId,
+            userId: user.id || 0,
+            userName: user.nome && user.cognome ? `${user.nome} ${user.cognome}` : (user.username || 'Utente'),
+            userEmail: user.email || 'email@esempio.com',
+            timestamp: new Date().toISOString(),
+            status: 'completed',
+            paymentMethod: 'card'
+        };
+        
+        // Inizializza array per ordini admin se non esiste
+        if (!db.adminOrders) {
+            db.adminOrders = [];
+        }
+        
         if (action === 'purchase') {
-            // Crea un nuovo registro di vendita
-            const sale = db.saveSale(
-                user.id,
-                Number(productId),
-                parseFloat(price)
-            );
-            
-            return res.json({ 
-                success: true, 
-                message: 'Acquisto completato con successo!', 
-                orderId: sale.orderId 
-            });
+            // Salva i dettagli dell'acquisto
+            try {
+                // Aggiungi l'ordine alla lista degli ordini amministrativi
+                db.adminOrders.push({
+                    ...orderData,
+                    type: 'purchase',
+                    products: [{
+                        id: product.id,
+                        name: product.name || `${product.brand} ${product.category}`,
+                        brand: product.brand,
+                        category: product.category,
+                        price: parseFloat(price),
+                        image: product.image || null
+                    }],
+                    total: parseFloat(price)
+                });
+                
+                console.log("Acquisto salvato con ID:", orderId);
+                return res.json({ 
+                    success: true, 
+                    message: 'Acquisto completato con successo!', 
+                    orderId: orderId 
+                });
+            } catch (err) {
+                console.error("Errore nel salvataggio dell'acquisto:", err);
+                return res.status(500).json({ success: false, error: 'Errore nel salvataggio dell\'acquisto' });
+            }
         } else if (action === 'rental') {
-            // Crea un nuovo registro di noleggio
-            const rental = db.saveRental(
-                user.id,
-                Number(productId),
-                Number(days),
-                parseFloat(price),
-                startDate || new Date().toISOString(),
-                endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
-            );
+            // Verifica che i dati del noleggio siano presenti
+            if (!days) {
+                return res.status(400).json({ success: false, error: 'Durata del noleggio mancante' });
+            }
             
-            return res.json({ 
-                success: true, 
-                message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}`,
-                orderId: rental.orderId
-            });
+            // Salva i dettagli del noleggio
+            try {
+                // Gestione delle date
+                const rentalStartDate = startDate || new Date().toISOString();
+                const rentalEndDate = endDate || new Date(Date.now() + (parseInt(days) * 24 * 60 * 60 * 1000)).toISOString();
+                
+                // Aggiungi l'ordine alla lista degli ordini amministrativi
+                db.adminOrders.push({
+                    ...orderData,
+                    type: 'rental',
+                    products: [{
+                        id: product.id,
+                        name: product.name || `${product.brand} ${product.category}`,
+                        brand: product.brand,
+                        category: product.category,
+                        price: parseFloat(price),
+                        duration: Number(days),
+                        startDate: rentalStartDate,
+                        endDate: rentalEndDate,
+                        image: product.image || null
+                    }],
+                    rentalDuration: Number(days),
+                    startDate: rentalStartDate,
+                    endDate: rentalEndDate,
+                    total: parseFloat(price)
+                });
+                
+                console.log("Noleggio salvato con ID:", orderId);
+                return res.json({ 
+                    success: true, 
+                    message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}`,
+                    orderId: orderId
+                });
+            } catch (err) {
+                console.error("Errore nel salvataggio del noleggio:", err);
+                return res.status(500).json({ success: false, error: 'Errore nel salvataggio del noleggio' });
+            }
         } else {
+            console.error("Azione non valida:", action);
             return res.status(400).json({ success: false, error: 'Azione non valida!' });
         }
     } catch (error) {
         console.error("Errore durante il completamento dell'ordine:", error);
-        return res.status(500).json({ success: false, error: 'Errore interno del server' });
+        return res.status(500).json({ success: false, error: 'Errore interno del server: ' + error.message });
     }
 });
-
 
 // Assicurati che questa route sia presente nel tuo server.js
 app.get('/my-orders', ensureAuthenticated, (req, res) => {
