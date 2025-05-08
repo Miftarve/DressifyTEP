@@ -1557,9 +1557,13 @@ app.get('/reset-products', ensureAuthenticated, ensureAdmin, (req, res) => {
     db.resetProducts();
     res.redirect('/prodotti');
 });
-hbs.registerHelper('eq', function (a, b) {
-    return a === b;
-});
+if (hbs && hbs.registerHelper) {
+    hbs.registerHelper('eq', function (a, b) {
+        return a === b;
+    });
+} else {
+    console.warn("ATTENZIONE: Impossibile registrare l'helper 'eq'. L'oggetto hbs non è disponibile o non ha il metodo registerHelper.");
+}
 /**
  * @swagger
  * /prodotti:
@@ -2330,26 +2334,16 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
         // Recupera i dati dell'utente
         const user = req.user;
         
-        // Recupera le informazioni dal database
-        const sales = getAllSales();
-        const rentals = getAllRentals();
-        
-        // Cerca l'ordine corrispondente tra vendite e noleggi
-        let orderData = sales.find(sale => sale.orderId === orderId);
-        let orderType = 'purchase';
+        // Recupera l'ordine dal database usando il nuovo metodo
+        const orderData = db.getOrderById(orderId);
         
         if (!orderData) {
-            // Se non è una vendita, cerca tra i noleggi
-            orderData = rentals.find(rental => rental.id === parseInt(orderId));
-            orderType = 'rental';
-            
-            // Se non è trovato neanche tra i noleggi
-            if (!orderData) {
-                // Se l'ordine non è presente nel database, crea un ordine fittizio con i dati dalla query string
-                // Questo è utile quando si proviene dalla pagina di successo
+            // Se l'ordine non è trovato nel database, prova a crearne uno fittizio con i dati dalla query string
+            if (req.query.items) {
+                // Crea un ordine fittizio con i dati dalla query string
                 const date = new Date();
                 
-                orderData = {
+                const fakeOrder = {
                     orderId: orderId,
                     date: date.toISOString().split('T')[0],
                     items: [],
@@ -2357,6 +2351,7 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
                     subtotal: 0,
                     shipping: 0,
                     status: 'completed',
+                    type: 'purchase',
                     shippingAddress: {
                         street: 'Via Roma 123',
                         city: 'Milano',
@@ -2370,11 +2365,11 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
                     }
                 };
                 
-                // Tenta di recuperare i dati dal localStorage (tramite query parameter)
-                const cartItems = req.query.items ? JSON.parse(decodeURIComponent(req.query.items)) : [];
+                // Tenta di recuperare i dati dalla query string
+                const cartItems = JSON.parse(decodeURIComponent(req.query.items));
                 
                 if (cartItems && cartItems.length > 0) {
-                    orderData.items = cartItems.map(item => {
+                    fakeOrder.items = cartItems.map(item => {
                         return {
                             ...item,
                             price: parseFloat(item.price),
@@ -2383,56 +2378,30 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
                     });
                     
                     // Calcola i totali
-                    orderData.subtotal = orderData.items.reduce((total, item) => {
+                    fakeOrder.subtotal = fakeOrder.items.reduce((total, item) => {
                         return total + (item.type === 'rental' 
                             ? parseFloat(item.price) * parseInt(item.duration)
                             : parseFloat(item.price));
                     }, 0);
                     
-                    orderData.shipping = 0;
-                    orderData.total = orderData.subtotal + orderData.shipping;
+                    fakeOrder.shipping = 0;
+                    fakeOrder.total = fakeOrder.subtotal + fakeOrder.shipping;
                 }
+                
+                // Renderizza la pagina con l'ordine fittizio
+                return res.render('order-details', { 
+                    order: formatOrderForView(fakeOrder),
+                    user: user
+                });
             }
+            
+            // Se non ci sono dati nella query string, mostra un errore
+            return res.status(404).render('error', { message: 'Ordine non trovato!' });
         }
         
-        // Formatta i dati dell'ordine per la visualizzazione
-        const order = {
-            orderId: orderData.orderId || orderData.id,
-            date: new Date(orderData.timestamp || Date.now()).toLocaleDateString('it-IT'),
-            items: orderData.items || [
-                {
-                    id: orderData.productId,
-                    category: orderData.product?.category || 'Abbigliamento',
-                    brand: orderData.product?.brand || 'Dressimify',
-                    size: orderData.product?.size || 'M',
-                    color: orderData.product?.color || 'N/D',
-                    type: orderType,
-                    price: orderData.price,
-                    duration: orderData.days,
-                    startDate: orderData.startDate ? new Date(orderData.startDate).toLocaleDateString('it-IT') : '',
-                    endDate: orderData.endDate ? new Date(orderData.endDate).toLocaleDateString('it-IT') : ''
-                }
-            ],
-            subtotal: orderData.subtotal || orderData.price || 0,
-            shipping: orderData.shipping || 0,
-            total: orderData.total || orderData.price || 0,
-            status: orderData.status || 'completed',
-            shippingAddress: orderData.shippingAddress || {
-                street: 'Via Roma 123',
-                city: 'Milano',
-                zip: '20100',
-                country: 'Italia'
-            },
-            paymentMethod: orderData.paymentMethod || {
-                type: 'Carta di Credito',
-                lastFour: '1234',
-                expiry: '12/25'
-            }
-        };
-        
-        // Renderizza la pagina di dettaglio ordine
+        // Renderizza la pagina con l'ordine trovato
         res.render('order-details', { 
-            order: order,
+            order: formatOrderForView(orderData),
             user: user
         });
         
@@ -2443,6 +2412,43 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
         });
     }
 });
+
+// Funzione helper per formattare i dati dell'ordine per la vista
+function formatOrderForView(orderData) {
+    return {
+        orderId: orderData.orderId,
+        date: orderData.timestamp ? new Date(orderData.timestamp).toLocaleDateString('it-IT') : new Date().toLocaleDateString('it-IT'),
+        items: orderData.items || [
+            {
+                id: orderData.productId,
+                category: orderData.product?.category || 'Abbigliamento',
+                brand: orderData.product?.brand || 'Dressimify',
+                size: orderData.product?.size || 'M',
+                color: orderData.product?.color || 'N/D',
+                type: orderData.type || 'purchase',
+                price: orderData.price,
+                duration: orderData.days,
+                startDate: orderData.startDate ? new Date(orderData.startDate).toLocaleDateString('it-IT') : '',
+                endDate: orderData.endDate ? new Date(orderData.endDate).toLocaleDateString('it-IT') : ''
+            }
+        ],
+        subtotal: orderData.subtotal || orderData.price || 0,
+        shipping: orderData.shipping || 0,
+        total: orderData.total || orderData.price || 0,
+        status: orderData.status || 'completed',
+        shippingAddress: orderData.shippingAddress || {
+            street: 'Via Roma 123',
+            city: 'Milano',
+            zip: '20100',
+            country: 'Italia'
+        },
+        paymentMethod: orderData.paymentMethod || {
+            type: 'Carta di Credito',
+            lastFour: '1234',
+            expiry: '12/25'
+        }
+    };
+}
 /**
  * @swagger
  * /completa:
@@ -2509,60 +2515,135 @@ app.get('/order/:id', ensureAuthenticated, (req, res) => {
  *         description: Prodotto non trovato
  */
 app.post('/completa', ensureAuthenticated, (req, res) => {
-    const { action, productId, days, price, startDate, endDate } = req.body;
-    const product = db.getProductById(Number(productId));
-    
-    if (!product) {
-        return res.status(404).json({ error: 'Prodotto non trovato!' });
-    }
-    
-    // Ottieni dati dell'utente attuale
-    const user = req.user;
-    
-    if (action === 'purchase') {
-        // Crea un nuovo registro di vendita
-        const sale = createSale({
-            productId: Number(productId),
-            product: product,
-            userId: user.id,
-            user: {
-                id: user.id,
-                nome: user.name || user.nome,
-                email: user.email
-            },
-            price: parseFloat(price)
-        });
+    try {
+        const { action, productId, days, price, startDate, endDate } = req.body;
+        const product = db.getProductById(Number(productId));
         
-        return res.json({ 
-            success: true, 
-            message: 'Acquisto completato con successo!', 
-            orderId: sale.orderId 
-        });
-    } else if (action === 'rental') {
-        // Crea un nuovo registro di noleggio
-        const rental = createRental({
-            productId: Number(productId),
-            product: product,
-            userId: user.id,
-            user: {
-                id: user.id,
-                nome: user.name || user.nome,
-                email: user.email
-            },
-            days: Number(days),
-            price: parseFloat(price),
-            startDate: startDate || new Date().toISOString(),
-            endDate: endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
-        });
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Prodotto non trovato!' });
+        }
         
-        return res.json({ 
-            success: true, 
-            message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}` 
-        });
-    } else {
-        return res.status(400).json({ error: 'Azione non valida!' });
+        // Ottieni dati dell'utente attuale
+        const user = req.user;
+        
+        if (action === 'purchase') {
+            // Crea un nuovo registro di vendita
+            const sale = db.saveSale(
+                user.id,
+                Number(productId),
+                parseFloat(price)
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: 'Acquisto completato con successo!', 
+                orderId: sale.orderId 
+            });
+        } else if (action === 'rental') {
+            // Crea un nuovo registro di noleggio
+            const rental = db.saveRental(
+                user.id,
+                Number(productId),
+                Number(days),
+                parseFloat(price),
+                startDate || new Date().toISOString(),
+                endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}`,
+                orderId: rental.orderId
+            });
+        } else {
+            return res.status(400).json({ success: false, error: 'Azione non valida!' });
+        }
+    } catch (error) {
+        console.error("Errore durante il completamento dell'ordine:", error);
+        return res.status(500).json({ success: false, error: 'Errore interno del server' });
     }
 });
+
+
+// Assicurati che questa route sia presente nel tuo server.js
+app.get('/my-orders', ensureAuthenticated, (req, res) => {
+    try {
+        const user = req.user;
+        
+        // Recupera vendite e noleggi dal database
+        const sales = db.getAllSales ? db.getAllSales().filter(sale => sale.userId === user.id) : [];
+        const rentals = db.getAllRentals ? db.getAllRentals().filter(rental => rental.userId === user.id) : [];
+        
+        console.log(`Trovati ${sales.length} acquisti e ${rentals.length} noleggi per l'utente ${user.id}`);
+        
+        // Formatta i dati per la visualizzazione
+        const purchaseOrders = sales.map(sale => {
+            return {
+                orderId: sale.orderId || sale.id,
+                date: new Date(sale.timestamp || Date.now()).toLocaleDateString('it-IT'),
+                status: sale.status || 'completed',
+                statusLabel: 'Completato', // O usa una funzione getStatusLabel
+                total: sale.price,
+                items: [
+                    {
+                        category: sale.product?.category || 'Abbigliamento',
+                        brand: sale.product?.brand || 'Dressimify',
+                        type: 'purchase'
+                    }
+                ]
+            };
+        });
+        
+        const rentalOrders = rentals.map(rental => {
+            return {
+                orderId: rental.orderId || rental.id,
+                date: new Date(rental.timestamp || Date.now()).toLocaleDateString('it-IT'),
+                status: rental.status || 'completed',
+                statusLabel: 'Completato', // O usa una funzione getStatusLabel
+                total: rental.price,
+                items: [
+                    {
+                        category: rental.product?.category || 'Abbigliamento',
+                        brand: rental.product?.brand || 'Dressimify',
+                        type: 'rental',
+                        startDate: rental.startDate ? new Date(rental.startDate).toLocaleDateString('it-IT') : '',
+                        endDate: rental.endDate ? new Date(rental.endDate).toLocaleDateString('it-IT') : ''
+                    }
+                ]
+            };
+        });
+        
+        // Combina gli ordini e ordina per data (più recenti prima)
+        const allOrders = [...purchaseOrders, ...rentalOrders].sort((a, b) => {
+            return new Date(b.date.split('/').reverse().join('-')) - 
+                   new Date(a.date.split('/').reverse().join('-'));
+        });
+        
+        // Renderizza la pagina con i dati
+        res.render('my-orders', {
+            user: user,
+            orders: allOrders
+        });
+    } catch (error) {
+        console.error("Errore nel recupero degli ordini:", error);
+        res.status(500).render('error', { message: 'Si è verificato un errore durante il recupero degli ordini.' });
+    }
+});
+
+// Funzione helper per tradurre lo stato dell'ordine
+function getStatusLabel(status) {
+    const statusMap = {
+        'completed': 'Completato',
+        'processing': 'In elaborazione',
+        'shipped': 'Spedito',
+        'cancelled': 'Annullato',
+        'approved': 'Approvato',
+        'pending': 'In attesa',
+        'rejected': 'Rifiutato'
+    };
+    
+    return statusMap[status] || 'Sconosciuto';
+}
 
 // ===== CHAT ROUTES =====
 

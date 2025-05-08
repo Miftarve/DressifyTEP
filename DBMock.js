@@ -34,7 +34,7 @@ class DBMock {
             { id: 19, category: 'Felpa con cappuccio', size: 'S', color: 'Nero', brand: 'Nike', condition: 'Nuovo', price: 60 },
             { id: 20, category: 'Scarpe da ginnastica', size: '39', color: 'Bianco', brand: 'Adidas', condition: 'Usato', price: 45 }
         ];
-    
+
         // Inizializza il contatore prodotti per i nuovi prodotti
         this.productCounter = this.products.length ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
 
@@ -42,8 +42,8 @@ class DBMock {
         this.conversations = {};
 
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
-        this.rentals = this.rentals || []; // Array per memorizzare i noleggi
-        this.purchases = this.purchases || [];
+        this.rentals = this.rentals || [];
+        this.sales = this.sales || [];
     }
 
     resetProducts() {
@@ -92,35 +92,35 @@ class DBMock {
     }
 
     // Aggiorna un prodotto esistente
-   // Sostituisci la funzione updateProduct nel tuo DBMock.js con questa:
-updateProduct(id, updatedData) {
-    // Log per debug
-    console.log("Aggiornamento prodotto - ID:", id);
-    console.log("Dati di aggiornamento ricevuti:", updatedData);
-    
-    const productIndex = this.products.findIndex(product => product.id === id);
-    
-    if (productIndex === -1) {
-        console.log("Prodotto non trovato con ID:", id);
-        return null; // Prodotto non trovato
+    // Sostituisci la funzione updateProduct nel tuo DBMock.js con questa:
+    updateProduct(id, updatedData) {
+        // Log per debug
+        console.log("Aggiornamento prodotto - ID:", id);
+        console.log("Dati di aggiornamento ricevuti:", updatedData);
+
+        const productIndex = this.products.findIndex(product => product.id === id);
+
+        if (productIndex === -1) {
+            console.log("Prodotto non trovato con ID:", id);
+            return null; // Prodotto non trovato
+        }
+
+        console.log("Prodotto prima dell'aggiornamento:", this.products[productIndex]);
+
+        // Per assicurarsi che tutti i campi necessari siano presenti e aggiornati
+        const updatedProduct = {
+            ...this.products[productIndex],  // Mantieni tutti i campi esistenti
+            ...updatedData,                  // Sovrascrivi con i nuovi dati
+            id: parseInt(id)                 // Assicurati che l'ID rimanga lo stesso e sia un numero
+        };
+
+        // Aggiorna il prodotto nell'array
+        this.products[productIndex] = updatedProduct;
+
+        console.log("Prodotto dopo l'aggiornamento:", this.products[productIndex]);
+
+        return this.products[productIndex];
     }
-    
-    console.log("Prodotto prima dell'aggiornamento:", this.products[productIndex]);
-    
-    // Per assicurarsi che tutti i campi necessari siano presenti e aggiornati
-    const updatedProduct = {
-        ...this.products[productIndex],  // Mantieni tutti i campi esistenti
-        ...updatedData,                  // Sovrascrivi con i nuovi dati
-        id: parseInt(id)                 // Assicurati che l'ID rimanga lo stesso e sia un numero
-    };
-    
-    // Aggiorna il prodotto nell'array
-    this.products[productIndex] = updatedProduct;
-    
-    console.log("Prodotto dopo l'aggiornamento:", this.products[productIndex]);
-    
-    return this.products[productIndex];
-}
 
     // Elimina un prodotto
     deleteProduct(id) {
@@ -170,24 +170,24 @@ updateProduct(id, updatedData) {
         if (userIndex === -1) {
             return null; // Utente non trovato
         }
-        
+
         // Log per debug
         console.log("Aggiornamento utente ID:", id);
         console.log("Dati inviati per l'aggiornamento:", updates);
         console.log("Utente prima dell'aggiornamento:", this.users[userIndex]);
-        
+
         // Aggiorna tutti i campi forniti
         const updatedUser = {
             ...this.users[userIndex], // Mantieni tutti i campi esistenti
             ...updates,               // Sovrascrivi con i nuovi dati
             id: id                    // Assicurati che l'ID rimanga lo stesso
         };
-        
+
         // Sostituisci l'utente nell'array
         this.users[userIndex] = updatedUser;
-        
+
         console.log("Utente dopo l'aggiornamento:", this.users[userIndex]);
-        
+
         return this.users[userIndex];
     }
 
@@ -241,42 +241,42 @@ updateProduct(id, updatedData) {
     }
 
     // Metodo per salvare un noleggio
-saveRental(userId, productId, days, price, startDate, endDate) {
-    const rental = {
-      id: this.rentals.length + 1,
-      userId,
-      productId,
-      days,
-      price,
-      startDate,
-      endDate,
-      timestamp: new Date().toISOString()
-    };
-    this.rentals.push(rental);
-    return rental;
-  }
-  
-  // Metodo per salvare un acquisto
-  savePurchase(userId, productId, price) {
-    const purchase = {
-      id: this.purchases.length + 1,
-      userId,
-      productId,
-      price,
-      timestamp: new Date().toISOString()
-    };
-    this.purchases.push(purchase);
-    return purchase;
-  }
-  
-  // Metodi per recuperare i dati
-  getAllRentals() {
-    return this.rentals;
-  }
-  
-  getAllPurchases() {
-    return this.purchases;
-  }
+    saveRental(userId, productId, days, price, startDate, endDate) {
+        const rental = {
+            id: this.rentals.length + 1,
+            userId,
+            productId,
+            days,
+            price,
+            startDate,
+            endDate,
+            timestamp: new Date().toISOString()
+        };
+        this.rentals.push(rental);
+        return rental;
+    }
+
+    // Metodo per salvare un acquisto
+    savePurchase(userId, productId, price) {
+        const purchase = {
+            id: this.purchases.length + 1,
+            userId,
+            productId,
+            price,
+            timestamp: new Date().toISOString()
+        };
+        this.purchases.push(purchase);
+        return purchase;
+    }
+
+    // Metodi per recuperare i dati
+    getAllRentals() {
+        return this.rentals;
+    }
+
+    getAllPurchases() {
+        return this.purchases;
+    }
     // Aggiorna il metodo saveMessage nel file DBMock.js per gestire correttamente i tipi di ID
 
     // Aggiorna il metodo saveMessage nel file DBMock.js per gestire Promise in modo appropriato
@@ -331,6 +331,87 @@ saveRental(userId, productId, days, price, startDate, endDate) {
                 }
             );
         });
+    }
+    // Metodo per salvare un noleggio
+    saveRental(userId, productId, days, price, startDate, endDate) {
+        const rentalId = this.rentals.length + 1;
+        const timestamp = new Date().toISOString();
+        const orderId = `R${Date.now()}`; // Crea un ID univoco per l'ordine
+
+        const product = this.getProductById(Number(productId));
+
+        const rental = {
+            id: rentalId,
+            orderId: orderId,
+            userId: userId,
+            productId: productId,
+            product: product, // Include i dettagli del prodotto
+            days: days,
+            price: price,
+            startDate: startDate,
+            endDate: endDate,
+            timestamp: timestamp,
+            status: 'completed'
+        };
+
+        this.rentals.push(rental);
+        console.log(`Noleggio salvato: ID=${rentalId}, OrderID=${orderId}`);
+        return rental;
+    }
+
+    // Metodo per salvare un acquisto (rinomina da savePurchase a saveSale)
+    saveSale(userId, productId, price) {
+        const saleId = this.sales.length + 1;
+        const timestamp = new Date().toISOString();
+        const orderId = `S${Date.now()}`; // Crea un ID univoco per l'ordine
+
+        const product = this.getProductById(Number(productId));
+
+        const sale = {
+            id: saleId,
+            orderId: orderId,
+            userId: userId,
+            productId: productId,
+            product: product, // Include i dettagli del prodotto
+            price: price,
+            timestamp: timestamp,
+            status: 'completed'
+        };
+
+        this.sales.push(sale);
+        console.log(`Vendita salvata: ID=${saleId}, OrderID=${orderId}`);
+        return sale;
+    }
+    // Metodi per recuperare i dati
+    getAllRentals() {
+        return this.rentals;
+    }
+
+    getAllSales() {
+        return this.sales;
+    }
+
+    // Nuovi metodi per recuperare gli ordini di un utente specifico
+    getUserRentals(userId) {
+        return this.rentals.filter(rental => rental.userId === userId);
+    }
+
+    getUserSales(userId) {
+        return this.sales.filter(sale => sale.userId === userId);
+    }
+
+    // Metodo per recuperare un ordine specifico
+    getOrderById(orderId) {
+        // Cerca prima tra le vendite
+        const sale = this.sales.find(sale => sale.orderId === orderId);
+        if (sale) return { ...sale, type: 'purchase' };
+
+        // Se non trovato, cerca tra i noleggi
+        const rental = this.rentals.find(rental => rental.orderId === orderId);
+        if (rental) return { ...rental, type: 'rental' };
+
+        // Se non trovato, restituisci null
+        return null;
     }
 }
 
