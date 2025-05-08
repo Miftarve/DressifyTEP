@@ -466,6 +466,9 @@
             </div>
 
             <form id="checkout-form" class="checkout-form">
+                <!-- Campo nascosto per i dati del carrello -->
+                <input type="hidden" id="cart-data" name="cart-data" value="">
+                
                 <div class="form-section">
                     <h2 class="form-section-title"><i class="fas fa-credit-card"></i> Informazioni Pagamento</h2>
 
@@ -527,12 +530,16 @@
             const checkoutItemsContainer = document.getElementById('checkout-items');
             const checkoutTotalElement = document.getElementById('checkout-total');
             const submitButton = document.getElementById('checkout-submit');
+            const cartDataInput = document.getElementById('cart-data');
 
             // Se il carrello è vuoto, reindirizza alla pagina dei prodotti
             if (cart.length === 0) {
                 window.location.href = '/noleggio';
                 return;
             }
+
+            // Salva i dati del carrello nel campo nascosto
+            cartDataInput.value = JSON.stringify(cart);
 
             // Calcola il totale
             let total = 0;
@@ -574,8 +581,47 @@
             // Aggiorna il totale
             checkoutTotalElement.textContent = total.toFixed(2) + '€';
 
-            // Gestisce l'invio del form
-            // Nel file checkout.hbs, cerca lo script che gestisce l'invio del form
+            // Gestione della validazione dei campi
+            // Validazione numero carta
+            document.getElementById('card-number').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 16) value = value.slice(0, 16);
+
+                // Formatta con spazi ogni 4 cifre
+                const parts = [];
+                for (let i = 0; i < value.length; i += 4) {
+                    parts.push(value.slice(i, i + 4));
+                }
+                e.target.value = parts.join(' ');
+            });
+
+            // Validazione data scadenza
+            document.getElementById('card-expiry').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 4) value = value.slice(0, 4);
+
+                if (value.length > 2) {
+                    e.target.value = value.slice(0, 2) + '/' + value.slice(2);
+                } else {
+                    e.target.value = value;
+                }
+            });
+
+            // Validazione CVC
+            document.getElementById('card-cvc').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 3) value = value.slice(0, 3);
+                e.target.value = value;
+            });
+
+            // Validazione CAP
+            document.getElementById('zip').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 5) value = value.slice(0, 5);
+                e.target.value = value;
+            });
+
+            // Gestione dell'invio del form
             document.getElementById('checkout-form').addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -583,11 +629,6 @@
                 submitButton.disabled = true;
                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Elaborazione...';
 
-                // Recupera il carrello dal localStorage
-                const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
- document.getElementById('cart-data').value = localStorage.getItem('cart');
-    
                 // Per ogni articolo nel carrello, crea una transazione nel server
                 const promises = cart.map(item => {
                     if (item.type === 'rental') {
@@ -624,9 +665,12 @@
 
                 // Processo tutte le transazioni
                 Promise.all(promises)
-                    .then(responses => {
+                    .then(responses => Promise.all(responses.map(r => r.json())))
+                    .then(results => {
+                        console.log('Risultati delle transazioni:', results);
+                        
                         // Verifica se tutte le richieste sono andate a buon fine
-                        const allSuccessful = responses.every(response => response.ok);
+                        const allSuccessful = results.every(result => result.success);
 
                         if (allSuccessful) {
                             console.log('Tutte le transazioni completate con successo');
@@ -649,108 +693,7 @@
                         submitButton.innerHTML = '<i class="fas fa-lock"></i> Completa Ordine';
                     });
             });
-            e.preventDefault();
-
-            // Disabilita il pulsante per evitare invii multipli
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Elaborazione...';
-
-            // Per ogni articolo nel carrello, crea una transazione nel server
-            const promises = cart.map(item => {
-                if (item.type === 'rental') {
-                    // Formato per noleggio
-                    return fetch('/completa', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            action: 'rental',
-                            productId: item.id,
-                            days: item.duration,
-                            price: (parseFloat(item.price) * parseInt(item.duration)).toFixed(2),
-                            startDate: item.startDate,
-                            endDate: item.endDate
-                        })
-                    });
-                } else {
-                    // Formato per acquisto
-                    return fetch('/completa', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            action: 'purchase',
-                            productId: item.id,
-                            price: item.price
-                        })
-                    });
-                }
-            });
-
-            // Elabora tutte le transazioni
-            Promise.all(promises)
-                .then(responses => {
-                    // Verifica se tutte le richieste sono andate a buon fine
-                    const allSuccessful = responses.every(response => response.ok);
-
-                    if (allSuccessful) {
-                        // Cancella il carrello
-                        localStorage.removeItem('cart');
-
-                        // Reindirizza alla pagina di successo
-                        window.location.href = '/success?orderId=' + Date.now();
-                    } else {
-                        throw new Error('Errore durante l\'elaborazione dell\'ordine');
-                    }
-                })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    alert('Si è verificato un errore durante l\'elaborazione dell\'ordine. Riprova.');
-
-                    // Riattiva il pulsante
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-lock"></i> Completa Ordine';
-                });
         });
-
-        // Aggiunge validazione di base ai campi della carta
-        document.getElementById('card-number').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 16) value = value.slice(0, 16);
-
-            // Formatta con spazi ogni 4 cifre
-            const parts = [];
-            for (let i = 0; i < value.length; i += 4) {
-                parts.push(value.slice(i, i + 4));
-            }
-            e.target.value = parts.join(' ');
-        });
-
-        document.getElementById('card-expiry').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 4) value = value.slice(0, 4);
-
-            if (value.length > 2) {
-                e.target.value = value.slice(0, 2) + '/' + value.slice(2);
-            } else {
-                e.target.value = value;
-            }
-        });
-
-        document.getElementById('card-cvc').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 3) value = value.slice(0, 3);
-            e.target.value = value;
-        });
-
-        document.getElementById('zip').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 5) value = value.slice(0, 5);
-            e.target.value = value;
-        });
-    });
     </script>
 </body>
 

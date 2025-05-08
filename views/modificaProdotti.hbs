@@ -903,7 +903,6 @@
         }
     </style>
 </head>
-
 <body>
     <!-- Header -->
     <header class="header">
@@ -916,7 +915,7 @@
         
         <div class="header-actions">
             <nav class="header-nav">
-                <a href="/dashboard" class="header-nav-item">
+                <a href="/home" class="header-nav-item">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
                 <a href="/prodotti" class="header-nav-item active">
@@ -929,7 +928,7 @@
             
             <div class="header-info">
                 <i class="far fa-calendar-alt"></i>
-                <span>02/05/2025 14:02</span>
+                <span id="currentDateTime">02/05/2025 14:02</span>
             </div>
             
             <div class="header-user">
@@ -942,7 +941,7 @@
     <!-- Breadcrumb -->
     <div class="breadcrumb">
         <div class="breadcrumb-item">
-            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="/home"><i class="fas fa-home"></i> Dashboard</a>
         </div>
         <div class="breadcrumb-item">
             <a href="/prodotti"><i class="fas fa-tshirt"></i> Prodotti</a>
@@ -986,35 +985,31 @@
                     </div>
                     
                     <div class="product-info">
-                        <div class="product-status nuovo">
-                            <i class="fas fa-circle"></i> Nuovo
+                        <div class="product-status {{product.condition}}">
+                            <i class="fas fa-circle"></i> {{#if (eq product.condition "nuovo")}}Nuovo{{else}}Usato{{/if}}
                         </div>
-                        <h3 class="product-name">Giacca Elegante</h3>
+                        <h3 class="product-name">{{product.category}}</h3>
                         <div class="product-category">
-                            <i class="fas fa-tag"></i> Categoria: Giacche
+                            <i class="fas fa-tag"></i> Categoria: {{product.category}}
                         </div>
                         <div class="product-price">
-                            €49.99 <span class="price-period">al giorno</span>
+                            €{{product.price}} <span class="price-period">al giorno</span>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Edit Form -->
                 <form action="/modificaProdotto/{{product.id}}" method="POST" id="edit-product-form">
+                    <!-- Campo nascosto per ID prodotto -->
+                    <input type="hidden" name="id" value="{{product.id}}">
+                    
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="name">Nome Prodotto *</label>
-                            <div class="input-group">
-                                <i class="fas fa-tag input-icon"></i>
-                                <input type="text" id="name" name="name" class="form-input input-with-icon" value="Giacca Elegante" placeholder="Inserisci il nome del prodotto" required>
-                            </div>
-                        </div>
-                        
                         <div class="form-group">
                             <label class="form-label" for="category">Categoria *</label>
                             <div class="input-group">
                                 <i class="fas fa-folder input-icon"></i>
-                                <input type="text" id="category" name="category" class="form-input input-with-icon" value="Giacche" placeholder="Es: Abbigliamento, Calzature..." required>
+                                <input type="text" id="category" name="category" class="form-input input-with-icon" 
+                                       value="{{product.category}}" placeholder="Es: Abbigliamento, Calzature..." required>
                             </div>
                         </div>
                         
@@ -1022,7 +1017,8 @@
                             <label class="form-label" for="brand">Marca *</label>
                             <div class="input-group">
                                 <i class="fas fa-copyright input-icon"></i>
-                                <input type="text" id="brand" name="brand" class="form-input input-with-icon" value="Armani" placeholder="Es: Nike, Adidas, Zara..." required>
+                                <input type="text" id="brand" name="brand" class="form-input input-with-icon" 
+                                       value="{{product.brand}}" placeholder="Es: Nike, Adidas, Zara..." required>
                             </div>
                         </div>
                         
@@ -1030,7 +1026,8 @@
                             <label class="form-label" for="size">Taglia *</label>
                             <div class="input-group">
                                 <i class="fas fa-ruler input-icon"></i>
-                                <input type="text" id="size" name="size" class="form-input input-with-icon" value="M" placeholder="Es: S, M, L, 42, 44..." required>
+                                <input type="text" id="size" name="size" class="form-input input-with-icon" 
+                                       value="{{product.size}}" placeholder="Es: S, M, L, 42, 44..." required>
                             </div>
                         </div>
                         
@@ -1038,11 +1035,12 @@
                             <label class="form-label" for="color">Colore *</label>
                             <div class="input-group">
                                 <i class="fas fa-palette input-icon"></i>
-                                <input type="text" id="color" name="color" class="form-input input-with-icon" value="Nero" placeholder="Es: Nero, Blu, Rosso..." required>
+                                <input type="text" id="color" name="color" class="form-input input-with-icon" 
+                                       value="{{product.color}}" placeholder="Es: Nero, Blu, Rosso..." required>
                             </div>
                             
                             <div class="color-samples">
-                                <div class="color-sample selected" style="background-color: #000000;" data-color="Nero" title="Nero"></div>
+                                <div class="color-sample" style="background-color: #000000;" data-color="Nero" title="Nero"></div>
                                 <div class="color-sample" style="background-color: #FFFFFF;" data-color="Bianco" title="Bianco"></div>
                                 <div class="color-sample" style="background-color: #0000FF;" data-color="Blu" title="Blu"></div>
                                 <div class="color-sample" style="background-color: #FF0000;" data-color="Rosso" title="Rosso"></div>
@@ -1056,8 +1054,8 @@
                         <div class="form-group">
                             <label class="form-label" for="condition">Condizione *</label>
                             <select id="condition" name="condition" class="form-select" required>
-                                <option value="nuovo" selected>Nuovo</option>
-                                <option value="usato">Usato</option>
+                                <option value="nuovo" {{#if (eq product.condition "nuovo")}}selected{{/if}}>Nuovo</option>
+                                <option value="usato" {{#if (eq product.condition "usato")}}selected{{/if}}>Usato</option>
                             </select>
                         </div>
                         
@@ -1065,22 +1063,18 @@
                             <label class="form-label" for="price">Prezzo di Noleggio (€) *</label>
                             <div class="input-group price-input">
                                 <span class="price-currency">€</span>
-                                <input type="number" id="price" name="price" class="form-input" min="0.01" step="0.01" value="49.99" placeholder="Inserisci il prezzo" required>
+                                <input type="number" id="price" name="price" class="form-input" 
+                                       min="0.01" step="0.01" value="{{product.price}}" placeholder="Inserisci il prezzo" required>
                             </div>
                             <div class="form-hint">Prezzo giornaliero di noleggio</div>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label" for="description">Descrizione</label>
-                            <textarea id="description" name="description" class="form-input" rows="4" placeholder="Inserisci una descrizione dettagliata del prodotto">Giacca elegante adatta per occasioni formali. Disponibile nel colore nero, taglia M. Prodotta da Armani con materiali di alta qualità.</textarea>
                         </div>
                     </div>
                     
                     <div class="button-group">
-                        <button type="button" class="btn btn-outline" onClick="history.back()">
+                        <button type="button" class="btn btn-outline" onClick="location.href='/prodotti'">
                             <i class="fas fa-times"></i> Annulla
                         </button>
-                        <button type="button" class="btn btn-danger" id="delete-product-btn">
+                        <button type="button" class="btn btn-danger" id="delete-product-btn" onclick="eliminaProdotto({{product.id}})">
                             <i class="fas fa-trash"></i> Elimina
                         </button>
                         <button type="submit" class="btn btn-success">
@@ -1120,22 +1114,30 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Current time and user
-            const currentDateDisplay = document.querySelector('.header-info span');
-            currentDateDisplay.textContent = '02/05/2025 14:02';
+            // Aggiorna la data e l'ora corrente
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('it-IT') + ' - ' + 
+                                 now.getHours().toString().padStart(2, '0') + ':' + 
+                                 now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentDateTime').textContent = formattedDate;
             
             // Color selector
             const colorSamples = document.querySelectorAll('.color-sample');
             const colorInput = document.getElementById('color');
             
+            // Seleziona il colore corrente
+            const currentColor = colorInput.value;
             colorSamples.forEach(sample => {
+                if(sample.getAttribute('data-color').toLowerCase() === currentColor.toLowerCase()) {
+                    sample.classList.add('selected');
+                }
+                
                 sample.addEventListener('click', function() {
                     colorSamples.forEach(s => s.classList.remove('selected'));
                     this.classList.add('selected');
                     colorInput.value = this.getAttribute('data-color');
                     
                     // Update product preview
-                    document.querySelector('.product-name').textContent = document.getElementById('name').value || 'Prodotto';
                     document.querySelector('.product-category').innerHTML = `<i class="fas fa-tag"></i> Categoria: ${document.getElementById('category').value || 'N/D'}`;
                     document.querySelector('.product-price').innerHTML = `€${document.getElementById('price').value || '0.00'} <span class="price-period">al giorno</span>`;
                     
@@ -1147,59 +1149,21 @@
                 });
             });
             
-            // Form submission (demo)
-            const editProductForm = document.getElementById('edit-product-form');
-            const toast = document.getElementById('toast');
-            
-            editProductForm.addEventListener('submit', function(e) {
-                e.preventDefault(); // Demo only - Remove in production
-                
-                // Show success toast
-                toast.classList.add('show');
-                
-                // Hide toast after 4 seconds
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 4000);
-            });
-            
             // Close toast
             document.querySelector('.toast-close').addEventListener('click', function() {
-                toast.classList.remove('show');
-            });
-            
-            // Delete button
-            document.getElementById('delete-product-btn').addEventListener('click', function() {
-                if (confirm('Sei sicuro di voler eliminare questo prodotto? L\'operazione non può essere annullata.')) {
-                    // Demo only - Replace with actual delete action
-                    toast.querySelector('.toast-icon').className = 'toast-icon error';
-                    toast.querySelector('.toast-icon i').className = 'fas fa-trash';
-                    toast.querySelector('.toast-title').textContent = 'Prodotto Eliminato';
-                    toast.querySelector('.toast-message').textContent = 'Il prodotto è stato eliminato dal catalogo.';
-                    toast.classList.add('show');
-                    
-                    setTimeout(() => {
-                        // Redirect after deletion (demo)
-                        // window.location.href = '/prodotti';
-                    }, 2000);
-                }
+                document.getElementById('toast').classList.remove('show');
             });
             
             // Real-time product preview update
-            const nameInput = document.getElementById('name');
             const categoryInput = document.getElementById('category');
             const priceInput = document.getElementById('price');
             const conditionSelect = document.getElementById('condition');
             
-            [nameInput, categoryInput, priceInput, conditionSelect].forEach(input => {
+            [categoryInput, priceInput, conditionSelect].forEach(input => {
                 input.addEventListener('input', function() {
-                    // Update product name
-                    if (this.id === 'name') {
-                        document.querySelector('.product-name').textContent = this.value || 'Prodotto';
-                    }
-                    
-                    // Update category
+                    // Update name and category
                     if (this.id === 'category') {
+                        document.querySelector('.product-name').textContent = this.value || 'Prodotto';
                         document.querySelector('.product-category').innerHTML = `<i class="fas fa-tag"></i> Categoria: ${this.value || 'N/D'}`;
                     }
                     
@@ -1217,7 +1181,13 @@
                 });
             });
         });
+        
+        // Funzione per eliminare prodotto
+        function eliminaProdotto(id) {
+            if (confirm('Sei sicuro di voler eliminare questo prodotto? L\'operazione non può essere annullata.')) {
+                window.location.href = '/eliminaProdotto/' + id;
+            }
+        }
     </script>
 </body>
-
 </html>

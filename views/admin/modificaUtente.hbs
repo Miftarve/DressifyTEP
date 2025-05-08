@@ -700,11 +700,11 @@
     <div class="header-actions">
       <div class="header-info">
         <i class="far fa-calendar-alt"></i>
-        <span>02/05/2025 - 13:58</span>
+        <span id="currentDateTime">02/05/2025 - 13:58</span>
       </div>
       <div class="header-user">
-        <div class="user-avatar">M</div>
-        <span>Miftarve</span>
+        <div class="user-avatar">{{firstLetter user.nome}}</div>
+        <span>{{user.nome}}</span>
       </div>
     </div>
   </header>
@@ -712,10 +712,10 @@
   <!-- Breadcrumb -->
   <div class="breadcrumb">
     <div class="breadcrumb-item">
-      <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="/home"><i class="fas fa-home"></i> Dashboard</a>
     </div>
     <div class="breadcrumb-item">
-      <a href="/utenti">Gestione Utenti</a>
+      <a href="/home">Gestione Utenti</a>
     </div>
     <div class="breadcrumb-item">
       <i class="fas fa-user-edit"></i> Modifica Utente
@@ -765,7 +765,7 @@
               <label class="form-label" for="nome">Nome *</label>
               <div class="input-group">
                 <i class="fas fa-user input-icon"></i>
-                <input type="text" id="nome" name="nome" value="Mario" placeholder="Inserisci il nome" class="form-input input-with-icon" required>
+                <input type="text" id="nome" name="nome" value="{{user.nome}}" placeholder="Inserisci il nome" class="form-input input-with-icon" required>
               </div>
             </div>
             
@@ -773,7 +773,7 @@
               <label class="form-label" for="cognome">Cognome *</label>
               <div class="input-group">
                 <i class="fas fa-user input-icon"></i>
-                <input type="text" id="cognome" name="cognome" value="Rossi" placeholder="Inserisci il cognome" class="form-input input-with-icon" required>
+                <input type="text" id="cognome" name="cognome" value="{{user.cognome}}" placeholder="Inserisci il cognome" class="form-input input-with-icon" required>
               </div>
             </div>
             
@@ -781,7 +781,7 @@
               <label class="form-label" for="dataNascita">Data di Nascita *</label>
               <div class="input-group">
                 <i class="fas fa-calendar input-icon"></i>
-                <input type="date" id="dataNascita" name="dataNascita" value="1990-05-15" class="form-input input-with-icon" required>
+                <input type="date" id="dataNascita" name="dataNascita" value="{{user.dataNascita}}" class="form-input input-with-icon" required>
               </div>
             </div>
             
@@ -789,7 +789,7 @@
               <label class="form-label" for="luogoNascita">Luogo di Nascita *</label>
               <div class="input-group">
                 <i class="fas fa-map-marker-alt input-icon"></i>
-                <input type="text" id="luogoNascita" name="luogoNascita" value="Milano" placeholder="Inserisci il luogo di nascita" class="form-input input-with-icon" required>
+                <input type="text" id="luogoNascita" name="luogoNascita" value="{{user.luogoNascita}}" placeholder="Inserisci il luogo di nascita" class="form-input input-with-icon" required>
               </div>
             </div>
             
@@ -797,7 +797,7 @@
               <label class="form-label" for="email">Email *</label>
               <div class="input-group">
                 <i class="fas fa-envelope input-icon"></i>
-                <input type="email" id="email" name="email" value="mario.rossi@example.com" placeholder="Inserisci l'email" class="form-input input-with-icon" required>
+                <input type="email" id="email" name="email" value="{{user.email}}" placeholder="Inserisci l'email" class="form-input input-with-icon" required>
               </div>
               <div class="form-hint">L'email verrà utilizzata per l'accesso al sistema e le comunicazioni</div>
             </div>
@@ -805,26 +805,25 @@
             <div class="form-group">
               <label class="form-label" for="ruolo">Ruolo *</label>
               <select id="ruolo" name="ruolo" class="form-select" required>
-                <option value="admin">Amministratore</option>
-                <option value="user" selected>Utente</option>
+                <option value="admin" {{#if (eq user.ruolo "admin")}}selected{{/if}}>Amministratore</option>
+                <option value="user" {{#if (eq user.ruolo "user")}}selected{{/if}}>Utente</option>
               </select>
             </div>
             
             <div class="form-group">
-              <label class="form-label" for="stato">Stato Account</label>
-              <select id="stato" name="stato" class="form-select">
-                <option value="active" selected>Attivo</option>
-                <option value="suspended">Sospeso</option>
-                <option value="inactive">Inattivo</option>
-              </select>
+              <label class="form-label" for="username">Username *</label>
+              <div class="input-group">
+                <i class="fas fa-user-tag input-icon"></i>
+                <input type="text" id="username" name="username" value="{{user.username}}" placeholder="Inserisci username" class="form-input input-with-icon" required>
+              </div>
             </div>
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="cambiaPassword">Modifica Password</label>
+            <label class="form-label" for="password">Password</label>
             <div class="input-group">
               <i class="fas fa-lock input-icon"></i>
-              <input type="password" id="cambiaPassword" name="cambiaPassword" placeholder="Lascia vuoto per mantenere la password attuale" class="form-input input-with-icon">
+              <input type="password" id="password" name="password" placeholder="Lascia vuoto per mantenere la password attuale" class="form-input input-with-icon">
             </div>
             <div class="form-hint">Per sicurezza, crea una password di almeno 8 caratteri con lettere, numeri e simboli</div>
           </div>
@@ -833,7 +832,7 @@
             <button type="button" class="btn btn-outline" onclick="location.href='/home'">
               <i class="fas fa-times"></i> Annulla
             </button>
-            <button type="button" class="btn btn-danger" id="delete-user-btn">
+            <button type="button" class="btn btn-danger" id="delete-user-btn" onclick="eliminaUtente({{user.id}})">
               <i class="fas fa-trash"></i> Elimina Utente
             </button>
             <button type="submit" class="btn btn-primary">
@@ -873,6 +872,13 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Aggiorna la data e l'ora corrente
+      const now = new Date();
+      const formattedDate = now.toLocaleDateString('it-IT') + ' - ' + 
+                            now.getHours().toString().padStart(2, '0') + ':' + 
+                            now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentDateTime').textContent = formattedDate;
+      
       // Gestione upload avatar
       const avatarInput = document.getElementById('avatar-input');
       const avatarPreview = document.querySelector('.avatar-preview');
@@ -895,46 +901,21 @@
         }
       });
       
-      // Gestione form submit
-      const editUserForm = document.getElementById('edit-user-form');
-      const successToast = document.getElementById('success-toast');
-      
-      editUserForm.addEventListener('submit', function(e) {
-        // Solo per demo - in produzione rimuovere questa parte
-        e.preventDefault();
-        
-        // Simula salvataggio
-        setTimeout(() => {
-          successToast.classList.add('show');
-          
-          setTimeout(() => {
-            successToast.classList.remove('show');
-          }, 5000);
-        }, 1000);
-      });
-      
       // Chiusura toast
       const toastClose = document.querySelector('.toast-close');
-      
-      toastClose.addEventListener('click', function() {
-        successToast.classList.remove('show');
-      });
-      
-      // Eliminazione utente
-      const deleteUserBtn = document.getElementById('delete-user-btn');
-      
-      deleteUserBtn.addEventListener('click', function() {
-        if (confirm('Sei sicuro di voler eliminare questo utente? Questa azione non può essere annullata.')) {
-          // Qui andrebbe il codice per l'eliminazione effettiva
-          alert('Utente eliminato con successo');
-          window.location.href = '/utenti';
-        }
-      });
-      
-      // Aggiorna data e ora nell'header
-      const dateTimeDisplay = document.querySelector('.header-info span');
-      dateTimeDisplay.textContent = '02/05/2025 - 13:58';
+      if (toastClose) {
+        toastClose.addEventListener('click', function() {
+          document.getElementById('success-toast').classList.remove('show');
+        });
+      }
     });
+    
+    // Funzione per eliminare utente
+    function eliminaUtente(id) {
+      if (confirm('Sei sicuro di voler eliminare questo utente? Questa azione non può essere annullata.')) {
+        window.location.href = '/eliminaUtente/' + id;
+      }
+    }
   </script>
 </body>
 </html>

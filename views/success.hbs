@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordine Completato - Dressimify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Reset e stili base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header e Navbar */
+        #header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #4a90e2;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #4a90e2;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #4a90e2;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main container */
+        main {
+            flex: 1;
+            padding: 50px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Success card */
+        .success-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            transform: translateY(0);
+            transition: transform 0.5s, box-shadow 0.5s;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .success-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 50%;
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform: scale(0);
+        }
+
+        @keyframes scaleIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .success-text {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .order-id {
+            font-weight: 700;
+            color: #4a90e2;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-outline {
+            border: 2px solid #ddd;
+            color: #555;
+            background-color: transparent;
+        }
+
+        .btn-outline:hover {
+            border-color: #4a90e2;
+            color: #4a90e2;
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff;
+            padding: 20px 5%;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #4a90e2;
+        }
+
+        /* Confetti animation */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            top: -10px;
+            will-change: transform;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .nav-links {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .success-card {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+
+            .success-title {
+                font-size: 1.8rem;
+            }
+
+            .success-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 4rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="header">
+        <nav class="navbar">
+            <a href="/" class="logo">
+                <i class="fas fa-tshirt"></i>
+                <span>Dressimify</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/noleggio"><i class="fas fa-shopping-bag"></i> Prodotti</a></li>
+                <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1 class="success-title">Ordine Completato!</h1>
+            <p class="success-text">Grazie per il tuo ordine. La tua transazione è stata elaborata con successo.</p>
+
+            <div class="order-details">
+                <div class="order-id" id="order-id">Ordine #{{orderId}}</div>
+                <div class="order-date" id="order-date">Data: <span id="current-date"></span></div>
+            </div>
+
+            <p>Riceverai presto un'email di conferma con i dettagli del tuo ordine.</p>
+
+            <!-- Aggiungi questo pulsante nella sezione "action-buttons" del file success.hbs -->
+            <div class="action-buttons">
+                <a href="/order/{{orderId}}" class="btn btn-primary">
+                    <i class="fas fa-receipt"></i> Visualizza Dettagli Ordine
+                </a>
+                <a href="/noleggio" class="btn btn-outline">
+                    <i class="fas fa-tshirt"></i> Continua lo Shopping
+                </a>
+                <a href="/home" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Torna alla Home
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-tshirt"></i> Dressimify &copy; 2025
+            </div>
+            <div class="footer-links">
+                <a href="/termini">Termini e Condizioni</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/contatti">Contatti</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Imposta la data attuale
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+
+            // Ottieni l'ID dell'ordine dall'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId') || Math.floor(Math.random() * 1000000);
+            if (document.getElementById('order-id')) {
+                document.getElementById('order-id').textContent = 'Ordine #' + orderId;
+            }
+
+            // Crea confetti per celebrare
+            createConfetti();
+        });
+
+        // Funzione per creare l'effetto confetti
+        function createConfetti() {
+            const confettiContainer = document.getElementById('confetti-container');
+            const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590', '#4a90e2', '#9b5de5'];
+            const confettiCount = 100;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Math.random() * 10 + 5;
+                const shape = Math.random() > 0.5 ? '50%' : '0';
+
+                confetti.style.backgroundColor = color;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.borderRadius = shape;
+                confetti.style.opacity = Math.random() + 0.2;
+
+                confettiContainer.appendChild(confetti);
+
+                // Animazione
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 2;
+
+                confetti.animate([
+                    { transform: 'translateY(0) rotate(0) scale(1)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg) scale(0)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    delay: delay * 1000,
+                    easing: 'cubic-bezier(.215,.61,.355,1)',
+                    fill: 'forwards'
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

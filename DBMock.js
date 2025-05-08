@@ -34,17 +34,28 @@ class DBMock {
             { id: 19, category: 'Felpa con cappuccio', size: 'S', color: 'Nero', brand: 'Nike', condition: 'Nuovo', price: 60 },
             { id: 20, category: 'Scarpe da ginnastica', size: '39', color: 'Bianco', brand: 'Adidas', condition: 'Usato', price: 45 }
         ];
+    
+        // Inizializza il contatore prodotti per i nuovi prodotti
+        this.productCounter = this.products.length ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
 
         // Inizializza le conversazioni (nuovo)
         this.conversations = {};
 
         this.userCounter = this.users.length ? this.users[this.users.length - 1].id + 1 : 1;
-        this.productCounter = this.products.length ? this.products[this.products.length - 1].id + 1 : 4; // Assicurati che il contatore parta dal giusto ID per i nuovi prodotti
         this.rentals = this.rentals || []; // Array per memorizzare i noleggi
         this.purchases = this.purchases || [];
     }
 
-
+    resetProducts() {
+        // Ripristina i prodotti originali
+        this.products = [
+            { id: 1, category: 'Maglietta', size: 'S', color: 'Nera', brand: 'Nike', condition: 'Nuovo', price: 15 },
+            { id: 2, category: 'Pantaloni', size: 'M', color: 'Blu', brand: 'Adidas', condition: 'Usato', price: 20 },
+            // ...gli altri prodotti...
+        ];
+        this.productCounter = this.products.length ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
+        return this.products;
+    }
     calculateRentalPrice(productId, days) {
         const product = this.getProductById(productId);
         if (!product) return null;
@@ -55,13 +66,6 @@ class DBMock {
     getAllUsers() {
         return this.users.map(user => ({ ...user, password: undefined })); // Escludi la password
     }
-
-    // Ottieni tutti i prodotti
-    getAllProducts() {
-        console.log('Tutti i prodotti:', this.products); // Debug per controllare i dati
-        return this.products;
-    }
-
 
     // Aggiungi un nuovo prodotto
     createProduct(product) {
@@ -88,15 +92,35 @@ class DBMock {
     }
 
     // Aggiorna un prodotto esistente
-    updateProduct(id, updatedData) {
-        const productIndex = this.products.findIndex(product => product.id === id);
-        if (productIndex === -1) {
-            return null; // Prodotto non trovato
-        }
-        this.products[productIndex] = { ...this.products[productIndex], ...updatedData };
-        return this.products[productIndex];
+   // Sostituisci la funzione updateProduct nel tuo DBMock.js con questa:
+updateProduct(id, updatedData) {
+    // Log per debug
+    console.log("Aggiornamento prodotto - ID:", id);
+    console.log("Dati di aggiornamento ricevuti:", updatedData);
+    
+    const productIndex = this.products.findIndex(product => product.id === id);
+    
+    if (productIndex === -1) {
+        console.log("Prodotto non trovato con ID:", id);
+        return null; // Prodotto non trovato
     }
-
+    
+    console.log("Prodotto prima dell'aggiornamento:", this.products[productIndex]);
+    
+    // Per assicurarsi che tutti i campi necessari siano presenti e aggiornati
+    const updatedProduct = {
+        ...this.products[productIndex],  // Mantieni tutti i campi esistenti
+        ...updatedData,                  // Sovrascrivi con i nuovi dati
+        id: parseInt(id)                 // Assicurati che l'ID rimanga lo stesso e sia un numero
+    };
+    
+    // Aggiorna il prodotto nell'array
+    this.products[productIndex] = updatedProduct;
+    
+    console.log("Prodotto dopo l'aggiornamento:", this.products[productIndex]);
+    
+    return this.products[productIndex];
+}
 
     // Elimina un prodotto
     deleteProduct(id) {
@@ -142,16 +166,29 @@ class DBMock {
 
     // Aggiorna un utente esistente
     updateUser(id, updates) {
-        const user = this.users.find(user => user.id === id);
-        if (!user) {
-            return null;
+        const userIndex = this.users.findIndex(user => user.id === id);
+        if (userIndex === -1) {
+            return null; // Utente non trovato
         }
-        if (updates.username) user.username = updates.username;
-        if (updates.nome) user.nome = updates.nome;
-        if (updates.ruolo) user.ruolo = updates.ruolo;
-        if (updates.dataNascita) user.dataNascita = updates.dataNascita;
-        if (updates.password) user.password = updates.password;
-        return user;
+        
+        // Log per debug
+        console.log("Aggiornamento utente ID:", id);
+        console.log("Dati inviati per l'aggiornamento:", updates);
+        console.log("Utente prima dell'aggiornamento:", this.users[userIndex]);
+        
+        // Aggiorna tutti i campi forniti
+        const updatedUser = {
+            ...this.users[userIndex], // Mantieni tutti i campi esistenti
+            ...updates,               // Sovrascrivi con i nuovi dati
+            id: id                    // Assicurati che l'ID rimanga lo stesso
+        };
+        
+        // Sostituisci l'utente nell'array
+        this.users[userIndex] = updatedUser;
+        
+        console.log("Utente dopo l'aggiornamento:", this.users[userIndex]);
+        
+        return this.users[userIndex];
     }
 
     // Elimina un utente

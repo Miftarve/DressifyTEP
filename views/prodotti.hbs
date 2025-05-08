@@ -1328,7 +1328,7 @@
                                 <table class="product-table">
                                     <thead>
                                         <tr>
-                                            <th>Nome</th>
+                                            <th>ID</th>
                                             <th>Categoria</th>
                                             <th>Taglia</th>
                                             <th>Colore</th>
@@ -1339,130 +1339,74 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {{#if products.length}}
+                                        {{#each products}}
                                         <tr>
-                                            <td>Giacca Elegante</td>
-                                            <td>Giacche</td>
-                                            <td>M</td>
-                                            <td>Nero</td>
-                                            <td>Armani</td>
+                                            <td>{{id}}</td>
+                                            <td>{{category}}</td>
+                                            <td>{{size}}</td>
+                                            <td>{{color}}</td>
+                                            <td>{{brand}}</td>
                                             <td>
-                                                <span class="status-badge nuovo">
-                                                    <i class="fas fa-circle"></i> Nuovo
+                                                <span class="status-badge {{condition}}">
+                                                    <i class="fas fa-circle"></i>
+                                                    {{#if (eq condition "nuovo")}}Nuovo{{else}}Usato{{/if}}
                                                 </span>
                                             </td>
-                                            <td class="product-price">€49.99</td>
+                                            <td class="product-price">€{{price}}</td>
                                             <td>
                                                 <div class="product-actions">
-                                                    <a href="/modificaProdotto/1" class="action-btn edit">
+                                                    <a href="/modificaProdotto/{{id}}" class="action-btn edit">
                                                         <i class="fas fa-edit"></i> Modifica
                                                     </a>
-                                                    <a href="/eliminaProdotto/1" class="action-btn delete">
+                                                    <a href="/eliminaProdotto/{{id}}" class="action-btn delete">
                                                         <i class="fas fa-trash"></i> Rimuovi
                                                     </a>
                                                 </div>
                                             </td>
                                         </tr>
+                                        {{/each}}
+                                        {{else}}
                                         <tr>
-                                            <td>Abito da Sera</td>
-                                            <td>Abiti</td>
-                                            <td>S</td>
-                                            <td>Rosso</td>
-                                            <td>Valentino</td>
-                                            <td>
-                                                <span class="status-badge usato">
-                                                    <i class="fas fa-circle"></i> Usato
-                                                </span>
-                                            </td>
-                                            <td class="product-price">€79.99</td>
-                                            <td>
-                                                <div class="product-actions">
-                                                    <a href="/modificaProdotto/2" class="action-btn edit">
-                                                        <i class="fas fa-edit"></i> Modifica
-                                                    </a>
-                                                    <a href="/eliminaProdotto/2" class="action-btn delete">
-                                                        <i class="fas fa-trash"></i> Rimuovi
-                                                    </a>
-                                                </div>
+                                            <td colspan="8" class="empty-table-message">
+                                                Non ci sono prodotti disponibili.
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Camicia Casual</td>
-                                            <td>Camicie</td>
-                                            <td>L</td>
-                                            <td>Blu</td>
-                                            <td>Zara</td>
-                                            <td>
-                                                <span class="status-badge nuovo">
-                                                    <i class="fas fa-circle"></i> Nuovo
-                                                </span>
-                                            </td>
-                                            <td class="product-price">€24.99</td>
-                                            <td>
-                                                <div class="product-actions">
-                                                    <a href="/modificaProdotto/3" class="action-btn edit">
-                                                        <i class="fas fa-edit"></i> Modifica
-                                                    </a>
-                                                    <a href="/eliminaProdotto/3" class="action-btn delete">
-                                                        <i class="fas fa-trash"></i> Rimuovi
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Scarpe Eleganti</td>
-                                            <td>Calzature</td>
-                                            <td>42</td>
-                                            <td>Marrone</td>
-                                            <td>Tod's</td>
-                                            <td>
-                                                <span class="status-badge usato">
-                                                    <i class="fas fa-circle"></i> Usato
-                                                </span>
-                                            </td>
-                                            <td class="product-price">€34.99</td>
-                                            <td>
-                                                <div class="product-actions">
-                                                    <a href="/modificaProdotto/4" class="action-btn edit">
-                                                        <i class="fas fa-edit"></i> Modifica
-                                                    </a>
-                                                    <a href="/eliminaProdotto/4" class="action-btn delete">
-                                                        <i class="fas fa-trash"></i> Rimuovi
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {{/if}}
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- Empty state (verrebbe mostrato quando non ci sono prodotti) -->
-                            <!-- <div class="empty-state">
+                            {{#unless products.length}}
+                            <!-- Empty state (mostra quando non ci sono prodotti) -->
+                            <div class="empty-state">
                                 <div class="empty-state-icon">
                                     <i class="fas fa-box-open"></i>
                                 </div>
                                 <div class="empty-state-text">
-                                    Non ci sono prodotti disponibili. Aggiungi il tuo primo prodotto utilizzando il form a sinistra.
+                                    Non ci sono prodotti disponibili. Aggiungi il tuo primo prodotto utilizzando il form
+                                    a sinistra.
                                 </div>
-                            </div> -->
+                            </div>
+                            {{/unless}}
 
-                            <!-- Paginazione -->
+                            {{#if products.length}}
+                            <!-- Paginazione - Semplificata per ora -->
                             <div class="pagination">
                                 <div class="pagination-info">
-                                    Mostrando 1-4 di 16 prodotti
+                                    Mostrando 1-{{products.length}} di {{products.length}} prodotti
                                 </div>
                                 <div class="pagination-buttons">
                                     <button class="pagination-button" disabled>
                                         <i class="fas fa-chevron-left"></i>
                                     </button>
                                     <button class="pagination-button active">1</button>
-                                    <button class="pagination-button">2</button>
-                                    <button class="pagination-button">3</button>
-                                    <button class="pagination-button">4</button>
                                     <button class="pagination-button">
                                         <i class="fas fa-chevron-right"></i>
                                     </button>
                                 </div>
                             </div>
+                            {{/if}}
                         </div>
                     </div>
                 </div>

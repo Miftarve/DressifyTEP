@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Ordine #{{order.orderId}} - Dressimify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Reset e stili base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header e Navbar */
+        #header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #4a90e2;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #4a90e2;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #4a90e2;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main container */
+        main {
+            padding: 30px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .breadcrumb-item:not(:last-child):after {
+            content: '/';
+            margin: 0 10px;
+            color: #ccc;
+        }
+
+        .breadcrumb-item a {
+            color: #4a90e2;
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #2d6cb9;
+            transform: translateX(2px);
+        }
+
+        .breadcrumb-item.active {
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Order details container */
+        .order-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            transform: translateY(0);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .order-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .order-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-title i {
+            color: #4a90e2;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 10px;
+        }
+
+        .status-completed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-processing {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+
+        .status-shipped {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .order-meta {
+            color: #666;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .order-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-meta-item i {
+            color: #4a90e2;
+            min-width: 18px;
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-outline {
+            border: 1px solid #ddd;
+            color: #555;
+            background-color: transparent;
+        }
+
+        .btn-outline:hover {
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+
+        .btn-print {
+            border: 1px solid #4a90e2;
+            color: #4a90e2;
+            background-color: transparent;
+        }
+
+        .btn-print:hover {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        /* Section styles */
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        .order-section {
+            margin-bottom: 30px;
+        }
+
+        /* Items table */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 15px;
+            background-color: #f5f8fa;
+            border-bottom: 2px solid #e9ecef;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .items-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .item-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            border: 1px solid #eee;
+        }
+
+        .item-details {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .item-meta {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .item-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-left: 5px;
+        }
+
+        .badge-rental {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-purchase {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Address and payment cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        .info-card-title i {
+            color: #4a90e2;
+        }
+
+        .info-card-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .info-card-content p {
+            margin-bottom: 5px;
+        }
+
+        /* Summary section */
+        .order-summary {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-outline-lg {
+            border: 2px solid #ddd;
+            color: #555;
+            background-color: transparent;
+        }
+
+        .btn-outline-lg:hover {
+            border-color: #4a90e2;
+            color: #4a90e2;
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff;
+            padding: 20px 5%;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #4a90e2;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .nav-links {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .order-container {
+                padding: 15px;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .order-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .items-table thead {
+                display: none;
+            }
+
+            .items-table tbody tr {
+                display: block;
+                padding: 15px 0;
+            }
+
+            .items-table tbody td {
+                display: block;
+                text-align: right;
+                padding: 5px 0;
+                border: none;
+            }
+
+            .items-table tbody td:before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+            }
+
+            .item-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="header">
+        <nav class="navbar">
+            <a href="/" class="logo">
+                <i class="fas fa-tshirt"></i>
+                <span>Dressimify</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/noleggio"><i class="fas fa-shopping-bag"></i> Prodotti</a></li>
+                <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="breadcrumb">
+            <div class="breadcrumb-item"><a href="/home"><i class="fas fa-home"></i> Home</a></div>
+            <div class="breadcrumb-item"><a href="/my-orders"><i class="fas fa-shopping-bag"></i> I miei ordini</a></div>
+            <div class="breadcrumb-item active"><i class="fas fa-receipt"></i> Ordine #{{order.orderId}}</div>
+        </div>
+
+        <div class="order-container">
+            <div class="order-header">
+                <div>
+                    <h1 class="order-title">
+                        <i class="fas fa-receipt"></i> Ordine #{{order.orderId}}
+                        <span class="order-status status-completed">Completato</span>
+                    </h1>
+                    <div class="order-meta">
+                        <div class="order-meta-item">
+                            <i class="far fa-calendar-alt"></i> Data ordine: {{order.date}}
+                        </div>
+                        <div class="order-meta-item">
+                            <i class="far fa-user"></i> Cliente: {{user.nome}} {{user.cognome}}
+                        </div>
+                        <div class="order-meta-item">
+                            <i class="far fa-envelope"></i> Email: {{user.email}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <a href="javascript:window.print();" class="btn-sm btn-print">
+                        <i class="fas fa-print"></i> Stampa
+                    </a>
+                    <a href="/my-orders" class="btn-sm btn-outline">
+                        <i class="fas fa-chevron-left"></i> Torna agli ordini
+                    </a>
+                </div>
+            </div>
+
+            <div class="order-section">
+                <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Articoli Ordinati</h2>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="50%">Prodotto</th>
+                            <th>Tipo</th>
+                            <th>Periodo</th>
+                            <th>Prezzo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each order.items}}
+                        <tr>
+                            <td data-label="Prodotto">
+                                <div class="item-details">
+                                    <div class="item-image">
+                                        {{#if image}}
+                                        <img src="{{image}}" alt="{{category}}">
+                                        {{else}}
+                                        <i class="fas fa-tshirt"></i>
+                                        {{/if}}
+                                    </div>
+                                    <div>
+                                        <div class="item-title">{{brand}} - {{category}}</div>
+                                        <div class="item-meta">Taglia: {{size}} | Colore: {{color}}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Tipo">
+                                {{#if (eq type "rental")}}
+                                <span class="item-badge badge-rental">Noleggio</span>
+                                {{else}}
+                                <span class="item-badge badge-purchase">Acquisto</span>
+                                {{/if}}
+                            </td>
+                            <td data-label="Periodo">
+                                {{#if (eq type "rental")}}
+                                {{startDate}} - {{endDate}}
+                                <div class="item-meta">({{duration}} giorni)</div>
+                                {{else}}
+                                -
+                                {{/if}}
+                            </td>
+                            <td data-label="Prezzo" class="item-price">{{price}}€</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                <div class="order-summary">
+                    <div class="summary-row">
+                        <span>Subtotale</span>
+                        <span>{{order.subtotal}}€</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Spedizione</span>
+                        <span>{{order.shipping}}€</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Totale</span>
+                        <span>{{order.total}}€</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3 class="info-card-title"><i class="fas fa-map-marker-alt"></i> Indirizzo di Spedizione</h3>
+                    <div class="info-card-content">
+                        <p>{{order.shippingAddress.street}}</p>
+                        <p>{{order.shippingAddress.city}}, {{order.shippingAddress.zip}}</p>
+                        <p>{{order.shippingAddress.country}}</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="info-card-title"><i class="fas fa-credit-card"></i> Metodo di Pagamento</h3>
+                    <div class="info-card-content">
+                        <p>{{order.paymentMethod.type}}</p>
+                        <p>**** **** **** {{order.paymentMethod.lastFour}}</p>
+                        <p>Scadenza: {{order.paymentMethod.expiry}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/noleggio" class="btn btn-outline-lg">
+                    <i class="fas fa-shopping-bag"></i> Continua lo Shopping
+                </a>
+                <a href="/contact-support?order={{order.orderId}}" class="btn btn-primary">
+                    <i class="fas fa-headset"></i> Assistenza Ordine
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-tshirt"></i> Dressimify &copy; 2025
+            </div>
+            <div class="footer-links">
+                <a href="/termini">Termini e Condizioni</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/contatti">Contatti</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Puoi aggiungere funzionalità JavaScript se necessario
+            console.log("Dettagli ordine caricati per ordine #{{order.orderId}}");
+        });
+    </script>
+</body>
+
+</html>

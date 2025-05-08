@@ -35,12 +35,17 @@ const io = socketIo(server);
 // Tracciare gli utenti connessi
 const connectedUsers = new Map();
 
+// Arrays per archiviare noleggi e vendite
+const rentals = [];
+const sales = [];
+
 // Middleware
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 // Configurazione del motore di template
 app.set('view engine', 'hbs');
@@ -50,159 +55,17 @@ hbs.registerHelper('json', context => JSON.stringify(context, null, 2));
 // Inizializza Passport.js (solo per OAuth)
 app.use(passport.initialize());
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - id
- *         - nome
- *         - cognome
- *         - email
- *         - username
- *         - password
- *         - ruolo
- *       properties:
- *         id:
- *           type: integer
- *           description: ID univoco dell'utente
- *         nome:
- *           type: string
- *           description: Nome dell'utente
- *         cognome:
- *           type: string
- *           description: Cognome dell'utente
- *         email:
- *           type: string
- *           format: email
- *           description: Email dell'utente
- *         username:
- *           type: string
- *           description: Username dell'utente
- *         password:
- *           type: string
- *           description: Password dell'utente
- *         ruolo:
- *           type: string
- *           enum: [user, admin]
- *           description: Ruolo dell'utente nel sistema
- *         dataNascita:
- *           type: string
- *           format: date
- *           description: Data di nascita dell'utente
- *         luogoNascita:
- *           type: string
- *           description: Luogo di nascita dell'utente
- *         googleId:
- *           type: string
- *           description: ID di Google se registrato con Google OAuth
- *         facebookId:
- *           type: string
- *           description: ID di Facebook se registrato con Facebook OAuth
- *     Product:
- *       type: object
- *       required:
- *         - id
- *         - category
- *         - price
- *       properties:
- *         id:
- *           type: integer
- *           description: ID univoco del prodotto
- *         category:
- *           type: string
- *           description: Categoria del prodotto
- *         size:
- *           type: string
- *           description: Taglia del prodotto
- *         color:
- *           type: string
- *           description: Colore del prodotto
- *         brand:
- *           type: string
- *           description: Marca del prodotto
- *         condition:
- *           type: string
- *           description: Condizione del prodotto
- *         price:
- *           type: number
- *           description: Prezzo del prodotto
- *     Message:
- *       type: object
- *       required:
- *         - id
- *         - senderId
- *         - recipientId
- *         - text
- *         - timestamp
- *       properties:
- *         id:
- *           type: integer
- *           description: ID univoco del messaggio
- *         senderId:
- *           type: integer
- *           description: ID dell'utente che ha inviato il messaggio
- *         recipientId:
- *           type: integer
- *           description: ID dell'utente che riceve il messaggio
- *         text:
- *           type: string
- *           description: Contenuto del messaggio
- *         timestamp:
- *           type: string
- *           format: date-time
- *           description: Data e ora d'invio del messaggio
- *         read:
- *           type: boolean
- *           description: Stato di lettura del messaggio
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *       description: Autenticazione basata su JWT
- *     googleOAuth:
- *       type: oauth2
- *       flows:
- *         authorizationCode:
- *           authorizationUrl: http://localhost:3000/auth/google
- *           scopes:
- *             profile: Informazioni del profilo
- *             email: Indirizzo email dell'utente
- *     facebookOAuth:
- *       type: oauth2
- *       flows:
- *         authorizationCode:
- *           authorizationUrl: http://localhost:3000/auth/facebook
- *           scopes:
- *             email: Indirizzo email dell'utente
- *             public_profile: Informazioni pubbliche del profilo
- *   responses:
- *     UnauthorizedError:
- *       description: Accesso non autorizzato
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               message:
- *                 type: string
- *                 example: Non sei autorizzato ad accedere a questa risorsa
- */
-
 // Swagger Configuration
 const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
-            title: 'E-commerce e Chat API',
+            title: 'Dressify - E-commerce e Chat API',
             version: '1.0.0',
-            description: 'Documentazione completa delle API per la piattaforma di e-commerce e chat',
+            description: 'Documentazione completa delle API per la piattaforma di e-commerce di abbigliamento Dressify',
             contact: {
-                name: 'Supporto Tecnico',
-                email: 'support@example.com'
+                name: 'Supporto Tecnico Dressify',
+                email: 'support@dressify.com'
             }
         },
         servers: [
@@ -211,7 +74,7 @@ const swaggerOptions = {
                 description: 'Server di sviluppo locale',
             },
             {
-                url: 'https://api.example.com',
+                url: 'https://api.dressify.com',
                 description: 'Server di produzione',
             }
         ],
@@ -222,15 +85,15 @@ const swaggerOptions = {
             },
             {
                 name: 'Users',
-                description: 'Gestione degli utenti'
+                description: 'Gestione degli utenti e profili'
             },
             {
                 name: 'Products',
-                description: 'Gestione dei prodotti'
+                description: 'Gestione dei prodotti di abbigliamento'
             },
             {
                 name: 'Rentals',
-                description: 'Operazioni di noleggio dei prodotti'
+                description: 'Operazioni di noleggio dei capi di abbigliamento'
             },
             {
                 name: 'Chat',
@@ -239,14 +102,341 @@ const swaggerOptions = {
             {
                 name: 'Cart',
                 description: 'Gestione del carrello e checkout'
+            },
+            {
+                name: 'Admin',
+                description: 'Funzionalità di amministrazione'
             }
         ],
         components: {
+            schemas: {
+                User: {
+                    type: 'object',
+                    required: ['id', 'nome', 'cognome', 'email', 'username', 'password', 'ruolo'],
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID univoco dell\'utente'
+                        },
+                        nome: {
+                            type: 'string',
+                            description: 'Nome dell\'utente'
+                        },
+                        cognome: {
+                            type: 'string',
+                            description: 'Cognome dell\'utente'
+                        },
+                        email: {
+                            type: 'string',
+                            format: 'email',
+                            description: 'Email dell\'utente'
+                        },
+                        username: {
+                            type: 'string',
+                            description: 'Username dell\'utente'
+                        },
+                        password: {
+                            type: 'string',
+                            description: 'Password dell\'utente',
+                            format: 'password'
+                        },
+                        ruolo: {
+                            type: 'string',
+                            enum: ['user', 'admin'],
+                            description: 'Ruolo dell\'utente nel sistema'
+                        },
+                        dataNascita: {
+                            type: 'string',
+                            format: 'date',
+                            description: 'Data di nascita dell\'utente'
+                        },
+                        luogoNascita: {
+                            type: 'string',
+                            description: 'Luogo di nascita dell\'utente'
+                        },
+                        googleId: {
+                            type: 'string',
+                            description: 'ID di Google se registrato con Google OAuth'
+                        },
+                        facebookId: {
+                            type: 'string',
+                            description: 'ID di Facebook se registrato con Facebook OAuth'
+                        }
+                    },
+                    example: {
+                        id: 1,
+                        nome: 'Mario',
+                        cognome: 'Rossi',
+                        email: 'mario.rossi@example.com',
+                        username: 'mario.rossi',
+                        password: 'password123',
+                        ruolo: 'user',
+                        dataNascita: '1990-01-01',
+                        luogoNascita: 'Roma',
+                        googleId: null,
+                        facebookId: null
+                    }
+                },
+                Product: {
+                    type: 'object',
+                    required: ['id', 'category', 'price'],
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID univoco del prodotto'
+                        },
+                        category: {
+                            type: 'string',
+                            description: 'Categoria del prodotto (es. camicia, pantalone, giacca)'
+                        },
+                        size: {
+                            type: 'string',
+                            description: 'Taglia del prodotto (es. XS, S, M, L, XL)'
+                        },
+                        color: {
+                            type: 'string',
+                            description: 'Colore del prodotto'
+                        },
+                        brand: {
+                            type: 'string',
+                            description: 'Marca del prodotto'
+                        },
+                        condition: {
+                            type: 'string',
+                            enum: ['nuovo', 'come nuovo', 'buono', 'usato'],
+                            description: 'Condizione del prodotto'
+                        },
+                        price: {
+                            type: 'number',
+                            description: 'Prezzo del prodotto in euro'
+                        }
+                    },
+                    example: {
+                        id: 1,
+                        category: 'Camicia',
+                        size: 'M',
+                        color: 'Blu',
+                        brand: 'Ralph Lauren',
+                        condition: 'come nuovo',
+                        price: 49.99
+                    }
+                },
+                Message: {
+                    type: 'object',
+                    required: ['id', 'senderId', 'recipientId', 'text', 'timestamp'],
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID univoco del messaggio'
+                        },
+                        senderId: {
+                            type: 'integer',
+                            description: 'ID dell\'utente che ha inviato il messaggio'
+                        },
+                        recipientId: {
+                            type: 'integer',
+                            description: 'ID dell\'utente che riceve il messaggio'
+                        },
+                        text: {
+                            type: 'string',
+                            description: 'Contenuto del messaggio'
+                        },
+                        timestamp: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Data e ora d\'invio del messaggio'
+                        },
+                        read: {
+                            type: 'boolean',
+                            description: 'Stato di lettura del messaggio'
+                        }
+                    },
+                    example: {
+                        id: 1,
+                        senderId: 1,
+                        recipientId: 2,
+                        text: 'Ciao, il prodotto è ancora disponibile?',
+                        timestamp: '2023-05-20T14:30:00Z',
+                        read: false
+                    }
+                },
+                Rental: {
+                    type: 'object',
+                    required: ['id', 'productId', 'userId', 'days', 'price', 'startDate', 'endDate'],
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID univoco del noleggio'
+                        },
+                        productId: {
+                            type: 'integer',
+                            description: 'ID del prodotto noleggiato'
+                        },
+                        userId: {
+                            type: 'integer',
+                            description: 'ID dell\'utente che ha effettuato il noleggio'
+                        },
+                        days: {
+                            type: 'integer',
+                            description: 'Durata del noleggio in giorni'
+                        },
+                        price: {
+                            type: 'number',
+                            description: 'Prezzo totale del noleggio'
+                        },
+                        startDate: {
+                            type: 'string',
+                            format: 'date',
+                            description: 'Data di inizio noleggio'
+                        },
+                        endDate: {
+                            type: 'string',
+                            format: 'date',
+                            description: 'Data di fine noleggio'
+                        },
+                        status: {
+                            type: 'string',
+                            enum: ['pending', 'approved', 'rejected'],
+                            description: 'Stato del noleggio'
+                        }
+                    },
+                    example: {
+                        id: 1,
+                        productId: 2,
+                        userId: 3,
+                        days: 7,
+                        price: 35.99,
+                        startDate: '2023-06-10',
+                        endDate: '2023-06-17',
+                        status: 'approved'
+                    }
+                },
+                Sale: {
+                    type: 'object',
+                    required: ['id', 'orderId', 'productId', 'userId', 'price'],
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID univoco della vendita'
+                        },
+                        orderId: {
+                            type: 'string',
+                            description: 'Codice univoco dell\'ordine'
+                        },
+                        productId: {
+                            type: 'integer',
+                            description: 'ID del prodotto venduto'
+                        },
+                        userId: {
+                            type: 'integer',
+                            description: 'ID dell\'utente che ha effettuato l\'acquisto'
+                        },
+                        price: {
+                            type: 'number',
+                            description: 'Prezzo dell\'acquisto'
+                        },
+                        timestamp: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Data e ora dell\'acquisto'
+                        },
+                        status: {
+                            type: 'string',
+                            enum: ['processing', 'completed', 'refunded'],
+                            description: 'Stato dell\'ordine'
+                        }
+                    },
+                    example: {
+                        id: 1,
+                        orderId: 'ORD-2023-001',
+                        productId: 5,
+                        userId: 2,
+                        price: 89.99,
+                        timestamp: '2023-05-15T10:30:00Z',
+                        status: 'completed'
+                    }
+                }
+            },
             securitySchemes: {
                 bearerAuth: {
                     type: 'http',
                     scheme: 'bearer',
-                    bearerFormat: 'JWT'
+                    bearerFormat: 'JWT',
+                    description: 'Inserisci il token JWT ottenuto al login'
+                },
+                googleOAuth: {
+                    type: 'oauth2',
+                    flows: {
+                        authorizationCode: {
+                            authorizationUrl: 'http://localhost:3000/auth/google',
+                            scopes: {
+                                profile: 'Informazioni del profilo',
+                                email: 'Indirizzo email dell\'utente'
+                            }
+                        }
+                    }
+                },
+                facebookOAuth: {
+                    type: 'oauth2',
+                    flows: {
+                        authorizationCode: {
+                            authorizationUrl: 'http://localhost:3000/auth/facebook',
+                            scopes: {
+                                email: 'Indirizzo email dell\'utente',
+                                public_profile: 'Informazioni pubbliche del profilo'
+                            }
+                        }
+                    }
+                }
+            },
+            responses: {
+                UnauthorizedError: {
+                    description: 'Accesso non autorizzato',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    message: {
+                                        type: 'string',
+                                        example: 'Non sei autorizzato ad accedere a questa risorsa'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                BadRequestError: {
+                    description: 'Richiesta non valida',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    message: {
+                                        type: 'string',
+                                        example: 'La richiesta contiene dati non validi'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                NotFoundError: {
+                    description: 'Risorsa non trovata',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    message: {
+                                        type: 'string',
+                                        example: 'La risorsa richiesta non è stata trovata'
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -262,6 +452,109 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+// ===== HELPER FUNCTIONS =====
+
+// Registra helpers per Handlebars
+hbs.registerHelper('eq', function(a, b) {
+    return a === b;
+});
+
+hbs.registerHelper('lt', function(a, b) {
+    return parseFloat(a) < parseFloat(b);
+});
+
+hbs.registerHelper('gt', function(a, b) {
+    return parseFloat(a) > parseFloat(b);
+});
+
+hbs.registerHelper('multiply', function(a, b) {
+    return (parseFloat(a) * parseFloat(b)).toFixed(2);
+});
+
+hbs.registerHelper('firstLetter', function(str) {
+    return str ? str.charAt(0).toUpperCase() : '';
+});
+
+hbs.registerHelper('formatDate', function(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+});
+
+hbs.registerHelper('formatPrice', function(price) {
+    return parseFloat(price).toFixed(2);
+});
+
+hbs.registerHelper('getProductImage', function(category, color, brand) {
+    // Genera un ID univoco per rendere diverse le immagini
+    const uniqueId = category.charCodeAt(0) + (color ? color.charCodeAt(0) : 0) + (brand ? brand.length : 0);
+    
+    // URL di alta qualità per le immagini di abbigliamento
+    return `https://source.unsplash.com/500x600/?${encodeURIComponent(category.toLowerCase())},${color ? encodeURIComponent(color.toLowerCase()) : 'clothing'},fashion&sig=${uniqueId}`;
+});
+
+// Funzioni di utilità per gestire gli utenti
+function findUserByEmail(email) {
+    const allUsers = db.getAllUsers();
+    return allUsers.find(user => user.email === email);
+}
+
+// Funzioni di utilità per noleggi e vendite
+function createRental(data) {
+    const newRental = {
+        id: rentals.length + 1,
+        ...data,
+        timestamp: new Date().toISOString(),
+        status: 'pending' // pending, approved, rejected
+    };
+    rentals.push(newRental);
+    return newRental;
+}
+
+function createSale(data) {
+    const newSale = {
+        id: sales.length + 1,
+        orderId: `ORD-${new Date().getFullYear()}-${String(sales.length + 1).padStart(3, '0')}`,
+        ...data,
+        timestamp: new Date().toISOString(),
+        status: 'processing' // processing, completed, refunded
+    };
+    sales.push(newSale);
+    return newSale;
+}
+
+function getAllRentals() {
+    return rentals;
+}
+
+function getAllSales() {
+    return sales;
+}
+
+function updateRentalStatus(id, status) {
+    const rental = rentals.find(r => r.id === id);
+    if (rental) {
+        rental.status = status;
+        return rental;
+    }
+    return null;
+}
+
+function updateSaleStatus(id, status) {
+    const sale = sales.find(s => s.id === id);
+    if (sale) {
+        sale.status = status;
+        return sale;
+    }
+    return null;
+}
+
+// ===== PASSPORT CONFIGURATION =====
+
 // Funzioni di utilità per Passport.js
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -275,13 +568,7 @@ passport.deserializeUser((id, done) => {
     done(null, user);
 });
 
-// Funzione di utilità per trovare un utente tramite email
-function findUserByEmail(email) {
-    const allUsers = db.getAllUsers();
-    return allUsers.find(user => user.email === email);
-}
-
-// ===== GOOGLE AUTHENTICATION STRATEGY =====
+// Google Authentication Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -319,7 +606,7 @@ passport.use(new GoogleStrategy({
     }
 }));
 
-// ===== FACEBOOK AUTHENTICATION STRATEGY =====
+// Facebook Authentication Strategy
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -365,6 +652,301 @@ passport.use(new FacebookStrategy({
         return done(error, null);
     }
 }));
+
+// ===== MIDDLEWARE =====
+
+// Middleware per verificare l'autenticazione con JWT
+function ensureAuthenticated(req, res, next) {
+    // Ottieni il token da cookie o header Authorization
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.redirect('/login');
+    }
+
+    try {
+        // Verifica il token
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded;
+
+        // Funzioni per mantenere retrocompatibilità con il codice esistente
+        req.isAuthenticated = () => true;
+
+        next();
+    } catch (error) {
+        // Se il token non è valido, reindirizza al login
+        res.clearCookie('token');
+        return res.redirect('/login');
+    }
+}
+
+// Middleware per controllare se l'utente è un amministratore
+function ensureAdmin(req, res, next) {
+    if (req.isAuthenticated && req.isAuthenticated() && req.user.ruolo === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ error: 'Accesso non autorizzato' });
+}
+
+// ===== AUTHENTICATION ROUTES =====
+
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     summary: Visualizza la pagina di login
+ *     tags: [Auth]
+ *     description: Mostra la pagina di login o reindirizza alla home se l'utente è già autenticato
+ *     responses:
+ *       200:
+ *         description: Pagina di login
+ *       302:
+ *         description: Reindirizza alla home se l'utente è già autenticato
+ */
+app.get('/login', (req, res) => {
+    // Verifica se c'è un token valido
+    const token = req.cookies.token;
+    if (token) {
+        try {
+            jwt.verify(token, SECRET_KEY);
+            return res.redirect('/home'); // Token valido, reindirizza alla home
+        } catch (error) {
+            // Token non valido, elimina il cookie
+            res.clearCookie('token');
+        }
+    }
+    res.sendFile(path.join(__dirname, 'public', 'login.html')); // Mostra il login
+});
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Elabora il login dell'utente
+ *     tags: [Auth]
+ *     description: Verifica le credenziali dell'utente e genera un token JWT
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Username o email dell'utente
+ *               password:
+ *                 type: string
+ *                 description: Password dell'utente
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Login effettuato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT da utilizzare per le richieste autenticate
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     nome:
+ *                       type: string
+ *                     cognome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     ruolo:
+ *                       type: string
+ *       401:
+ *         description: Username o password errati
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Username o password errati!
+ */
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Recupera l'utente dal database
+    const user = db.getUserByUsername(username);
+
+    if (user && user.password === password) {
+        // Genera token JWT
+        const token = jwt.sign({
+            id: user.id,
+            name: user.nome,
+            email: user.email,
+            ruolo: user.ruolo
+        }, SECRET_KEY, {
+            expiresIn: '24h' // Token valido per 24 ore
+        });
+
+        // Salva token nei cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 // 24 ore
+        });
+
+        // Invia token e dati utente come JSON
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                nome: user.nome,
+                cognome: user.cognome,
+                email: user.email,
+                ruolo: user.ruolo
+            }
+        });
+    } else {
+        res.status(401).json({ message: 'Username o password errati!' });
+    }
+});
+
+/**
+ * @swagger
+ * /logout:
+ *   get:
+ *     summary: Logout dell'utente
+ *     tags: [Auth]
+ *     description: Termina la sessione dell'utente e lo reindirizza alla home
+ *     responses:
+ *       302:
+ *         description: Reindirizza alla home page dopo il logout
+ */
+app.get('/logout', (req, res) => {
+    // Elimina il cookie del token
+    res.clearCookie('token');
+    res.redirect('/');
+});
+
+/**
+ * @swagger
+ * /register:
+ *   get:
+ *     summary: Visualizza la pagina di registrazione
+ *     tags: [Auth]
+ *     description: Mostra il form di registrazione per nuovi utenti
+ *     responses:
+ *       200:
+ *         description: Pagina di registrazione
+ *       302:
+ *         description: Reindirizza alla home se l'utente è già autenticato
+ */
+app.get('/register', (req, res) => {
+    // Verifica se c'è un token valido
+    const token = req.cookies.token;
+    if (token) {
+        try {
+            jwt.verify(token, SECRET_KEY);
+            return res.redirect('/home'); // Token valido, reindirizza alla home
+        } catch (error) {
+            // Token non valido, elimina il cookie
+            res.clearCookie('token');
+        }
+    }
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Elabora la registrazione di un nuovo utente
+ *     tags: [Auth]
+ *     description: Crea un nuovo account utente con i dati forniti
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 description: Nome dell'utente
+ *               cognome:
+ *                 type: string
+ *                 description: Cognome dell'utente
+ *               dataNascita:
+ *                 type: string
+ *                 format: date
+ *                 description: Data di nascita dell'utente (formato YYYY-MM-DD)
+ *               luogoNascita:
+ *                 type: string
+ *                 description: Luogo di nascita dell'utente
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email dell'utente
+ *               username:
+ *                 type: string
+ *                 description: Username dell'utente
+ *               password:
+ *                 type: string
+ *                 description: Password dell'utente
+ *             required:
+ *               - nome
+ *               - cognome
+ *               - email
+ *               - username
+ *               - password
+ *     responses:
+ *       302:
+ *         description: Reindirizza al login in caso di successo
+ *       400:
+ *         description: Errore di validazione o utente già esistente
+ */
+app.post('/register', (req, res) => {
+    const { nome, cognome, dataNascita, luogoNascita, email, username, password } = req.body;
+
+    // Controlla se esiste già un utente con lo stesso email o username
+    const existingUser = db.getUserByUsername(username) || db.getUserByUsername(email);
+    if (existingUser) {
+        return res.render('error', { message: 'Email o username già in uso!' });
+    }
+
+    // Crea un nuovo utente con il ruolo predefinito "user"
+    const newUser = db.createUser({
+        nome,
+        cognome,
+        dataNascita,
+        luogoNascita,
+        ruolo: 'user',
+        email,
+        username,
+        password,
+    });
+
+    res.redirect('/login');
+});
+
+/**
+ * @swagger
+ * /recuperoDati:
+ *   get:
+ *     summary: Pagina di recupero dati
+ *     tags: [Auth]
+ *     description: Visualizza la pagina per il recupero dei dati dell'account
+ *     responses:
+ *       200:
+ *         description: Pagina di recupero dati
+ */
+app.get('/recuperoDati', (req, res) => {
+    res.sendFile(path.join(__dirname, 'recuperDati.html'));
+});
 
 /**
  * @swagger
@@ -522,34 +1104,10 @@ app.get('/auth/facebook/callback',
  *                   example: User data deleted successfully.
  *       400:
  *         description: Richiesta non valida, manca l'ID utente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: User ID is required
  *       404:
  *         description: Utente non trovato
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: User not found
  *       500:
  *         description: Errore del server durante l'eliminazione
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Failed to delete user data
  */
 app.post('/api/delete-user-data', async (req, res) => {
     const userId = req.body.user_id; // ID utente fornito da Facebook
@@ -578,73 +1136,14 @@ app.post('/api/delete-user-data', async (req, res) => {
     }
 });
 
-// Middleware per verificare l'autenticazione con JWT
-function ensureAuthenticated(req, res, next) {
-    // Ottieni il token da cookie o header Authorization
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-        return res.redirect('/login');
-    }
-
-    try {
-        // Verifica il token
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded;
-
-        // Funzioni per mantenere retrocompatibilità con il codice esistente
-        req.isAuthenticated = () => true;
-
-        next();
-    } catch (error) {
-        // Se il token non è valido, reindirizza al login
-        res.clearCookie('token');
-        return res.redirect('/login');
-    }
-}
-
-// Middleware per controllare se l'utente è un amministratore
-function ensureAdmin(req, res, next) {
-    if (req.isAuthenticated && req.isAuthenticated() && req.user.ruolo === 'admin') {
-        return next();
-    }
-    return res.status(403).json({ error: 'Accesso non autorizzato' });
-}
-
-/**
- * @swagger
- * /login:
- *   get:
- *     summary: Visualizza la pagina di login
- *     tags: [Auth]
- *     description: Mostra la pagina di login o reindirizza alla home se l'utente è già autenticato
- *     responses:
- *       200:
- *         description: Pagina di login
- *       302:
- *         description: Reindirizza alla home se l'utente è già autenticato
- */
-app.get('/login', (req, res) => {
-    // Verifica se c'è un token valido
-    const token = req.cookies.token;
-    if (token) {
-        try {
-            jwt.verify(token, SECRET_KEY);
-            return res.redirect('/home'); // Token valido, reindirizza alla home
-        } catch (error) {
-            // Token non valido, elimina il cookie
-            res.clearCookie('token');
-        }
-    }
-    res.sendFile(path.join(__dirname, 'public', 'login.html')); // Mostra il login
-});
+// ===== USER ROUTES =====
 
 /**
  * @swagger
  * /:
  *   get:
  *     summary: Reindirizza alla home page
- *     tags: [Auth]
+ *     tags: [Users]
  *     description: Reindirizza automaticamente l'utente alla home page
  *     responses:
  *       302:
@@ -652,104 +1151,6 @@ app.get('/login', (req, res) => {
  */
 app.get('/', (req, res) => {
     res.redirect('/home');
-});
-
-/**
- * @swagger
- * /recuperoDati:
- *   get:
- *     summary: Pagina di recupero dati
- *     tags: [Auth]
- *     description: Visualizza la pagina per il recupero dei dati dell'account
- *     responses:
- *       200:
- *         description: Pagina di recupero dati
- */
-app.get('/recuperoDati', (req, res) => {
-    res.sendFile(path.join(__dirname, 'recuperDati.html'));
-});
-
-/**
- * @swagger
- * /login:
- *   post:
- *     summary: Elabora il login dell'utente
- *     tags: [Auth]
- *     description: Verifica le credenziali dell'utente e genera un token JWT
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: Username o email dell'utente
- *               password:
- *                 type: string
- *                 description: Password dell'utente
- *             required:
- *               - username
- *               - password
- *     responses:
- *       302:
- *         description: Reindirizza alla home in caso di successo o alla pagina di errore in caso di fallimento
- */
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Recupera l'utente dal database
-    const user = db.getUserByUsername(username);
-
-    if (user && user.password === password) {
-        // Genera token JWT
-        const token = jwt.sign({
-            id: user.id,
-            name: user.nome,
-            email: user.email,
-            ruolo: user.ruolo
-        }, SECRET_KEY, {
-            expiresIn: '24h' // Token valido per 24 ore
-        });
-
-        // Salva token nei cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000 // 24 ore
-        });
-
-        // Invia token e dati utente come JSON
-        res.json({
-            token,
-            user: {
-                id: user.id,
-                nome: user.nome,
-                cognome: user.cognome,
-                email: user.email,
-                ruolo: user.ruolo
-            }
-        });
-    } else {
-        res.status(401).json({ message: 'Username o password errati!' });
-    }
-});
-
-/**
- * @swagger
- * /logout:
- *   get:
- *     summary: Logout dell'utente
- *     tags: [Auth]
- *     description: Termina la sessione dell'utente e lo reindirizza alla home
- *     responses:
- *       302:
- *         description: Reindirizza alla home page dopo il logout
- */
-app.get('/logout', (req, res) => {
-    // Elimina il cookie del token
-    res.clearCookie('token');
-    res.redirect('/');
 });
 
 /**
@@ -789,10 +1190,102 @@ app.get('/home', ensureAuthenticated, (req, res) => {
 
 /**
  * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Ottiene la lista degli utenti
+ *     tags: [Users, Chat]
+ *     description: Restituisce la lista di tutti gli utenti tranne quello corrente
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista degli utenti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   nome:
+ *                     type: string
+ *                   cognome:
+ *                     type: string
+ *                   username:
+ *                     type: string
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ */
+app.get('/api/users', ensureAuthenticated, (req, res) => {
+    const currentUser = req.user || req.session.user;
+    const users = db.getAllUsers().filter(user => user.id !== currentUser.id);
+
+    // Invia solo le informazioni necessarie
+    const safeUsers = users.map(user => ({
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username
+    }));
+
+    res.json(safeUsers);
+});
+
+/**
+ * @swagger
+ * /api/currentUser:
+ *   get:
+ *     summary: Ottiene l'utente corrente
+ *     tags: [Users, Chat]
+ *     description: Restituisce i dati dell'utente attualmente autenticato
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dati dell'utente corrente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nome:
+ *                   type: string
+ *                 cognome:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ */
+app.get('/api/currentUser', ensureAuthenticated, (req, res) => {
+    const user = req.user || req.session.user;
+
+    // Invia informazioni sicure dell'utente
+    const safeUser = {
+        id: user.id,
+        nome: user.nome,
+        cognome: user.cognome,
+        username: user.username,
+        email: user.email
+    };
+
+    res.json(safeUser);
+});
+
+// ===== ADMIN USER MANAGEMENT =====
+
+/**
+ * @swagger
  * /registraUtente:
  *   post:
  *     summary: Registra un nuovo utente (funzione admin)
- *     tags: [Users]
+ *     tags: [Admin, Users]
  *     description: Permette a un amministratore di creare un nuovo utente nel sistema
  *     security:
  *       - bearerAuth: []
@@ -837,7 +1330,11 @@ app.get('/home', ensureAuthenticated, (req, res) => {
  *               - password
  *     responses:
  *       302:
- *         description: Reindirizza alla home page con messaggio di successo o alla pagina di errore in caso di fallimento
+ *         description: Reindirizza alla home page con messaggio di successo
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       400:
+ *         description: Dati mancanti o non validi
  */
 app.post('/registraUtente', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { nome, cognome, dataNascita, luogoNascita, ruolo, email, password } = req.body;
@@ -853,109 +1350,10 @@ app.post('/registraUtente', ensureAuthenticated, ensureAdmin, (req, res) => {
 
 /**
  * @swagger
- * /register:
- *   get:
- *     summary: Visualizza la pagina di registrazione
- *     tags: [Auth]
- *     description: Mostra il form di registrazione per nuovi utenti
- *     responses:
- *       200:
- *         description: Pagina di registrazione
- *       302:
- *         description: Reindirizza alla home se l'utente è già autenticato
- */
-app.get('/register', (req, res) => {
-    // Verifica se c'è un token valido
-    const token = req.cookies.token;
-    if (token) {
-        try {
-            jwt.verify(token, SECRET_KEY);
-            return res.redirect('/home'); // Token valido, reindirizza alla home
-        } catch (error) {
-            // Token non valido, elimina il cookie
-            res.clearCookie('token');
-        }
-    }
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-
-/**
- * @swagger
- * /register:
- *   post:
- *     summary: Elabora la registrazione di un nuovo utente
- *     tags: [Auth]
- *     description: Crea un nuovo account utente con i dati forniti
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *                 description: Nome dell'utente
- *               cognome:
- *                 type: string
- *                 description: Cognome dell'utente
- *               dataNascita:
- *                 type: string
- *                 format: date
- *                 description: Data di nascita dell'utente (formato YYYY-MM-DD)
- *               luogoNascita:
- *                 type: string
- *                 description: Luogo di nascita dell'utente
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Email dell'utente
- *               username:
- *                 type: string
- *                 description: Username dell'utente
- *               password:
- *                 type: string
- *                 description: Password dell'utente
- *             required:
- *               - nome
- *               - cognome
- *               - email
- *               - username
- *               - password
- *     responses:
- *       302:
- *         description: Reindirizza al login in caso di successo o alla pagina di errore in caso di fallimento
- */
-app.post('/register', (req, res) => {
-    const { nome, cognome, dataNascita, luogoNascita, email, username, password } = req.body;
-
-    // Controlla se esiste già un utente con lo stesso email o username
-    const existingUser = db.getUserByUsername(username) || db.getUserByUsername(email);
-    if (existingUser) {
-        return res.render('error', { message: 'Email o username già in uso!' });
-    }
-
-    // Crea un nuovo utente con il ruolo predefinito "user"
-    const newUser = db.createUser({
-        nome,
-        cognome,
-        dataNascita,
-        luogoNascita,
-        ruolo: 'user',
-        email,
-        username,
-        password,
-    });
-
-    res.redirect('/login');
-});
-
-/**
- * @swagger
  * /modificaUtente/{id}:
  *   get:
  *     summary: Visualizza il form per modificare i dati di un utente
- *     tags: [Users]
+ *     tags: [Admin, Users]
  *     description: Mostra un form precompilato con i dati dell'utente da modificare
  *     security:
  *       - bearerAuth: []
@@ -969,8 +1367,10 @@ app.post('/register', (req, res) => {
  *     responses:
  *       200:
  *         description: Form di modifica con i dati dell'utente
- *       302:
- *         description: Reindirizza alla pagina di errore se l'utente non è trovato
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Utente non trovato
  */
 app.get('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
@@ -990,7 +1390,7 @@ app.get('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
  * /modificaUtente/{id}:
  *   post:
  *     summary: Aggiorna i dati di un utente
- *     tags: [Users]
+ *     tags: [Admin, Users]
  *     description: Elabora i dati del form e aggiorna le informazioni dell'utente
  *     security:
  *       - bearerAuth: []
@@ -1038,18 +1438,40 @@ app.get('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
  *               - password
  *     responses:
  *       302:
- *         description: Reindirizza alla home page in caso di successo o alla pagina di errore in caso di fallimento
+ *         description: Reindirizza alla home page in caso di successo
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Utente non trovato
  */
+// Trova questa funzione nel tuo server.js e modificala così:
 app.post('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
-    const { nome, cognome, dataNascita, ruolo, email, password } = req.body;
+    const { nome, cognome, dataNascita, luogoNascita, ruolo, email, username, password } = req.body;
 
-    const updatedUser = db.updateUser(userId, { nome, cognome, dataNascita, ruolo, email, password });
+    // Costruisci l'oggetto utente da aggiornare
+    const userData = { 
+        nome, 
+        cognome, 
+        dataNascita, 
+        luogoNascita, // Aggiungi questo campo
+        ruolo, 
+        email,
+        username // Aggiungi questo campo
+    };
+    
+    // Aggiungi la password solo se è stata fornita
+    if (password && password.trim() !== '') {
+        userData.password = password;
+    }
+
+    const updatedUser = db.updateUser(userId, userData);
 
     if (!updatedUser) {
         return res.render('error', { message: 'Impossibile modificare l\'utente!' });
     }
 
+    // Reindirizza alla home page dopo una modifica riuscita
     res.redirect('/home');
 });
 
@@ -1058,7 +1480,7 @@ app.post('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => 
  * /eliminaUtente/{id}:
  *   get:
  *     summary: Elimina un utente
- *     tags: [Users]
+ *     tags: [Admin, Users]
  *     description: Rimuove un utente dal sistema
  *     security:
  *       - bearerAuth: []
@@ -1071,7 +1493,11 @@ app.post('/modificaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => 
  *         description: ID dell'utente da eliminare
  *     responses:
  *       302:
- *         description: Reindirizza alla home page in caso di successo o alla pagina di errore in caso di fallimento
+ *         description: Reindirizza alla home page in caso di successo
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Utente non trovato
  */
 app.get('/eliminaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const userId = parseInt(req.params.id);
@@ -1084,16 +1510,14 @@ app.get('/eliminaUtente/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     res.redirect('/home');
 });
 
-hbs.registerHelper('eq', function (a, b) {
-    return a === b;
-});
+// ===== PRODUCTS ROUTES =====
 
 /**
  * @swagger
  * /prodotti:
  *   get:
  *     summary: Ottiene la lista dei prodotti (solo admin)
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Visualizza tutti i prodotti nel sistema, accessibile solo agli amministratori
  *     security:
  *       - bearerAuth: []
@@ -1106,20 +1530,42 @@ hbs.registerHelper('eq', function (a, b) {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Product'
- *       302:
- *         description: Reindirizza al login se non autenticato o non admin
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
  */
 app.get('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
-    const products = db.getAllProducts();
-    res.render('prodotti', { products });
+    try {
+        // Log per debug
+        console.log("Recupero prodotti dal database...");
+        
+        // Ottieni i prodotti dal database
+        const products = db.getAllProducts();
+        console.log(`Recuperati ${products.length} prodotti`);
+        
+        // Renderizza la pagina con i prodotti
+        res.render('prodotti', { 
+            products: products,
+            user: req.user
+        });
+    } catch (error) {
+        console.error("Errore nel caricamento dei prodotti:", error);
+        res.render('error', { message: 'Errore nel caricamento dei prodotti: ' + error.message });
+    }
 });
 
+app.get('/reset-products', ensureAuthenticated, ensureAdmin, (req, res) => {
+    db.resetProducts();
+    res.redirect('/prodotti');
+});
+hbs.registerHelper('eq', function (a, b) {
+    return a === b;
+});
 /**
  * @swagger
  * /prodotti:
  *   post:
  *     summary: Aggiunge un nuovo prodotto (solo admin)
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Crea un nuovo prodotto nel sistema
  *     security:
  *       - bearerAuth: []
@@ -1154,8 +1600,8 @@ app.get('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
  *     responses:
  *       302:
  *         description: Reindirizza alla pagina dei prodotti in caso di successo
- *       401:
- *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
  */
 app.post('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { category, size, color, brand, condition, price } = req.body;
@@ -1168,7 +1614,7 @@ app.post('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
  * /modificaProdotto/{id}:
  *   get:
  *     summary: Visualizza il form per modificare un prodotto
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Mostra un form precompilato con i dati del prodotto da modificare
  *     security:
  *       - bearerAuth: []
@@ -1182,8 +1628,10 @@ app.post('/prodotti', ensureAuthenticated, ensureAdmin, (req, res) => {
  *     responses:
  *       200:
  *         description: Form di modifica con i dati del prodotto
- *       302:
- *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Prodotto non trovato
  */
 app.get('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { id } = req.params;
@@ -1201,7 +1649,7 @@ app.get('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =>
  * /modificaProdotto/{id}:
  *   post:
  *     summary: Aggiorna i dati di un prodotto
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Elabora i dati del form e aggiorna le informazioni del prodotto
  *     security:
  *       - bearerAuth: []
@@ -1242,19 +1690,44 @@ app.get('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =>
  *               - price
  *     responses:
  *       302:
- *         description: Reindirizza alla pagina dei prodotti in caso di successo o alla pagina di errore in caso di fallimento
+ *         description: Reindirizza alla pagina dei prodotti in caso di successo
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Prodotto non trovato
  */
+// Aggiorna questa route nel tuo server.js
 app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
-    const { id } = req.params;
-    const { category, size, color, brand, condition, price } = req.body;
-
-    const updatedProduct = db.updateProduct(Number(id), { category, size, color, brand, condition, price });
-
-    if (!updatedProduct) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
+    try {
+        const productId = parseInt(req.params.id);
+        console.log("Modifica prodotto - ID:", productId);
+        console.log("Dati ricevuti:", req.body);
+        
+        const { category, size, color, brand, condition, price } = req.body;
+        
+        // Converti price a numero
+        const priceNum = parseFloat(price);
+        
+        const updatedProduct = db.updateProduct(productId, { 
+            category, 
+            size, 
+            color, 
+            brand, 
+            condition, 
+            price: priceNum 
+        });
+        
+        if (!updatedProduct) {
+            console.log("Aggiornamento prodotto fallito");
+            return res.render('error', { message: 'Prodotto non trovato!' });
+        }
+        
+        // Redirect dopo un aggiornamento riuscito
+        res.redirect('/prodotti');
+    } catch (error) {
+        console.error("Errore durante l'aggiornamento del prodotto:", error);
+        res.render('error', { message: 'Errore durante l\'aggiornamento: ' + error.message });
     }
-
-    res.redirect('/prodotti');
 });
 
 /**
@@ -1262,7 +1735,7 @@ app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =
  * /eliminaProdotto/{id}:
  *   get:
  *     summary: Visualizza la pagina di conferma per eliminare un prodotto
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Mostra una pagina di conferma prima di eliminare il prodotto
  *     security:
  *       - bearerAuth: []
@@ -1276,8 +1749,10 @@ app.post('/modificaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =
  *     responses:
  *       200:
  *         description: Pagina di conferma eliminazione
- *       302:
- *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Prodotto non trovato
  */
 app.get('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { id } = req.params;
@@ -1295,7 +1770,7 @@ app.get('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => 
  * /eliminaProdotto/{id}:
  *   post:
  *     summary: Elimina un prodotto
- *     tags: [Products]
+ *     tags: [Admin, Products]
  *     description: Rimuove definitivamente un prodotto dal sistema
  *     security:
  *       - bearerAuth: []
@@ -1308,7 +1783,11 @@ app.get('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => 
  *         description: ID del prodotto da eliminare
  *     responses:
  *       302:
- *         description: Reindirizza alla pagina dei prodotti in caso di successo o alla pagina di errore in caso di fallimento
+ *         description: Reindirizza alla pagina dei prodotti in caso di successo
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Prodotto non trovato
  */
 app.post('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) => {
     const { id } = req.params;
@@ -1321,176 +1800,7 @@ app.post('/eliminaProdotto/:id', ensureAuthenticated, ensureAdmin, (req, res) =>
     res.redirect('/prodotti');
 });
 
-/**
- * @swagger
- * /noleggio/{id}:
- *   get:
- *     summary: Visualizza il form per noleggiare un prodotto specifico
- *     tags: [Rentals]
- *     description: Mostra una pagina con i dettagli del prodotto e un form per il noleggio
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del prodotto da noleggiare
- *     responses:
- *       200:
- *         description: Form di noleggio
- *       302:
- *         description: Reindirizza alla pagina di errore se il prodotto non è trovato
- */
-app.get('/noleggio/:id', ensureAuthenticated, (req, res) => {
-    const productId = parseInt(req.params.id);
-    const product = db.getProductById(productId);
-
-    if (!product) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    res.render('noleggio', { product });
-});
-
-/**
- * @swagger
- * /noleggio/{id}:
- *   post:
- *     summary: Calcola il prezzo del noleggio per un prodotto specifico
- *     tags: [Rentals]
- *     description: Elabora i dati del form e calcola il prezzo del noleggio in base alla durata
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del prodotto da noleggiare
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               days:
- *                 type: integer
- *                 description: Durata del noleggio in giorni
- *             required:
- *               - days
- *     responses:
- *       200:
- *         description: Pagina di conferma con il prezzo calcolato
- *       302:
- *         description: Reindirizza alla pagina di errore se la validazione fallisce
- */
-app.post('/noleggio/:id', ensureAuthenticated, (req, res) => {
-    const productId = parseInt(req.params.id);
-    const { days } = req.body;
-
-    if (!days || days <= 0) {
-        return res.render('error', { message: 'Durata del noleggio non valida!' });
-    }
-
-    const price = db.calculateRentalPrice(productId, days);
-    if (price === null) {
-        return res.render('error', { message: 'Prodotto non trovato!' });
-    }
-
-    // Memorizza i dati del noleggio nell'oggetto req.rental invece che in session
-    req.rental = { productId, days, price };
-    res.render('confermaNoleggio', { productId, days, price });
-});
-
-/**
- * @swagger
- * /completa:
- *   post:
- *     summary: Completa il processo di noleggio o acquisto
- *     tags: [Rentals, Products]
- *     description: Finalizza il noleggio o l'acquisto di un prodotto
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               action:
- *                 type: string
- *                 enum: [rental, purchase]
- *                 description: Azione da completare (noleggio o acquisto)
- *               productId:
- *                 type: integer
- *                 description: ID del prodotto
- *               days:
- *                 type: integer
- *                 description: Durata del noleggio in giorni
- *               price:
- *                 type: number
- *                 description: Prezzo calcolato
- *             required:
- *               - action
- *               - productId
- *               - price
- *     responses:
- *       200:
- *         description: Pagina di successo con conferma dell'operazione
- *       302:
- *         description: Reindirizza alla pagina di errore se l'azione non è valida
- */
-app.post('/completa', ensureAuthenticated, (req, res) => {
-    const { action, productId, days, price } = req.body;
-
-    if (action === 'purchase') {
-        res.render('success', { message: 'Acquisto completato con successo!', price });
-    } else if (action === 'rental') {
-        res.render('success', { message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}` });
-    } else {
-        res.render('error', { message: 'Azione non valida!' });
-    }
-});
-
-/**
- * @swagger
- * /calcolaPrezzo:
- *   post:
- *     summary: Calcola il prezzo del noleggio
- *     tags: [Rentals]
- *     description: Calcola il prezzo del noleggio in base alla durata specificata
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               durata:
- *                 type: integer
- *                 description: Durata del noleggio in giorni
- *             required:
- *               - durata
- *     responses:
- *       200:
- *         description: Pagina di noleggio con il prezzo calcolato
- */
-app.post('/calcolaPrezzo', ensureAuthenticated, (req, res) => {
-    const durata = parseInt(req.body.durata);
-    const prezzoPerGiorno = 10; // Esempio di prezzo giornaliero
-    const totale = durata * prezzoPerGiorno;
-
-    res.render('noleggio', {
-        prezzo: totale,
-    });
-});
+// ===== RENTAL ROUTES =====
 
 /**
  * @swagger
@@ -1530,6 +1840,8 @@ app.post('/calcolaPrezzo', ensureAuthenticated, (req, res) => {
  *     responses:
  *       200:
  *         description: Lista filtrata di prodotti
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
 app.get('/noleggio', ensureAuthenticated, (req, res) => {
     let filteredProducts = db.getAllProducts();
@@ -1610,6 +1922,8 @@ app.get('/noleggio', ensureAuthenticated, (req, res) => {
  *     responses:
  *       200:
  *         description: Pagina di noleggio con il prezzo calcolato
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
 app.post('/noleggio', ensureAuthenticated, (req, res) => {
     const { id, durata } = req.body;
@@ -1617,6 +1931,134 @@ app.post('/noleggio', ensureAuthenticated, (req, res) => {
     const prezzo = product ? product.price * durata : null;
     res.render('noleggio', { prezzo, products: db.getAllProducts() });
 });
+
+/**
+ * @swagger
+ * /noleggio/{id}:
+ *   get:
+ *     summary: Visualizza il form per noleggiare un prodotto specifico
+ *     tags: [Rentals]
+ *     description: Mostra una pagina con i dettagli del prodotto e un form per il noleggio
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del prodotto da noleggiare
+ *     responses:
+ *       200:
+ *         description: Form di noleggio
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       404:
+ *         description: Prodotto non trovato
+ */
+app.get('/noleggio/:id', ensureAuthenticated, (req, res) => {
+    const productId = parseInt(req.params.id);
+    const product = db.getProductById(productId);
+
+    if (!product) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
+    }
+
+    res.render('noleggio', { product });
+});
+
+/**
+ * @swagger
+ * /noleggio/{id}:
+ *   post:
+ *     summary: Calcola il prezzo del noleggio per un prodotto specifico
+ *     tags: [Rentals]
+ *     description: Elabora i dati del form e calcola il prezzo del noleggio in base alla durata
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del prodotto da noleggiare
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               days:
+ *                 type: integer
+ *                 description: Durata del noleggio in giorni
+ *             required:
+ *               - days
+ *     responses:
+ *       200:
+ *         description: Pagina di conferma con il prezzo calcolato
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       400:
+ *         description: Durata del noleggio non valida
+ */
+app.post('/noleggio/:id', ensureAuthenticated, (req, res) => {
+    const productId = parseInt(req.params.id);
+    const { days } = req.body;
+
+    if (!days || days <= 0) {
+        return res.render('error', { message: 'Durata del noleggio non valida!' });
+    }
+
+    const price = db.calculateRentalPrice(productId, days);
+    if (price === null) {
+        return res.render('error', { message: 'Prodotto non trovato!' });
+    }
+
+    // Memorizza i dati del noleggio nell'oggetto req.rental invece che in session
+    req.rental = { productId, days, price };
+    res.render('confermaNoleggio', { productId, days, price });
+});
+
+/**
+ * @swagger
+ * /calcolaPrezzo:
+ *   post:
+ *     summary: Calcola il prezzo del noleggio
+ *     tags: [Rentals]
+ *     description: Calcola il prezzo del noleggio in base alla durata specificata
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               durata:
+ *                 type: integer
+ *                 description: Durata del noleggio in giorni
+ *             required:
+ *               - durata
+ *     responses:
+ *       200:
+ *         description: Pagina di noleggio con il prezzo calcolato
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ */
+app.post('/calcolaPrezzo', ensureAuthenticated, (req, res) => {
+    const durata = parseInt(req.body.durata);
+    const prezzoPerGiorno = 10; // Esempio di prezzo giornaliero
+    const totale = durata * prezzoPerGiorno;
+
+    res.render('noleggio', {
+        prezzo: totale,
+    });
+});
+
+// ===== CART & CHECKOUT ROUTES =====
 
 /**
  * @swagger
@@ -1642,6 +2084,8 @@ app.post('/noleggio', ensureAuthenticated, (req, res) => {
  *     responses:
  *       200:
  *         description: Pagina di conferma acquisto con dettagli del prodotto
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  *       404:
  *         description: Prodotto non trovato
  */
@@ -1687,6 +2131,8 @@ app.post('/acquista', ensureAuthenticated, (req, res) => {
  *                 success:
  *                   type: boolean
  *                   example: true
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
 app.post('/api/cart/add', ensureAuthenticated, (req, res) => {
     res.json({ success: true });
@@ -1724,6 +2170,8 @@ app.post('/api/cart/add', ensureAuthenticated, (req, res) => {
  *                 success:
  *                   type: boolean
  *                   example: true
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
 app.post('/api/cart/remove', ensureAuthenticated, (req, res) => {
     res.json({ success: true });
@@ -1741,14 +2189,11 @@ app.post('/api/cart/remove', ensureAuthenticated, (req, res) => {
  *     responses:
  *       200:
  *         description: Pagina di checkout
- *       302:
- *         description: Reindirizza al login se l'utente non è autenticato
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
 app.get('/checkout', ensureAuthenticated, (req, res) => {
-    res.render('checkout', {
-        title: 'Completa il tuo ordine',
-        user: req.user
-    });
+    res.render('checkout', { user: req.user });
 });
 
 /**
@@ -1759,7 +2204,7 @@ app.get('/checkout', ensureAuthenticated, (req, res) => {
  *     tags: [Cart]
  *     description: Finalizza l'ordine con gli articoli nel carrello
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1800,7 +2245,6 @@ app.get('/checkout', ensureAuthenticated, (req, res) => {
  *       401:
  *         description: Non autorizzato, richiede autenticazione
  */
-// API per completare l'ordine
 app.post('/api/checkout', ensureAuthenticated, (req, res) => {
     const { cartItems } = req.body;
 
@@ -1816,20 +2260,327 @@ app.post('/api/checkout', ensureAuthenticated, (req, res) => {
 
 /**
  * @swagger
+ * /success:
+ *   get:
+ *     summary: Visualizza la pagina di conferma ordine
+ *     tags: [Cart]
+ *     description: Mostra una pagina di conferma dopo un acquisto o noleggio completato con successo
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: orderId
+ *         schema:
+ *           type: string
+ *         description: Identificatore dell'ordine (opzionale)
+ *     responses:
+ *       200:
+ *         description: Pagina di conferma successo
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ */
+app.get('/success', ensureAuthenticated, (req, res) => {
+    try {
+        // Ottieni l'ID dell'ordine dai parametri di query (se presente)
+        const orderId = req.query.orderId || Date.now();
+        
+        // Ottieni eventualmente i dati del carrello (se passati come query parameter)
+        const cartData = req.query.cart || '';
+        
+        // Renderizza la vista success con i dati necessari
+        res.render('success', { 
+            orderId: orderId,
+            user: req.user,
+            cartData: cartData,
+            message: 'Operazione completata con successo!'
+        });
+    } catch (error) {
+        console.error("Errore nel renderizzare la pagina di successo:", error);
+        res.status(500).render('error', { message: 'Si è verificato un errore nella pagina di successo.' });
+    }
+});
+/**
+ * @swagger
+ * /order/:id:
+ *   get:
+ *     summary: Visualizza i dettagli di un ordine specifico
+ *     tags: [Orders]
+ *     description: Mostra una pagina dettagliata con tutte le informazioni relative a un ordine
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID dell'ordine da visualizzare
+ *     responses:
+ *       200:
+ *         description: Pagina dettagli ordine
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       404:
+ *         description: Ordine non trovato
+ */
+app.get('/order/:id', ensureAuthenticated, (req, res) => {
+    try {
+        const orderId = req.params.id;
+        
+        // Recupera i dati dell'utente
+        const user = req.user;
+        
+        // Recupera le informazioni dal database
+        const sales = getAllSales();
+        const rentals = getAllRentals();
+        
+        // Cerca l'ordine corrispondente tra vendite e noleggi
+        let orderData = sales.find(sale => sale.orderId === orderId);
+        let orderType = 'purchase';
+        
+        if (!orderData) {
+            // Se non è una vendita, cerca tra i noleggi
+            orderData = rentals.find(rental => rental.id === parseInt(orderId));
+            orderType = 'rental';
+            
+            // Se non è trovato neanche tra i noleggi
+            if (!orderData) {
+                // Se l'ordine non è presente nel database, crea un ordine fittizio con i dati dalla query string
+                // Questo è utile quando si proviene dalla pagina di successo
+                const date = new Date();
+                
+                orderData = {
+                    orderId: orderId,
+                    date: date.toISOString().split('T')[0],
+                    items: [],
+                    total: 0,
+                    subtotal: 0,
+                    shipping: 0,
+                    status: 'completed',
+                    shippingAddress: {
+                        street: 'Via Roma 123',
+                        city: 'Milano',
+                        zip: '20100',
+                        country: 'Italia'
+                    },
+                    paymentMethod: {
+                        type: 'Carta di Credito',
+                        lastFour: '1234',
+                        expiry: '12/25'
+                    }
+                };
+                
+                // Tenta di recuperare i dati dal localStorage (tramite query parameter)
+                const cartItems = req.query.items ? JSON.parse(decodeURIComponent(req.query.items)) : [];
+                
+                if (cartItems && cartItems.length > 0) {
+                    orderData.items = cartItems.map(item => {
+                        return {
+                            ...item,
+                            price: parseFloat(item.price),
+                            type: item.type || 'purchase'
+                        };
+                    });
+                    
+                    // Calcola i totali
+                    orderData.subtotal = orderData.items.reduce((total, item) => {
+                        return total + (item.type === 'rental' 
+                            ? parseFloat(item.price) * parseInt(item.duration)
+                            : parseFloat(item.price));
+                    }, 0);
+                    
+                    orderData.shipping = 0;
+                    orderData.total = orderData.subtotal + orderData.shipping;
+                }
+            }
+        }
+        
+        // Formatta i dati dell'ordine per la visualizzazione
+        const order = {
+            orderId: orderData.orderId || orderData.id,
+            date: new Date(orderData.timestamp || Date.now()).toLocaleDateString('it-IT'),
+            items: orderData.items || [
+                {
+                    id: orderData.productId,
+                    category: orderData.product?.category || 'Abbigliamento',
+                    brand: orderData.product?.brand || 'Dressimify',
+                    size: orderData.product?.size || 'M',
+                    color: orderData.product?.color || 'N/D',
+                    type: orderType,
+                    price: orderData.price,
+                    duration: orderData.days,
+                    startDate: orderData.startDate ? new Date(orderData.startDate).toLocaleDateString('it-IT') : '',
+                    endDate: orderData.endDate ? new Date(orderData.endDate).toLocaleDateString('it-IT') : ''
+                }
+            ],
+            subtotal: orderData.subtotal || orderData.price || 0,
+            shipping: orderData.shipping || 0,
+            total: orderData.total || orderData.price || 0,
+            status: orderData.status || 'completed',
+            shippingAddress: orderData.shippingAddress || {
+                street: 'Via Roma 123',
+                city: 'Milano',
+                zip: '20100',
+                country: 'Italia'
+            },
+            paymentMethod: orderData.paymentMethod || {
+                type: 'Carta di Credito',
+                lastFour: '1234',
+                expiry: '12/25'
+            }
+        };
+        
+        // Renderizza la pagina di dettaglio ordine
+        res.render('order-details', { 
+            order: order,
+            user: user
+        });
+        
+    } catch (error) {
+        console.error("Errore nella visualizzazione dei dettagli dell'ordine:", error);
+        res.status(500).render('error', { 
+            message: 'Si è verificato un errore durante il recupero dei dettagli dell\'ordine.' 
+        });
+    }
+});
+/**
+ * @swagger
+ * /completa:
+ *   post:
+ *     summary: Completa il processo di noleggio o acquisto
+ *     tags: [Rentals, Products]
+ *     description: Finalizza il noleggio o l'acquisto di un prodotto
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 enum: [rental, purchase]
+ *                 description: Azione da completare (noleggio o acquisto)
+ *               productId:
+ *                 type: integer
+ *                 description: ID del prodotto
+ *               days:
+ *                 type: integer
+ *                 description: Durata del noleggio in giorni
+ *               price:
+ *                 type: number
+ *                 description: Prezzo calcolato
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Data di inizio noleggio
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Data di fine noleggio
+ *             required:
+ *               - action
+ *               - productId
+ *               - price
+ *     responses:
+ *       200:
+ *         description: Operazione completata con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Acquisto completato con successo!
+ *                 orderId:
+ *                   type: string
+ *                   example: ORD-2023-001
+ *       400:
+ *         description: Azione non valida o dati mancanti
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       404:
+ *         description: Prodotto non trovato
+ */
+app.post('/completa', ensureAuthenticated, (req, res) => {
+    const { action, productId, days, price, startDate, endDate } = req.body;
+    const product = db.getProductById(Number(productId));
+    
+    if (!product) {
+        return res.status(404).json({ error: 'Prodotto non trovato!' });
+    }
+    
+    // Ottieni dati dell'utente attuale
+    const user = req.user;
+    
+    if (action === 'purchase') {
+        // Crea un nuovo registro di vendita
+        const sale = createSale({
+            productId: Number(productId),
+            product: product,
+            userId: user.id,
+            user: {
+                id: user.id,
+                nome: user.name || user.nome,
+                email: user.email
+            },
+            price: parseFloat(price)
+        });
+        
+        return res.json({ 
+            success: true, 
+            message: 'Acquisto completato con successo!', 
+            orderId: sale.orderId 
+        });
+    } else if (action === 'rental') {
+        // Crea un nuovo registro di noleggio
+        const rental = createRental({
+            productId: Number(productId),
+            product: product,
+            userId: user.id,
+            user: {
+                id: user.id,
+                nome: user.name || user.nome,
+                email: user.email
+            },
+            days: Number(days),
+            price: parseFloat(price),
+            startDate: startDate || new Date().toISOString(),
+            endDate: endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
+        });
+        
+        return res.json({ 
+            success: true, 
+            message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}` 
+        });
+    } else {
+        return res.status(400).json({ error: 'Azione non valida!' });
+    }
+});
+
+// ===== CHAT ROUTES =====
+
+/**
+ * @swagger
  * /chat:
  *   get:
  *     summary: Visualizza la pagina della chat
  *     tags: [Chat]
  *     description: Mostra l'interfaccia della chat per comunicare con altri utenti
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Pagina della chat
- *       302:
- *         description: Reindirizza al login se l'utente non è autenticato
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
  */
-// Rotta per la pagina della chat (accessibile solo agli utenti autenticati)
 app.get('/chat', ensureAuthenticated, (req, res) => {
     // Ottieni l'utente corrente
     const currentUser = req.user || req.session.user;
@@ -1842,59 +2593,13 @@ app.get('/chat', ensureAuthenticated, (req, res) => {
 
 /**
  * @swagger
- * /api/users:
- *   get:
- *     summary: Ottiene la lista degli utenti
- *     tags: [Users, Chat]
- *     description: Restituisce la lista di tutti gli utenti tranne quello corrente
- *     security:
- *       - sessionAuth: []
- *     responses:
- *       200:
- *         description: Lista degli utenti
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   nome:
- *                     type: string
- *                   cognome:
- *                     type: string
- *                   username:
- *                     type: string
- *       401:
- *         description: Non autorizzato, richiede autenticazione
- */
-// Rotta per ottenere la lista degli utenti (per l'API)
-app.get('/api/users', ensureAuthenticated, (req, res) => {
-    const currentUser = req.user || req.session.user;
-    const users = db.getAllUsers().filter(user => user.id !== currentUser.id);
-
-    // Invia solo le informazioni necessarie
-    const safeUsers = users.map(user => ({
-        id: user.id,
-        nome: user.nome,
-        cognome: user.cognome,
-        username: user.username
-    }));
-
-    res.json(safeUsers);
-});
-
-/**
- * @swagger
  * /api/messages/{userId}:
  *   get:
  *     summary: Ottiene i messaggi di una conversazione
  *     tags: [Chat]
  *     description: Restituisce tutti i messaggi scambiati tra l'utente corrente e un altro utente
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -1934,85 +2639,229 @@ app.get('/api/messages/:userId', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// ===== ADMIN DASHBOARD ROUTES =====
+
 /**
  * @swagger
- * /api/currentUser:
+ * /noleggi:
  *   get:
- *     summary: Ottiene l'utente corrente
- *     tags: [Users, Chat]
- *     description: Restituisce i dati dell'utente attualmente autenticato
+ *     summary: Visualizza tutti i noleggi (admin)
+ *     tags: [Admin, Rentals]
+ *     description: Mostra la lista di tutti i noleggi effettuati dagli utenti
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Dati dell'utente corrente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                 nome:
- *                   type: string
- *                 cognome:
- *                   type: string
- *                 username:
- *                   type: string
- *                 email:
- *                   type: string
+ *         description: Pagina con la lista dei noleggi
  *       401:
  *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
  */
-// Rotta per ottenere l'utente corrente
-app.get('/api/currentUser', ensureAuthenticated, (req, res) => {
-    const user = req.user || req.session.user;
-
-    // Invia informazioni sicure dell'utente
-    const safeUser = {
-        id: user.id,
-        nome: user.nome,
-        cognome: user.cognome,
-        username: user.username,
-        email: user.email
-    };
-
-    res.json(safeUser);
+app.get('/noleggi', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.render('admin/noleggi', { rentals: getAllRentals() });
 });
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     SocketMessage:
- *       type: object
- *       required:
- *         - recipientId
- *         - text
- *       properties:
- *         recipientId:
- *           type: integer
- *           description: ID dell'utente che riceve il messaggio
- *         text:
- *           type: string
- *           description: Contenuto del messaggio
- *     MessageSaved:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *         senderId:
- *           type: integer
- *         recipientId:
- *           type: integer
- *         text:
- *           type: string
- *         timestamp:
- *           type: string
- *           format: date-time
- *         read:
- *           type: boolean
+ * /vendite:
+ *   get:
+ *     summary: Visualizza tutte le vendite (admin)
+ *     tags: [Admin, Products]
+ *     description: Mostra la lista di tutte le vendite effettuate
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Pagina con la lista delle vendite
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
  */
+app.get('/vendite', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.render('admin/vendite', { sales: getAllSales() });
+});
+
+/**
+ * @swagger
+ * /api/rentals:
+ *   get:
+ *     summary: Ottiene tutti i noleggi (admin)
+ *     tags: [Admin, Rentals]
+ *     description: Restituisce la lista di tutti i noleggi in formato JSON
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista dei noleggi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Rental'
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ */
+app.get('/api/rentals', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.json(getAllRentals());
+});
+
+/**
+ * @swagger
+ * /api/sales:
+ *   get:
+ *     summary: Ottiene tutte le vendite (admin)
+ *     tags: [Admin, Products]
+ *     description: Restituisce la lista di tutte le vendite in formato JSON
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista delle vendite
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Sale'
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ */
+app.get('/api/sales', ensureAuthenticated, ensureAdmin, (req, res) => {
+    res.json(getAllSales());
+});
+
+/**
+ * @swagger
+ * /api/rentals/{id}/status:
+ *   post:
+ *     summary: Aggiorna lo stato di un noleggio (admin)
+ *     tags: [Admin, Rentals]
+ *     description: Permette all'amministratore di cambiare lo stato di un noleggio
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del noleggio da aggiornare
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, approved, rejected]
+ *                 description: Nuovo stato del noleggio
+ *             required:
+ *               - status
+ *     responses:
+ *       200:
+ *         description: Noleggio aggiornato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Rental'
+ *       400:
+ *         description: Stato non valido
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Noleggio non trovato
+ */
+app.post('/api/rentals/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: 'Status non valido' });
+    }
+    
+    const updatedRental = updateRentalStatus(id, status);
+    
+    if (!updatedRental) {
+        return res.status(404).json({ error: 'Aluguel não encontrado' });
+    }
+    
+    res.json(updatedRental);
+});
+
+/**
+ * @swagger
+ * /api/sales/{id}/status:
+ *   post:
+ *     summary: Aggiorna lo stato di una vendita (admin)
+ *     tags: [Admin, Products]
+ *     description: Permette all'amministratore di cambiare lo stato di una vendita
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID della vendita da aggiornare
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [processing, completed, refunded]
+ *                 description: Nuovo stato della vendita
+ *             required:
+ *               - status
+ *     responses:
+ *       200:
+ *         description: Vendita aggiornata con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Sale'
+ *       400:
+ *         description: Stato non valido
+ *       401:
+ *         description: Non autorizzato, richiede autenticazione
+ *       403:
+ *         description: Accesso non autorizzato, solo per amministratori
+ *       404:
+ *         description: Vendita non trovata
+ */
+app.post('/api/sales/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    if (!status || !['processing', 'completed', 'refunded'].includes(status)) {
+        return res.status(400).json({ error: 'Status non valido' });
+    }
+    
+    const updatedSale = updateSaleStatus(id, status);
+    
+    if (!updatedSale) {
+        return res.status(404).json({ error: 'Venda não encontrada' });
+    }
+    
+    res.json(updatedSale);
+});
+
+// ===== SOCKET.IO CONFIGURATION =====
 
 // Socket.IO gestione
 io.use((socket, next) => {
@@ -2097,244 +2946,8 @@ io.on('connection', (socket) => {
     });
 });
 
-app.get('/noleggi', (req, res) => {
-    res.render('admin/noleggi'); // Esto busca views/admin/noleggi.hbs
-});
+// ===== SERVER STARTUP =====
 
-app.get('/vendite', (req, res) => {
-    res.render('admin/vendite'); // Esto busca views/admin/vendite.hbs
-});
-
-// Arrays para armazenar aluguéis e vendas
-const rentals = [];
-const sales = [];
-
-// Criar aluguel e incrementar ID
-function createRental(data) {
-  const newRental = {
-    id: rentals.length + 1,
-    ...data,
-    timestamp: new Date().toISOString(),
-    status: 'pending' // pending, approved, rejected
-  };
-  rentals.push(newRental);
-  return newRental;
-}
-
-// Criar venda e incrementar ID
-function createSale(data) {
-  const newSale = {
-    id: sales.length + 1,
-    orderId: `ORD-${new Date().getFullYear()}-${String(sales.length + 1).padStart(3, '0')}`,
-    ...data,
-    timestamp: new Date().toISOString(),
-    status: 'processing' // processing, completed, refunded
-  };
-  sales.push(newSale);
-  return newSale;
-}
-
-// Obter todos os aluguéis
-function getAllRentals() {
-  return rentals;
-}
-
-// Obter todas as vendas
-function getAllSales() {
-  return sales;
-}
-
-// Atualizar status do aluguel
-function updateRentalStatus(id, status) {
-  const rental = rentals.find(r => r.id === id);
-  if (rental) {
-    rental.status = status;
-    return rental;
-  }
-  return null;
-}
-
-// Atualizar status da venda
-function updateSaleStatus(id, status) {
-  const sale = sales.find(s => s.id === id);
-  if (sale) {
-    sale.status = status;
-    return sale;
-  }
-  return null;
-}
-
-// Adicione suporte para JSON no endpoint completa
-app.use(express.json());
-
-// Modifique o endpoint /completa para processar requisições JSON
-app.post('/completa', ensureAuthenticated, (req, res) => {
-    const { action, productId, days, price, startDate, endDate } = req.body;
-    const product = db.getProductById(Number(productId));
-    
-    if (!product) {
-        return res.status(404).json({ error: 'Produto não encontrado!' });
-    }
-    
-    // Obter dados do usuário atual
-    const user = req.user;
-    
-    if (action === 'purchase') {
-        // Criar um novo registro de venda
-        const sale = createSale({
-            productId: Number(productId),
-            product: product,
-            userId: user.id,
-            user: {
-                id: user.id,
-                nome: user.name || user.nome,
-                email: user.email
-            },
-            price: parseFloat(price)
-        });
-        
-        return res.json({ 
-            success: true, 
-            message: 'Acquisto completato con successo!', 
-            orderId: sale.orderId 
-        });
-    } else if (action === 'rental') {
-        // Criar um novo registro de aluguel
-        const rental = createRental({
-            productId: Number(productId),
-            product: product,
-            userId: user.id,
-            user: {
-                id: user.id,
-                nome: user.name || user.nome,
-                email: user.email
-            },
-            days: Number(days),
-            price: parseFloat(price),
-            startDate: startDate || new Date().toISOString(),
-            endDate: endDate || new Date(Date.now() + Number(days) * 24 * 60 * 60 * 1000).toISOString()
-        });
-        
-        return res.json({ 
-            success: true, 
-            message: `Noleggio completato per ${days} giorni! Prezzo totale: €${price}` 
-        });
-    } else {
-        return res.status(400).json({ error: 'Ação não válida!' });
-    }
-});
-
-// Rotas para sucesso e checkout
-app.get('/success', ensureAuthenticated, (req, res) => {
-    res.render('success');
-});
-
-app.get('/checkout', ensureAuthenticated, (req, res) => {
-    res.render('checkout', { user: req.user });
-});
-
-// Rotas admin para obter dados
-app.get('/api/rentals', ensureAuthenticated, ensureAdmin, (req, res) => {
-    res.json(getAllRentals());
-});
-
-app.get('/api/sales', ensureAuthenticated, ensureAdmin, (req, res) => {
-    res.json(getAllSales());
-});
-
-// Atualizar noleggi e vendite para usar dados reais
-app.get('/noleggi', ensureAuthenticated, ensureAdmin, (req, res) => {
-    res.render('admin/noleggi', { rentals: getAllRentals() });
-});
-
-app.get('/vendite', ensureAuthenticated, ensureAdmin, (req, res) => {
-    res.render('admin/vendite', { sales: getAllSales() });
-});
-
-// Endpoint para atualizar status do aluguel
-app.post('/api/rentals/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const { status } = req.body;
-    
-    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Status não válido' });
-    }
-    
-    const updatedRental = updateRentalStatus(id, status);
-    
-    if (!updatedRental) {
-        return res.status(404).json({ error: 'Aluguel não encontrado' });
-    }
-    
-    res.json(updatedRental);
-});
-
-// Endpoint para atualizar status da venda
-app.post('/api/sales/:id/status', ensureAuthenticated, ensureAdmin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const { status } = req.body;
-    
-    if (!status || !['processing', 'completed', 'refunded'].includes(status)) {
-        return res.status(400).json({ error: 'Status não válido' });
-    }
-    
-    const updatedSale = updateSaleStatus(id, status);
-    
-    if (!updatedSale) {
-        return res.status(404).json({ error: 'Venda não encontrada' });
-    }
-    
-    res.json(updatedSale);
-});
-
-// Adicione estes helpers para formatação
-hbs.registerHelper('eq', function (a, b) {
-    return a === b;
-});
-
-hbs.registerHelper('firstLetter', function (str) {
-    return str ? str.charAt(0).toUpperCase() : '';
-});
-
-hbs.registerHelper('formatDate', function (dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-});
-
-hbs.registerHelper('formatPrice', function (price) {
-    return parseFloat(price).toFixed(2);
-});
-// Registra gli helper personalizzati per Handlebars
-module.exports = function(hbs) {
-    hbs.registerHelper('eq', function(a, b) {
-      return a === b;
-    });
-  
-    hbs.registerHelper('lt', function(a, b) {
-      return parseFloat(a) < parseFloat(b);
-    });
-  
-    hbs.registerHelper('gt', function(a, b) {
-      return parseFloat(a) > parseFloat(b);
-    });
-  
-    hbs.registerHelper('multiply', function(a, b) {
-      return (parseFloat(a) * parseFloat(b)).toFixed(2);
-    });
-  
-    hbs.registerHelper('getProductImage', function(category, color, brand) {
-      // Genera un ID univoco per rendere diverse le immagini
-      const uniqueId = category.charCodeAt(0) + (color ? color.charCodeAt(0) : 0) + (brand ? brand.length : 0);
-      
-      // URL di alta qualità per le immagini di abbigliamento
-      return `https://source.unsplash.com/500x600/?${encodeURIComponent(category.toLowerCase())},${color ? encodeURIComponent(color.toLowerCase()) : 'clothing'},fashion&sig=${uniqueId}`;
-    });
-  };
 // Start server
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 
