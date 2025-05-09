@@ -581,43 +581,104 @@ passport.deserializeUser((id, done) => {
 });
 
 // Google Authentication Strategy
+// Modifica la strategia di autenticazione Google per gestire meglio gli errori
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('Profilo Google ricevuto:', profile.displayName);
+        
         // Verifica se l'utente esiste già nel DB utilizzando l'email
         let user = null;
         if (profile.emails && profile.emails.length > 0) {
-            user = findUserByEmail(profile.emails[0].value);
+            const email = profile.emails[0].value;
+            console.log('Ricerca utente con email:', email);
+            user = findUserByEmail(email);
         }
 
         // Se l'utente non esiste, lo creiamo
         if (!user) {
+            console.log('Creazione nuovo utente con profilo Google');
+            const firstName = profile.name?.givenName || profile.displayName.split(' ')[0] || 'Utente';
+            const lastName = profile.name?.familyName || (profile.displayName.split(' ').length > 1 ? profile.displayName.split(' ')[1] : 'Google');
+            
             user = db.createUser({
-                nome: profile.displayName || profile.name?.givenName || 'Google User',
-                cognome: profile.name?.familyName || '',
+                nome: firstName,
+                cognome: lastName,
                 email: profile.emails ? profile.emails[0].value : `google_${profile.id}@example.com`,
-                ruolo: 'user', // Ruolo predefinito
+                ruolo: 'user',
                 googleId: profile.id,
-                // Aggiungi altri campi necessari con valori predefiniti
                 dataNascita: new Date().toISOString().split('T')[0],
                 luogoNascita: 'Non specificato',
                 username: profile.emails ? profile.emails[0].value : `google_${profile.id}`,
                 password: 'google-auth-' + Math.random().toString(36).substring(2)
             });
+            console.log('Nuovo utente creato con ID:', user.id);
         } else {
+            console.log('Utente trovato:', user.id, user.nome);
             // Aggiorniamo il googleId se l'utente esiste
-            db.updateUser(user.id, { ...user, googleId: profile.id });
+            if (user.googleId !== profile.id) {
+                console.log('Aggiornamento googleId per utente esistente');
+                db.updateUser(user.id, { ...user, googleId: profile.id });
+            }
         }
 
         return done(null, user);
     } catch (error) {
+        console.error('Errore durante autenticazione Google:', error);
         return done(error, null);
     }
 }));
 
+// Aggiungi questa route di debug per verificare l'autenticazione
+app.get('/auth-debug', (req, res) => {
+    const token = req.cookies.token;
+    const userLocalStorage = `
+        <script>
+            document.write('<p>LocalStorage user: ' + (localStorage.getItem('user') ? JSON.stringify(JSON.parse(localStorage.getItem('user'))) : 'non presente') + '</p>');
+        </script>
+    `;
+    
+    if (!token) {
+        res.send(`
+            <h1>Diagnostica Autenticazione</h1>
+            <p style="color: red;">Nessun token JWT presente nei cookies</p>
+            ${userLocalStorage}
+            <p><a href="/login">Vai alla pagina di login</a></p>
+        `);
+        return;
+    }
+    
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const tokenServerTime = decoded.serverStartTime || 'non presente';
+        const currentServerTime = SERVER_START_TIME || 'non presente';
+        const tokenIsValid = tokenServerTime === currentServerTime;
+        
+        res.send(`
+            <h1>Diagnostica Autenticazione</h1>
+            <p style="color: ${tokenIsValid ? 'green' : 'red'};">
+                Token JWT: PRESENTE E ${tokenIsValid ? 'VALIDO' : 'NON VALIDO'}
+            </p>
+            <p>Token server time: ${tokenServerTime}</p>
+            <p>Current server time: ${currentServerTime}</p>
+            <p>Dati utente dal token:</p>
+            <pre>${JSON.stringify(decoded, null, 2)}</pre>
+            ${userLocalStorage}
+            <p><a href="/home">Vai alla home</a></p>
+        `);
+    } catch (error) {
+        res.send(`
+            <h1>Diagnostica Autenticazione</h1>
+            <p style="color: red;">Token JWT presente ma non valido</p>
+            <p>Errore: ${error.message}</p>
+            ${userLocalStorage}
+            <p><a href="/login">Vai alla pagina di login</a></p>
+        `);
+    }
+});
 // Facebook Authentication Strategy
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
@@ -1189,18 +1250,20 @@ app.get('/auth/google', passport.authenticate('google', {
  *       302:
  *         description: Reindirizza alla home page in caso di successo o alla pagina di login in caso di fallimento
  */
+// 1. Modifica il callback di Google OAuth aggiungendo SERVER_START_TIME
 app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/login'
     }),
     (req, res) => {
-        // Una volta autenticato con Google, genera un JWT
+        // Una volta autenticato con Google, genera un JWT che include SERVER_START_TIME
         if (req.user) {
             const token = jwt.sign({
                 id: req.user.id,
                 name: req.user.nome,
                 email: req.user.email,
-                ruolo: req.user.ruolo
+                ruolo: req.user.ruolo,
+                serverStartTime: SERVER_START_TIME  // Aggiungi questa riga!
             }, SECRET_KEY, {
                 expiresIn: '24h' // Token valido per 24 ore
             });
@@ -1211,12 +1274,99 @@ app.get('/auth/google/callback',
                 maxAge: 24 * 60 * 60 * 1000 // 24 ore
             });
 
-            res.redirect('/home');
+            // Reindirizza a una pagina intermediaria che salverà i dati utente in localStorage
+            const userData = {
+                id: req.user.id,
+                nome: req.user.nome || '',
+                cognome: req.user.cognome || '',
+                email: req.user.email || '',
+                ruolo: req.user.ruolo || 'user'
+            };
+
+            res.redirect(`/auth-success?user=${encodeURIComponent(JSON.stringify(userData))}`);
         } else {
             res.redirect('/login');
         }
     }
 );
+
+// 2. Aggiungi la nuova rotta per la pagina di successo dell'autenticazione
+app.get('/auth-success', (req, res) => {
+    // Questa pagina HTML prenderà i dati dall'URL e li salverà in localStorage
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Autenticazione completata</title>
+            <style>
+                body {
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #f6f9fc, #eef2f7);
+                    color: #1e293b;
+                }
+                .loader {
+                    border: 5px solid rgba(99, 102, 241, 0.1);
+                    border-top: 5px solid #6366f1;
+                    border-radius: 50%;
+                    width: 50px;
+                    height: 50px;
+                    animation: spin 1s linear infinite;
+                    margin-bottom: 20px;
+                }
+                .container {
+                    text-align: center;
+                    padding: 30px 40px;
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+                }
+                h2 {
+                    margin-bottom: 10px;
+                    color: #0f172a;
+                }
+                p {
+                    margin-bottom: 20px;
+                    color: #64748b;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="loader"></div>
+                <h2>Autenticazione riuscita!</h2>
+                <p>Ti stiamo reindirizzando...</p>
+            </div>
+
+            <script>
+                // Estrae i parametri dall'URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const userData = urlParams.get('user');
+                
+                if (userData) {
+                    // Salva i dati dell'utente nel localStorage
+                    localStorage.setItem('user', userData);
+                    console.log('Dati utente salvati:', userData);
+                }
+                
+                // Reindirizza alla home dopo un breve ritardo
+                setTimeout(() => {
+                    window.location.href = '/home';
+                }, 1500);
+            </script>
+        </body>
+        </html>
+    `);
+});
 
 /**
  * @swagger
