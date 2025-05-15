@@ -3442,6 +3442,241 @@ io.on('connection', (socket) => {
     });
 });
 
+/**
+ * @swagger
+ * /api/jwt-status:
+ *   get:
+ *     summary: Verifica se JWT funziona correttamente
+ *     tags: [Auth]
+ *     description: Endpoint per verificare se l'autenticazione JWT funziona
+ *     responses:
+ *       200:
+ *         description: Informazioni sullo stato del JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                   description: Può essere "success" o "error"
+ *                 message:
+ *                   type: string
+ *                   example: "JWT funziona correttamente!"
+ *                 isAuthenticated:
+ *                   type: boolean
+ *                   example: true
+ *                 userData:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "Mario"
+ *                     email:
+ *                       type: string
+ *                       example: "mario@example.com"
+ *                     ruolo:
+ *                       type: string
+ *                       example: "user"
+ */
+app.get('/api/jwt-status', (req, res) => {
+    // Ottieni il token da cookie o header Authorization
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.json({
+            status: "error",
+            message: "JWT non funziona: nessun token trovato",
+            isAuthenticated: false,
+            userData: null
+        });
+    }
+
+    try {
+        // Verifica il token
+        const decoded = jwt.verify(token, SECRET_KEY);
+        
+        // Verifica se il token è stato generato con lo stesso SERVER_START_TIME
+        if (decoded.serverStartTime !== SERVER_START_TIME) {
+            return res.json({
+                status: "error",
+                message: "JWT non funziona: token generato da una sessione diversa del server",
+                isAuthenticated: false,
+                userData: null
+            });
+        }
+        
+        // Token valido!
+        return res.json({
+            status: "success",
+            message: "JWT funziona correttamente!",
+            isAuthenticated: true,
+            userData: {
+                id: decoded.id,
+                name: decoded.name,
+                email: decoded.email,
+                ruolo: decoded.ruolo
+            }
+        });
+    } catch (error) {
+        // Token non valido
+        return res.json({
+            status: "error",
+            message: `JWT non funziona: ${error.message}`,
+            isAuthenticated: false,
+            userData: null
+        });
+    }
+});
+
+/**
+ * @swagger
+ * /test-jwt:
+ *   get:
+ *     summary: Pagina di test per JWT
+ *     tags: [Auth]
+ *     description: Mostra una pagina per testare il funzionamento del JWT
+ *     responses:
+ *       200:
+ *         description: Pagina HTML per testare JWT
+ */
+app.get('/test-jwt', (req, res) => {
+    // Invia direttamente il contenuto HTML invece di servire un file
+    res.send(`
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test JWT</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f6f9fc, #eef2f7);
+            color: #1e293b;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+        }
+        h1 {
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+        .status-card {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        .status-success {
+            background-color: #ecfdf5;
+            border-left: 5px solid #10b981;
+            color: #064e3b;
+        }
+        .status-error {
+            background-color: #fef2f2;
+            border-left: 5px solid #ef4444;
+            color: #7f1d1d;
+        }
+        .jwt-data {
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .button {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #4f46e5;
+        }
+        .logout-button {
+            background-color: #ef4444;
+        }
+        .logout-button:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Funzionamento JWT</h1>
+        
+        <div id="loading">Verifica JWT in corso...</div>
+        
+        <div id="jwtStatus" class="status-card" style="display: none;"></div>
+        
+        <div id="jwtData" class="jwt-data" style="display: none;"></div>
+        
+        <div id="actions" style="margin-top: 20px;">
+            <a href="/login" class="button">Vai al Login</a>
+            <a href="/register" class="button">Registrati</a>
+            <a href="/logout" class="button logout-button">Logout</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica lo stato JWT
+            checkJwtStatus();
+        });
+
+        function checkJwtStatus() {
+            fetch('/api/jwt-status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    const statusElement = document.getElementById('jwtStatus');
+                    statusElement.style.display = 'block';
+                    
+                    if (data.status === 'success') {
+                        statusElement.classList.add('status-success');
+                        statusElement.innerHTML = \`<h2>✅ \${data.message}</h2><p>L'utente è autenticato correttamente.</p>\`;
+                    } else {
+                        statusElement.classList.add('status-error');
+                        statusElement.innerHTML = \`<h2>❌ \${data.message}</h2><p>L'utente non è autenticato.</p>\`;
+                    }
+                    
+                    // Mostra i dati dell'utente se autenticato
+                    if (data.isAuthenticated && data.userData) {
+                        const jwtDataElement = document.getElementById('jwtData');
+                        jwtDataElement.style.display = 'block';
+                        jwtDataElement.innerHTML = \`<h3>Dati dell'utente dal JWT:</h3>\${JSON.stringify(data.userData, null, 2)}\`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('jwtStatus').style.display = 'block';
+                    document.getElementById('jwtStatus').classList.add('status-error');
+                    document.getElementById('jwtStatus').innerHTML = \`<h2>❌ Errore nella verifica JWT</h2><p>\${error.message}</p>\`;
+                });
+        }
+    </script>
+</body>
+</html>
+    `);
+});
 // ===== SERVER STARTUP =====
 
 // Start server
