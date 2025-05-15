@@ -3683,4 +3683,5 @@ app.get('/test-jwt', (req, res) => {
 const port = 3000;
 server.listen(port, () => console.log(`Server started on port ${port}. 
 Vai su http://localhost:${port}.
-Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.`)); 
+Vai su http://localhost:${port}/api-docs per vedere la documentazione Swagger.
+Vai su http://localhost:${port}/test-jwt per verificare il funzionamento del JWT.`)); 
